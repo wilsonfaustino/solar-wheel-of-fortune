@@ -29,10 +29,7 @@ function CenterButtonComponent({
       {isSpinning && (
         <>
           <div className="absolute inset-0 rounded-full border border-white/30 animate-ping-custom" />
-          <div
-            className="absolute inset-0 rounded-full border border-white/20 animate-ping-custom"
-            style={{ animationDelay: "0.5s" }}
-          />
+          <div className="absolute inset-0 rounded-full border border-white/20 animate-ping-custom delay-500" />
         </>
       )}
     </button>
