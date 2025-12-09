@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Radial Name Randomizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @keyframes pulse-glow {
+        0%,
+        100% {
+          opacity: 0.8;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.05);
+        }
+      }
+      .pulse-glow {
+        animation: pulse-glow 1s ease-in-out infinite;
+      }
+      @keyframes ping {
+        75%,
+        100% {
+          transform: scale(2);
+          opacity: 0;
+        }
+      }
+      .animate-ping {
+        animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+      }
+      body {
+        font-family: "Courier New", monospace;
+      }
+    </style>
+  </head>
+  <body class="bg-black">
+    <div class="flex items-center justify-center min-h-screen p-8">
+      <div
+        class="relative w-full max-w-4xl aspect-square flex items-center justify-center"
+      >
+        <!-- Central circle and names container -->
+        <div
+          id="wheel"
+          class="absolute inset-0 flex items-center justify-center transition-transform duration-[3000ms] ease-out"
+        >
+          <svg class="absolute" style="width: 500px; height: 500px">
+            <circle
+              cx="250"
+              cy="250"
+              r="100"
+              fill="none"
+              stroke="rgba(255, 255, 255, 0.15)"
+              stroke-width="0.5"
+            />
+            <!-- Names will be inserted here by JavaScript -->
+            <g id="names-container"></g>
+          </svg>
+        </div>
+
+        <!-- Center button -->
+        <button id="randomize-btn" class="relative z-10 group">
+          <div
+            class="relative flex items-center justify-center w-24 h-24 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm transition-all duration-300 hover:border-white/40 hover:bg-white/5"
+          >
+            <svg
+              class="w-8 h-8 text-white/80 transition-transform duration-300 group-hover:scale-150"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+              />
+            </svg>
+          </div>
+
+          <!-- Pulse rings -->
+          <div
+            id="pulse-ring-1"
+            class="absolute inset-0 rounded-full border border-white/30 hidden"
+          ></div>
+          <div
+            id="pulse-ring-2"
+            class="absolute inset-0 rounded-full border border-white/20 hidden"
+            style="animation-delay: 0.5s"
+          ></div>
+        </button>
+
+        <!-- Selected name display -->
+        <div
+          id="selected-display"
+          class="absolute bottom-8 left-1/2 -translate-x-1/2 hidden"
+        >
+          <div
+            class="px-6 py-3 border border-cyan-400/30 bg-black/60 backdrop-blur-sm rounded"
+          >
+            <div class="text-xs text-white/50 tracking-wider mb-1">
+              SELECTED
+            </div>
+            <div
+              id="selected-name"
+              class="text-2xl text-cyan-400 tracking-wider font-light"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Instruction text -->
+        <div
+          class="absolute top-8 left-1/2 -translate-x-1/2 text-white/40 text-xs tracking-wider"
+        >
+          CLICK CENTER TO RANDOMIZE
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const names = [
+        "ALEX",
+        "JORDAN",
+        "CASEY",
+        "MORGAN",
+        "RILEY",
+        "AVERY",
+        "TAYLOR",
+        "SKYLAR",
+        "QUINN",
+        "SAGE",
+        "ROWAN",
+        "DAKOTA",
+        "FINLEY",
+        "REESE",
+        "CHARLIE",
+        "PARKER",
+        "BLAKE",
+        "CAMERON",
+        "HARPER",
+        "AUSTIN",
+        "PHOENIX",
+        "SPENCER",
+        "MADISON",
+        "ASHLEY",
+        "BRANDON",
+        "TYLER",
+        "RYAN",
+        "CHRIS",
+        "LOGAN",
+        "MILES",
+      ];
+
+      const radius = 100;
+      const angleStep = (2 * Math.PI) / names.length;
+      let selectedIndex = null;
+      let isSpinning = false;
+
+      const wheel = document.getElementById("wheel");
+      const namesContainer = document.getElementById("names-container");
+      const randomizeBtn = document.getElementById("randomize-btn");
+      const selectedDisplay = document.getElementById("selected-display");
+      const selectedName = document.getElementById("selected-name");
+      const pulseRing1 = document.getElementById("pulse-ring-1");
+      const pulseRing2 = document.getElementById("pulse-ring-2");
+
+      // Create name elements
+      names.forEach((name, index) => {
+        const angle = index * angleStep - Math.PI / 2;
+        const x = 250 + Math.cos(angle) * 100;
+        const y = 250 + Math.sin(angle) * 100;
+        const textAngle = index * (360 / names.length) - 90;
+
+        const group = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "g"
+        );
+        group.setAttribute(
+          "transform",
+          `translate(${x}, ${y}) rotate(${textAngle})`
+        );
+        group.dataset.index = index;
+
+        const line = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "line"
+        );
+        line.setAttribute("x1", "0");
+        line.setAttribute("y1", "0");
+        line.setAttribute("x2", "120");
+        line.setAttribute("y2", "0");
+        line.setAttribute("class", "radial-line");
+        line.setAttribute("stroke", "white");
+        line.setAttribute("stroke-width", "0.5");
+        line.setAttribute("opacity", "0.12");
+        line.style.transition = "opacity 0.3s ease";
+
+        const text = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "text"
+        );
+        text.setAttribute("x", "0");
+        text.setAttribute("y", "-5");
+        text.setAttribute("font-size", "13");
+        text.setAttribute("font-weight", "300");
+        text.setAttribute("fill", "white");
+        text.setAttribute("opacity", "0.85");
+        text.setAttribute("letter-spacing", "2");
+        text.setAttribute("class", "name-label");
+        text.style.transition = "all 0.3s ease";
+        text.textContent = name;
+
+        group.appendChild(line);
+        group.appendChild(text);
+        namesContainer.appendChild(group);
+      });
+
+      function randomize() {
+        if (isSpinning) return;
+
+        isSpinning = true;
+        selectedIndex = null;
+        selectedDisplay.classList.add("hidden");
+
+        // Reset all names
+        document.querySelectorAll(".radial-line").forEach((line) => {
+          line.style.opacity = "0.12";
+        });
+        document.querySelectorAll(".name-label").forEach((label) => {
+          label.style.color = "white";
+          label.style.opacity = "0.85";
+          label.style.textShadow = "none";
+          label.style.fontSize = "13px";
+          label.style.fontWeight = "300";
+        });
+
+        // Show pulse rings
+        pulseRing1.classList.remove("hidden");
+        pulseRing1.classList.add("animate-ping");
+        pulseRing2.classList.remove("hidden");
+        pulseRing2.classList.add("animate-ping");
+
+        const spins = 3 + Math.random() * 2;
+        const finalIndex = Math.floor(Math.random() * names.length);
+        const targetRotation = spins * 360 + finalIndex * (360 / names.length);
+
+        wheel.style.transform = `rotate(${-targetRotation}deg)`;
+
+        setTimeout(() => {
+          selectedIndex = finalIndex;
+          isSpinning = false;
+
+          // Hide pulse rings
+          pulseRing1.classList.add("hidden");
+          pulseRing1.classList.remove("animate-ping");
+          pulseRing2.classList.add("hidden");
+          pulseRing2.classList.remove("animate-ping");
+
+          // Highlight selected
+          const selectedDiv = document.querySelector(
+            `[data-index="${finalIndex}"]`
+          );
+          const line = selectedDiv.querySelector(".radial-line");
+          const label = selectedDiv.querySelector(".name-label");
+
+          line.style.opacity = "0.6";
+          label.setAttribute("fill", "#00ffff");
+          label.style.opacity = "1";
+          label.style.fontSize = "24px";
+          label.style.fontWeight = "600";
+
+          // Show selected display
+          selectedName.textContent = names[finalIndex];
+          selectedDisplay.classList.remove("hidden");
+        }, 3000);
+      }
+
+      randomizeBtn.addEventListener("click", randomize);
+    </script>
+  </body>
+</html>

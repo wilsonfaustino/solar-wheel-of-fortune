@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  --font-mono: "Courier New", monospace;
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes ping {
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 1s ease-in-out infinite;
+}
+
+.animate-ping-custom {
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}

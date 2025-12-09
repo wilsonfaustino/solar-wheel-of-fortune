@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun create:*)",
+      "Bash(bun install:*)",
+      "Bash(bun add:*)",
+      "Bash(bun run tsc:*)",
+      "mcp__ide__getDiagnostics"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
