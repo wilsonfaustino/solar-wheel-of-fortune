@@ -27,8 +27,8 @@ A visually distinctive name selection tool with an engaging radial interface. Pe
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/radial-randomizer.git
-cd radial-randomizer
+git clone https://github.com/wilsonfaustino/solar-wheel-of-fortune.git
+cd solar-wheel-of-fortune
 
 # Install dependencies
 bun install
