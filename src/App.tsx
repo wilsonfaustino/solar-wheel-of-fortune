@@ -1,11 +1,14 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import { useShallow } from "zustand/shallow";
-import { RadialWheel } from "./components/wheel";
+import { RadialWheel, type RadialWheelRef } from "./components/wheel";
 import { NameManagementSidebar } from "./components/sidebar";
 import { useNameStore } from "./stores/useNameStore";
+import { useKeyboardShortcuts } from "./hooks";
 import type { Name } from "./types/name";
 
 function App() {
+  const wheelRef = useRef<RadialWheelRef>(null);
+
   const { lists, activeListId } = useNameStore(
     useShallow((state) => ({ lists: state.lists, activeListId: state.activeListId }))
   );
@@ -26,6 +29,10 @@ function App() {
     [markSelected]
   );
 
+  useKeyboardShortcuts({
+    onSpinTrigger: () => wheelRef.current?.spin(),
+  });
+
   return (
     <div className="bg-black min-h-screen flex">
       {/* Sidebar */}
@@ -34,7 +41,7 @@ function App() {
       {/* Main Wheel Area */}
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="relative w-full max-w-4xl aspect-square flex items-center justify-center">
-          <RadialWheel names={names} onSelect={handleSelect} />
+          <RadialWheel ref={wheelRef} names={names} onSelect={handleSelect} />
 
           {selectedName && (
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2">

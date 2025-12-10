@@ -113,19 +113,35 @@ function AddNameFormComponent({
         <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50
                         flex items-center justify-center p-4"
+          onClick={() => {
+            setShowBulkImport(false);
+            setBulkText("");
+            setError("");
+          }}
         >
-          <div className="bg-black border border-cyan-400/30 p-6 max-w-lg w-full">
+          <div
+            className="bg-black border border-cyan-400/30 p-6 max-w-lg w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3 className="text-cyan-400 font-mono text-lg mb-4 tracking-wider">
               BULK IMPORT
             </h3>
             <textarea
               value={bulkText}
               onChange={(e) => setBulkText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  setShowBulkImport(false);
+                  setBulkText("");
+                  setError("");
+                }
+              }}
               placeholder="Paste names (one per line)"
               className="w-full h-64 px-3 py-2 bg-black/50 border border-cyan-400/30
                          text-white font-mono text-sm
                          focus:outline-none focus:ring-2 focus:ring-cyan-400
                          placeholder:text-white/30 resize-none"
+              autoFocus
             />
             <div className="flex gap-2 mt-4">
               <button
