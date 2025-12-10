@@ -1,5 +1,9 @@
 # Product Requirements Document: Radial Name Randomizer
 
+> **Last Updated**: Session 2 (Name Management Sidebar Complete)
+> **Current Implementation Status**: MVP 70% Complete - Core wheel & name management done
+> **Next Focus**: Keyboard shortcuts, testing (Vitest), selection history, export
+
 ## 1. Product Overview
 
 ### 1.1 Vision
