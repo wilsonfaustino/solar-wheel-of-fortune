@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { useShallow } from "zustand/shallow";
 import { RadialWheel } from "./components/wheel";
+import { NameManagementSidebar } from "./components/sidebar";
 import { useNameStore } from "./stores/useNameStore";
 import type { Name } from "./types/name";
 
@@ -26,8 +27,12 @@ function App() {
   );
 
   return (
-    <div className="bg-black min-h-screen">
-      <div className="flex items-center justify-center min-h-screen p-8">
+    <div className="bg-black min-h-screen flex">
+      {/* Sidebar */}
+      <NameManagementSidebar />
+
+      {/* Main Wheel Area */}
+      <div className="flex-1 flex items-center justify-center p-8">
         <div className="relative w-full max-w-4xl aspect-square flex items-center justify-center">
           <RadialWheel names={names} onSelect={handleSelect} />
 
