@@ -11,6 +11,8 @@ A visually distinctive name selection tool with an engaging radial interface. Pe
 - **Bulk import** - Add multiple names at once via paste
 - **Persistent state** - Names and lists saved to localStorage
 - Selection tracking (count and timestamp per name)
+- **Keyboard shortcuts** - Space to spin, Escape to close modals
+- **Unit tests** - 30+ comprehensive tests with Vitest
 - Responsive layout (sidebar + wheel)
 
 ## Tech Stack
@@ -52,8 +54,9 @@ The app will be available at `http://localhost:5173`
 | `bun build` | Build for production |
 | `bun preview` | Preview production build |
 | `bun run tsc` | Type check |
-| `bun lint` | Run ESLint |
-| `bun test` | Run unit tests (coming in Session 3) |
+| `bun test` | Run tests in watch mode |
+| `bun test:ui` | Run tests with UI dashboard |
+| `bun test:run` | Run tests once (CI mode) |
 
 ## Project Structure
 
@@ -75,7 +78,14 @@ src/
 │       ├── BulkActionsPanel.tsx
 │       └── index.ts
 ├── stores/             # Zustand state management with Immer
-│   └── useNameStore.ts
+│   ├── useNameStore.ts
+│   ├── useNameStore.test.ts    # 30 unit tests
+│   └── useNameStore.mock.ts    # Test fixtures
+├── hooks/              # Custom React hooks
+│   ├── useKeyboardShortcuts.ts # Keyboard event handling
+│   └── index.ts
+├── test/               # Test utilities
+│   └── setup.ts        # Vitest configuration
 ├── types/              # TypeScript interfaces
 │   └── name.ts
 ├── constants/          # Configuration values
@@ -102,21 +112,28 @@ See [radial-randomizer-prd.md](./radial-randomizer-prd.md) for the complete prod
 - [x] Clear selections & reset buttons
 - [x] Immer middleware integration
 
-**Session 3: Keyboard Shortcuts & Testing** 🚧 Coming Next
-- [ ] Space bar to spin
-- [ ] Escape key for modals
-- [ ] Unit tests (Vitest + React Testing Library)
-- [ ] Integration tests
+**Session 3: Keyboard Shortcuts & Testing** ✅ Complete
+- [x] Space bar to spin the wheel
+- [x] Escape key for modals/dropdowns
+- [x] Unit tests (Vitest + React Testing Library)
+- [x] 30 comprehensive store tests
 
-**Session 4: Selection History & Export**
+**Session 4: Tooling Modernization** 🚧 In Progress
+- [ ] Migrate from ESLint to Biome 2 (unified linter + formatter)
+- [ ] Install and configure lefthook (git hooks manager)
+- [ ] Pre-commit validation (lint + type-check)
+- [ ] Pre-push tests
+- [ ] Commit message validation
+
+**Session 5: Selection History & Export**
 - [ ] Selection history panel (track spins)
 - [ ] Export CSV/JSON
 - [ ] Record selection metadata
 
-**Session 5+: Polish & Advanced**
+**Session 6+: Polish & Advanced**
 - [ ] Theme options (3 built-in themes)
 - [ ] Responsive layout (mobile drawer)
-- [ ] Keyboard shortcuts documentation
+- [ ] framer-motion → motion package migration
 
 ### Future (Post-MVP)
 - Weighted randomization
