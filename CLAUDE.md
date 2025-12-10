@@ -25,28 +25,34 @@ The project has been migrated from a single-file POC to a React + TypeScript app
 src/
 ├── components/
 │   ├── wheel/
-│   │   ├── RadialWheel.tsx    # Main wheel container with spin logic
+│   │   ├── RadialWheel.tsx    # Main wheel container with spin logic (forwardRef for keyboard spin)
 │   │   ├── CenterButton.tsx   # Spin trigger with pulse animation
 │   │   ├── NameLabel.tsx      # Individual name positioned radially
 │   │   ├── RadialLine.tsx     # Line extending from circle
-│   │   └── index.ts           # Barrel exports
+│   │   └── index.ts           # Barrel exports (includes RadialWheelRef)
 │   └── sidebar/
 │       ├── NameManagementSidebar.tsx  # Main container, connects to store
-│       ├── ListSelector.tsx           # Dropdown: switch/create/rename/delete lists
-│       ├── AddNameForm.tsx            # Input + bulk import modal
+│       ├── ListSelector.tsx           # Dropdown: switch/create/rename/delete lists (Escape to close)
+│       ├── AddNameForm.tsx            # Input + bulk import modal (Escape to close)
 │       ├── NameListDisplay.tsx        # Scrollable list, empty state
 │       ├── NameListItem.tsx           # Single name: edit/delete/exclude
 │       ├── BulkActionsPanel.tsx       # Clear selections, reset list
 │       └── index.ts                   # Barrel exports
 ├── stores/
-│   └── useNameStore.ts        # Zustand store with Immer middleware + localStorage
+│   ├── useNameStore.ts        # Zustand store with Immer middleware + localStorage
+│   ├── useNameStore.test.ts   # 30 unit tests for all store actions
+│   └── useNameStore.mock.ts   # Mock data for tests
 ├── types/
 │   └── name.ts                # TypeScript interfaces (Name, NameList, SelectionRecord)
 ├── constants/
 │   └── defaults.ts            # Default names, wheel config values
-├── hooks/                     # Custom React hooks (empty, for future use)
+├── hooks/
+│   ├── useKeyboardShortcuts.ts # Keyboard event handler (Space, Escape)
+│   └── index.ts               # Barrel exports
+├── test/
+│   └── setup.ts               # Vitest setup with jest-dom matchers
 ├── utils/                     # Utility functions (empty, for future use)
-├── App.tsx                    # Main app component (flex layout: sidebar + wheel)
+├── App.tsx                    # Main app component with keyboard shortcuts integration
 ├── main.tsx                   # React entry point
 └── index.css                  # Tailwind imports + custom animations + overflow: hidden
 ```
@@ -62,6 +68,9 @@ bun install    # Install dependencies
 bun dev        # Start dev server (http://localhost:5173)
 bun build      # Production build
 bun run tsc    # Type check
+bun test       # Run tests in watch mode
+bun test:ui    # Run tests with UI
+bun test:run   # Run tests once (CI mode)
 ```
 
 ### Key Implementation Details
@@ -77,6 +86,10 @@ bun run tsc    # Type check
 - Use `useShallow` hook when selecting multiple state values to prevent re-renders
 - Derived data (filtered names) should use `useMemo` to avoid infinite loops
 - Store actions: addName, deleteName, updateName, markSelected, setActiveList, createList, deleteList, updateListTitle, toggleNameExclusion, clearSelections, resetList, bulkAddNames
+
+**Keyboard Shortcuts** (Session 3)
+- Space: Spin the wheel (via `useKeyboardShortcuts` hook)
+- Escape: Close bulk import modal and list selector dropdown
 
 **Styling**
 - Tailwind v4 uses CSS-based config via `@theme` directive in `index.css`
@@ -135,7 +148,7 @@ refactor(components): extract shared validation utilities
 - [x] Fixed scrollbar layout issue (overflow: hidden on html/body)
 
 ### Remaining MVP Features
-- [ ] Keyboard shortcuts (Space to spin)
+- [x] Keyboard shortcuts (Space to spin, Escape for modals/dropdowns)
 - [ ] Selection history panel
 - [ ] Bulk import (paste, CSV) - form ready, needs integration
 - [ ] Export (JSON, CSV)
@@ -144,41 +157,39 @@ refactor(components): extract shared validation utilities
 
 ## Testing Strategy
 
-### Recommended: Vitest + React Testing Library
-Next session should implement unit tests using:
-- **Vitest** - Fast unit test runner (Vite-native, similar syntax to Jest)
-- **React Testing Library** - Component testing best practices
-- **@testing-library/user-event** - User interaction simulation
+### Implemented: Vitest + React Testing Library (Session 3)
+- **Vitest** - Fast unit test runner with Vite integration
+- **React Testing Library** - Component testing utilities
+- **Vitest Globals** - No imports needed in test files (configured in tsconfig)
+- **@testing-library/jest-dom** - DOM matchers for assertions
 
-**Key areas to test**:
-1. **Store (useNameStore.ts)**
-   - All 12 actions work correctly (add, delete, create list, etc.)
-   - localStorage persistence works
-   - Multi-list state management
+**Test Organization**:
+- Test files placed next to source files (e.g., `useNameStore.test.ts` next to `useNameStore.ts`)
+- Mock data extracted to `.mock.ts` files for cleaner tests
+- 30 unit tests for store (all 12 actions covered)
 
-2. **Sidebar Components**
-   - ListSelector: dropdown open/close, create/delete/rename list
-   - AddNameForm: input validation, bulk import modal
-   - NameListItem: inline editing, exclude toggle, delete
-   - BulkActionsPanel: clear/reset with confirmations
-
-3. **Wheel Component**
-   - Spin animation triggers correctly
-   - Selection updates store
-   - Excluded names not in active list
-
-4. **Integration Tests**
-   - Add name → displays in list → spin wheel → selection shows
-   - Create list → switch lists → names persist
-
-**Setup**:
+**Test Scripts**:
 ```bash
-bun add -d vitest @testing-library/react @testing-library/dom happy-dom
+bun test      # Run tests in watch mode
+bun test:ui   # Run tests with UI
+bun test:run  # Run tests once
 ```
+
+**Test Coverage** (Session 3):
+1. **Store (useNameStore.test.ts)** - 30 tests
+   - All 12 actions: addName, deleteName, updateName, markSelected, setActiveList, createList, deleteList, updateListTitle, toggleNameExclusion, clearSelections, resetList, bulkAddNames
+   - localStorage persistence
+   - Multi-list state management
+   - Edge cases and validations
+
+**Future Testing Areas**:
+- Component tests for sidebar and wheel components
+- Integration tests for user workflows
 
 ## Tech Debt
 
-- [ ] Add unit tests (Vitest + React Testing Library) - next priority
+- [x] Add unit tests (Vitest + React Testing Library) - COMPLETED Session 3
+- [ ] Add component/integration tests - future priority
 - [ ] Migrate from `framer-motion` to `motion` package (rebranded, same codebase)
   - Replace: `import { motion } from "framer-motion"` with `import { motion } from "motion/react"`
   - Consider using `motion/mini` for smaller bundle (2.5kb)
@@ -198,24 +209,40 @@ bun add -d vitest @testing-library/react @testing-library/dom happy-dom
 - Store selections use `useShallow` to prevent re-renders on object changes
 - Derived data (active names, has selections) use `useMemo`
 
-## Future Session Checklist
+## Session Progress
 
-### Session 3: Keyboard Shortcuts & Testing
-- [ ] Add `bun test` script for Vitest
-- [ ] Implement Space key listener for spin
-- [ ] Implement Escape key for modal/dropdown close
-- [ ] Add 20+ unit tests for store and components
-- [ ] Add 5+ integration tests
-- [ ] Run type check and build
+### Session 3: Keyboard Shortcuts & Testing (Completed)
+- [x] Add `bun test` script for Vitest (test, test:ui, test:run)
+- [x] Implement Space key listener for spin (via useKeyboardShortcuts hook)
+- [x] Implement Escape key for modal/dropdown close (AddNameForm, ListSelector)
+- [x] Add 30 unit tests for useNameStore (all 12 actions)
+- [x] Mock data extraction pattern (.mock.ts files)
+- [x] Run type check and build (all passing)
 
-### Session 4: Selection History & Export
+**Commits**:
+- feat(test): set up Vitest testing infrastructure
+- feat(shortcuts): add keyboard shortcuts for Space and Escape keys
+- test(store): add comprehensive unit tests for useNameStore with Vitest globals
+
+### Session 4: Tooling Modernization (Planned)
+- [ ] Remove ESLint dependencies and configuration
+- [ ] Install and configure Biome 2 (unified linter + formatter)
+- [ ] Migrate linting rules from ESLint to Biome
+- [ ] Install and configure lefthook (git hooks manager)
+- [ ] Set up pre-commit hooks (Biome check + type-check on staged files)
+- [ ] Set up pre-push hooks (full test suite)
+- [ ] Set up commit-msg validation (conventional commits format)
+- [ ] Test hooks with sample commits
+- [ ] Update documentation
+
+### Session 5: Selection History & Export (Planned)
 - [ ] Create selection history store (extend useNameStore)
 - [ ] Create history panel component
 - [ ] Record selections on spin
 - [ ] Export CSV/JSON functionality
-- [ ] Add import tests
+- [ ] Add tests for history/export features
 
-### Session 5+: Theming & Responsive
+### Session 6+: Theming & Responsive
 - [ ] Create theme system (3 built-in themes)
 - [ ] Add theme switcher component
 - [ ] Mobile responsiveness (sidebar drawer)
