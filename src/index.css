@@ -4,6 +4,11 @@
   --font-mono: "Courier New", monospace;
 }
 
+html,
+body {
+  overflow: hidden;
+}
+
 @keyframes pulse-glow {
   0%,
   100% {
