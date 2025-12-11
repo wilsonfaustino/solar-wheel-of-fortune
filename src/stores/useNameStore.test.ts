@@ -1,4 +1,4 @@
-import { useNameStore } from './useNameStore';
+import { selectHistoryStats, useNameStore } from './useNameStore';
 import { mockInitialState } from './useNameStore.mock';
 
 describe('useNameStore', () => {
@@ -380,6 +380,136 @@ describe('useNameStore', () => {
 
       expect(firstName?.selectionCount).toBe(1);
       expect(secondName?.selectionCount).toBe(1);
+    });
+  });
+
+  describe('Selection History', () => {
+    it('should record a selection with all required fields', () => {
+      const state = useNameStore.getState();
+      const nameId = state.lists[0].names[0].id;
+      const nameValue = state.lists[0].names[0].value;
+
+      state.recordSelection(nameValue, nameId);
+
+      const updatedState = useNameStore.getState();
+      expect(updatedState.history).toHaveLength(1);
+      const record = updatedState.history[0];
+      expect(record).toMatchObject({
+        nameId,
+        nameValue,
+        listId: state.activeListId,
+      });
+      expect(record.id).toBeDefined();
+      expect(record.timestamp).toBeInstanceOf(Date);
+    });
+
+    it('should add multiple selections to history in order', () => {
+      const state = useNameStore.getState();
+      const name1 = state.lists[0].names[0];
+      const name2 = state.lists[0].names[1];
+
+      state.recordSelection(name1.value, name1.id);
+      state.recordSelection(name2.value, name2.id);
+
+      const updatedState = useNameStore.getState();
+      expect(updatedState.history).toHaveLength(2);
+      expect(updatedState.history[0].nameId).toBe(name1.id);
+      expect(updatedState.history[1].nameId).toBe(name2.id);
+    });
+
+    it('should limit history to 100 items (FIFO)', () => {
+      const state = useNameStore.getState();
+      const names = state.lists[0].names;
+
+      // Add 150 selections
+      for (let i = 0; i < 150; i++) {
+        const name = names[i % names.length];
+        state.recordSelection(name.value, name.id);
+      }
+
+      const updatedState = useNameStore.getState();
+      expect(updatedState.history).toHaveLength(100);
+      // The first 50 should be removed (FIFO)
+      expect(updatedState.history[0].nameValue).not.toBeUndefined();
+    });
+
+    it('should generate unique IDs for each record', () => {
+      const state = useNameStore.getState();
+      const name = state.lists[0].names[0];
+
+      state.recordSelection(name.value, name.id);
+      state.recordSelection(name.value, name.id);
+
+      const updatedState = useNameStore.getState();
+      expect(updatedState.history[0].id).not.toBe(updatedState.history[1].id);
+    });
+
+    it('should clear all history', () => {
+      const state = useNameStore.getState();
+      const name = state.lists[0].names[0];
+
+      state.recordSelection(name.value, name.id);
+      state.recordSelection(name.value, name.id);
+      expect(useNameStore.getState().history).toHaveLength(2);
+
+      state.clearHistory();
+
+      expect(useNameStore.getState().history).toHaveLength(0);
+    });
+
+    it('should delete a specific history item', () => {
+      const state = useNameStore.getState();
+      const name1 = state.lists[0].names[0];
+      const name2 = state.lists[0].names[1];
+
+      state.recordSelection(name1.value, name1.id);
+      state.recordSelection(name2.value, name2.id);
+      state.recordSelection(name1.value, name1.id);
+
+      const recordIdToDelete = useNameStore.getState().history[1].id;
+      state.deleteHistoryItem(recordIdToDelete);
+
+      const updatedState = useNameStore.getState();
+      expect(updatedState.history).toHaveLength(2);
+      expect(updatedState.history.some((r) => r.id === recordIdToDelete)).toBe(false);
+    });
+
+    it('should persist history to localStorage', () => {
+      localStorage.clear();
+      useNameStore.setState(mockInitialState);
+
+      const state = useNameStore.getState();
+      const name = state.lists[0].names[0];
+      state.recordSelection(name.value, name.id);
+
+      const stored = localStorage.getItem('radial-randomizer-v1-state');
+      expect(stored).toBeDefined();
+      const parsed = JSON.parse(stored!);
+      expect(parsed.state.history).toHaveLength(1);
+    });
+
+    it('should return correct stats', () => {
+      const state = useNameStore.getState();
+      const name1 = state.lists[0].names[0];
+      const name2 = state.lists[0].names[1];
+
+      state.recordSelection(name1.value, name1.id);
+      state.recordSelection(name2.value, name2.id);
+      state.recordSelection(name1.value, name1.id);
+
+      const stats = selectHistoryStats(useNameStore.getState());
+      expect(stats.total).toBe(3);
+      expect(stats.unique).toBe(2);
+      expect(stats.lastSelection).toBeInstanceOf(Date);
+    });
+
+    it('should have zero stats for empty history', () => {
+      useNameStore.setState({ history: [] });
+
+      const stats = selectHistoryStats(useNameStore.getState());
+      expect(stats.total).toBe(0);
+      expect(stats.unique).toBe(0);
+      expect(stats.lastSelection).toBeNull();
     });
   });
 });
