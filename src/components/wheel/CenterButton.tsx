@@ -1,5 +1,5 @@
-import { memo } from "react";
-import { Sparkles } from "lucide-react";
+import { Sparkles } from 'lucide-react';
+import { memo } from 'react';
 
 interface CenterButtonProps {
   onClick: () => void;
@@ -7,13 +7,10 @@ interface CenterButtonProps {
   disabled?: boolean;
 }
 
-function CenterButtonComponent({
-  onClick,
-  isSpinning,
-  disabled,
-}: CenterButtonProps) {
+function CenterButtonComponent({ onClick, isSpinning, disabled }: CenterButtonProps) {
   return (
     <button
+      type="button"
       onClick={onClick}
       disabled={disabled || isSpinning}
       className="relative z-10 group"

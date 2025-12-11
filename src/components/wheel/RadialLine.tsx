@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo } from 'react';
 
 interface RadialLineProps {
   isSelected: boolean;
@@ -14,7 +14,7 @@ function RadialLineComponent({ isSelected }: RadialLineProps) {
       stroke="white"
       strokeWidth="0.5"
       opacity={isSelected ? 0.6 : 0.12}
-      style={{ transition: "opacity 0.3s ease" }}
+      style={{ transition: 'opacity 0.3s ease' }}
     />
   );
 }

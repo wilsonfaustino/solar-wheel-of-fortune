@@ -1,10 +1,10 @@
-import { useState, useCallback, useMemo, useRef } from "react";
-import { useShallow } from "zustand/shallow";
-import { RadialWheel, type RadialWheelRef } from "./components/wheel";
-import { NameManagementSidebar } from "./components/sidebar";
-import { useNameStore } from "./stores/useNameStore";
-import { useKeyboardShortcuts } from "./hooks";
-import type { Name } from "./types/name";
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { useShallow } from 'zustand/shallow';
+import { NameManagementSidebar } from './components/sidebar';
+import { RadialWheel, type RadialWheelRef } from './components/wheel';
+import { useKeyboardShortcuts } from './hooks';
+import { useNameStore } from './stores/useNameStore';
+import type { Name } from './types/name';
 
 function App() {
   const wheelRef = useRef<RadialWheelRef>(null);
@@ -46,9 +46,7 @@ function App() {
           {selectedName && (
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
               <div className="px-6 py-3 border border-cyan-400/30 bg-black/60 backdrop-blur-sm rounded">
-                <div className="text-xs text-white/50 tracking-wider mb-1 font-mono">
-                  SELECTED
-                </div>
+                <div className="text-xs text-white/50 tracking-wider mb-1 font-mono">SELECTED</div>
                 <div className="text-2xl text-cyan-400 tracking-wider font-light font-mono">
                   {selectedName.value}
                 </div>

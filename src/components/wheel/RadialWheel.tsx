@@ -1,9 +1,9 @@
-import { useState, useCallback, forwardRef, useImperativeHandle } from "react";
-import { motion } from "framer-motion";
-import { NameLabel } from "./NameLabel";
-import { CenterButton } from "./CenterButton";
-import { WHEEL_CONFIG } from "../../constants/defaults";
-import type { Name } from "../../types/name";
+import { motion } from 'framer-motion';
+import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
+import { WHEEL_CONFIG } from '../../constants/defaults';
+import type { Name } from '../../types/name';
+import { CenterButton } from './CenterButton';
+import { NameLabel } from './NameLabel';
 
 interface RadialWheelProps {
   names: Name[];
@@ -27,12 +27,10 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
       setSelectedIndex(null);
 
       const spins =
-        WHEEL_CONFIG.minSpins +
-        Math.random() * (WHEEL_CONFIG.maxSpins - WHEEL_CONFIG.minSpins);
+        WHEEL_CONFIG.minSpins + Math.random() * (WHEEL_CONFIG.maxSpins - WHEEL_CONFIG.minSpins);
       const finalIndex = Math.floor(Math.random() * names.length);
       const degreesPerName = 360 / names.length;
-      const targetRotation =
-        rotation - (spins * 360 + finalIndex * degreesPerName);
+      const targetRotation = rotation - (spins * 360 + finalIndex * degreesPerName);
 
       setRotation(targetRotation);
 
@@ -43,9 +41,13 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
       }, WHEEL_CONFIG.spinDuration);
     }, [isSpinning, names, rotation, onSelect]);
 
-    useImperativeHandle(ref, () => ({
-      spin: handleSpin,
-    }), [handleSpin]);
+    useImperativeHandle(
+      ref,
+      () => ({
+        spin: handleSpin,
+      }),
+      [handleSpin]
+    );
 
     return (
       <div className="relative w-full max-w-4xl aspect-square flex items-center justify-center">
@@ -64,6 +66,7 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
               height: WHEEL_CONFIG.svgSize,
             }}
           >
+            <title>Wheel of Fortune with names</title>
             <circle
               cx={WHEEL_CONFIG.centerOffset}
               cy={WHEEL_CONFIG.centerOffset}
@@ -86,11 +89,7 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
           </svg>
         </motion.div>
 
-        <CenterButton
-          onClick={handleSpin}
-          isSpinning={isSpinning}
-          disabled={names.length === 0}
-        />
+        <CenterButton onClick={handleSpin} isSpinning={isSpinning} disabled={names.length === 0} />
       </div>
     );
   }

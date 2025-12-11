@@ -1,8 +1,8 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { immer } from "zustand/middleware/immer";
-import type { Name, NameList } from "../types/name";
-import { DEFAULT_NAMES } from "../constants/defaults";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
+import { DEFAULT_NAMES } from '../constants/defaults';
+import type { Name, NameList } from '../types/name';
 
 function generateId(): string {
   return crypto.randomUUID();
@@ -24,7 +24,7 @@ function createName(value: string): Name {
 function createDefaultList(): NameList {
   return {
     id: generateId(),
-    title: "Default List",
+    title: 'Default List',
     names: DEFAULT_NAMES.map(createName),
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -66,9 +66,7 @@ export const useNameStore = create<NameStore>()(
         if (!trimmedValue) return;
 
         set((draft) => {
-          const activeList = draft.lists.find(
-            (list) => list.id === draft.activeListId
-          );
+          const activeList = draft.lists.find((list) => list.id === draft.activeListId);
           if (activeList) {
             activeList.names.push(createName(trimmedValue));
             activeList.updatedAt = new Date();
@@ -78,13 +76,9 @@ export const useNameStore = create<NameStore>()(
 
       deleteName: (nameId: string) => {
         set((draft) => {
-          const activeList = draft.lists.find(
-            (list) => list.id === draft.activeListId
-          );
+          const activeList = draft.lists.find((list) => list.id === draft.activeListId);
           if (activeList) {
-            activeList.names = activeList.names.filter(
-              (name) => name.id !== nameId
-            );
+            activeList.names = activeList.names.filter((name) => name.id !== nameId);
             activeList.updatedAt = new Date();
           }
         });
@@ -92,9 +86,7 @@ export const useNameStore = create<NameStore>()(
 
       updateName: (nameId: string, updates: Partial<Name>) => {
         set((draft) => {
-          const activeList = draft.lists.find(
-            (list) => list.id === draft.activeListId
-          );
+          const activeList = draft.lists.find((list) => list.id === draft.activeListId);
           if (activeList) {
             const name = activeList.names.find((n) => n.id === nameId);
             if (name) {
@@ -107,9 +99,7 @@ export const useNameStore = create<NameStore>()(
 
       markSelected: (nameId: string) => {
         set((draft) => {
-          const activeList = draft.lists.find(
-            (list) => list.id === draft.activeListId
-          );
+          const activeList = draft.lists.find((list) => list.id === draft.activeListId);
           if (activeList) {
             const name = activeList.names.find((n) => n.id === nameId);
             if (name) {
@@ -131,7 +121,7 @@ export const useNameStore = create<NameStore>()(
         set((draft) => {
           const newList: NameList = {
             id: generateId(),
-            title: title.trim() || "New List",
+            title: title.trim() || 'New List',
             names: [],
             createdAt: new Date(),
             updatedAt: new Date(),
@@ -159,7 +149,7 @@ export const useNameStore = create<NameStore>()(
         set((draft) => {
           const list = draft.lists.find((l) => l.id === listId);
           if (list) {
-            list.title = title.trim() || "Untitled List";
+            list.title = title.trim() || 'Untitled List';
             list.updatedAt = new Date();
           }
         });
@@ -167,9 +157,7 @@ export const useNameStore = create<NameStore>()(
 
       toggleNameExclusion: (nameId: string) => {
         set((draft) => {
-          const activeList = draft.lists.find(
-            (list) => list.id === draft.activeListId
-          );
+          const activeList = draft.lists.find((list) => list.id === draft.activeListId);
           if (activeList) {
             const name = activeList.names.find((n) => n.id === nameId);
             if (name) {
@@ -182,9 +170,7 @@ export const useNameStore = create<NameStore>()(
 
       clearSelections: () => {
         set((draft) => {
-          const activeList = draft.lists.find(
-            (list) => list.id === draft.activeListId
-          );
+          const activeList = draft.lists.find((list) => list.id === draft.activeListId);
           if (activeList) {
             activeList.names.forEach((name) => {
               name.lastSelectedAt = null;
@@ -197,9 +183,7 @@ export const useNameStore = create<NameStore>()(
 
       resetList: () => {
         set((draft) => {
-          const activeList = draft.lists.find(
-            (list) => list.id === draft.activeListId
-          );
+          const activeList = draft.lists.find((list) => list.id === draft.activeListId);
           if (activeList) {
             activeList.names.forEach((name) => {
               name.lastSelectedAt = null;
@@ -213,9 +197,7 @@ export const useNameStore = create<NameStore>()(
 
       bulkAddNames: (names: string[]) => {
         set((draft) => {
-          const activeList = draft.lists.find(
-            (list) => list.id === draft.activeListId
-          );
+          const activeList = draft.lists.find((list) => list.id === draft.activeListId);
           if (activeList) {
             const validNames = names
               .map((n) => n.trim().toUpperCase())
@@ -230,7 +212,7 @@ export const useNameStore = create<NameStore>()(
       },
     })),
     {
-      name: "radial-randomizer-v1-state",
+      name: 'radial-randomizer-v1-state',
       partialize: (state) => ({
         lists: state.lists,
         activeListId: state.activeListId,

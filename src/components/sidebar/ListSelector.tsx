@@ -1,6 +1,6 @@
-import { memo, useState, useRef, useEffect } from "react";
-import { ChevronDown, Plus, Edit2, Trash2 } from "lucide-react";
-import type { NameList } from "../../types/name";
+import { ChevronDown, Edit2, Plus, Trash2 } from 'lucide-react';
+import { memo, useEffect, useRef, useState } from 'react';
+import type { NameList } from '../../types/name';
 
 interface ListSelectorProps {
   lists: NameList[];
@@ -27,27 +27,24 @@ function ListSelectorComponent({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
         setEditingId(null);
       }
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         setIsOpen(false);
         setEditingId(null);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
@@ -56,7 +53,7 @@ function ListSelectorComponent({
     if (!list) return;
 
     if (lists.length === 1) {
-      alert("Cannot delete the only list");
+      alert('Cannot delete the only list');
       return;
     }
 
@@ -80,16 +77,14 @@ function ListSelectorComponent({
                    flex items-center justify-between group"
       >
         <div className="flex-1 text-left">
-          <div className="text-xs text-white/50 tracking-wider mb-1 font-mono">
-            ACTIVE LIST
-          </div>
+          <div className="text-xs text-white/50 tracking-wider mb-1 font-mono">ACTIVE LIST</div>
           <div className="text-cyan-400 tracking-wider font-light font-mono">
-            {activeList?.title || "No List"}
+            {activeList?.title || 'No List'}
           </div>
         </div>
         <ChevronDown
           className={`w-5 h-5 text-cyan-400/50 transition-transform
-                      ${isOpen ? "rotate-180" : ""}`}
+                      ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -106,7 +101,7 @@ function ListSelectorComponent({
               key={list.id}
               className={`px-4 py-3 border-b border-white/5 last:border-b-0
                          hover:bg-white/5 transition-colors group
-                         ${list.id === activeListId ? "bg-cyan-400/10" : ""}`}
+                         ${list.id === activeListId ? 'bg-cyan-400/10' : ''}`}
             >
               {editingId === list.id ? (
                 <input
@@ -120,14 +115,13 @@ function ListSelectorComponent({
                     setEditingId(null);
                   }}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") {
+                    if (e.key === 'Enter') {
                       onRenameList(list.id, e.currentTarget.value);
                       setEditingId(null);
-                    } else if (e.key === "Escape") {
+                    } else if (e.key === 'Escape') {
                       setEditingId(null);
                     }
                   }}
-                  autoFocus
                 />
               ) : (
                 <div className="flex items-center justify-between">
@@ -138,12 +132,8 @@ function ListSelectorComponent({
                     }}
                     className="flex-1 text-left"
                   >
-                    <div className="text-white font-mono text-sm">
-                      {list.title}
-                    </div>
-                    <div className="text-white/40 text-xs font-mono">
-                      {list.names.length} names
-                    </div>
+                    <div className="text-white font-mono text-sm">{list.title}</div>
+                    <div className="text-white/40 text-xs font-mono">{list.names.length} names</div>
                   </button>
 
                   {list.id !== activeListId && (
@@ -187,9 +177,7 @@ function ListSelectorComponent({
                        border-t border-cyan-400/30"
           >
             <Plus className="w-5 h-5 text-cyan-400" />
-            <span className="text-cyan-400 font-mono text-sm tracking-wider">
-              CREATE NEW LIST
-            </span>
+            <span className="text-cyan-400 font-mono text-sm tracking-wider">CREATE NEW LIST</span>
           </button>
         </div>
       )}

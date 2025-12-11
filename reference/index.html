@@ -152,9 +152,9 @@
         "MILES",
       ];
 
-      const radius = 100;
+      const _radius = 100;
       const angleStep = (2 * Math.PI) / names.length;
-      let selectedIndex = null;
+      let _selectedIndex = null;
       let isSpinning = false;
 
       const wheel = document.getElementById("wheel");
@@ -220,7 +220,7 @@
         if (isSpinning) return;
 
         isSpinning = true;
-        selectedIndex = null;
+        _selectedIndex = null;
         selectedDisplay.classList.add("hidden");
 
         // Reset all names
@@ -248,7 +248,7 @@
         wheel.style.transform = `rotate(${-targetRotation}deg)`;
 
         setTimeout(() => {
-          selectedIndex = finalIndex;
+          _selectedIndex = finalIndex;
           isSpinning = false;
 
           // Hide pulse rings

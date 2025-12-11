@@ -1,5 +1,5 @@
-import { memo } from "react";
-import { RotateCcw, Eraser } from "lucide-react";
+import { Eraser, RotateCcw } from 'lucide-react';
+import { memo } from 'react';
 
 interface BulkActionsPanelProps {
   hasNames: boolean;
@@ -18,7 +18,7 @@ function BulkActionsPanelComponent({
     if (!hasNames) return;
 
     const confirmed = confirm(
-      "Reset list? This will clear all selections and exclusions. Names will remain."
+      'Reset list? This will clear all selections and exclusions. Names will remain.'
     );
     if (confirmed) {
       onResetList();
@@ -35,7 +35,7 @@ function BulkActionsPanelComponent({
                    text-white/70 font-mono text-xs tracking-wider
                    disabled:opacity-30 disabled:cursor-not-allowed
                    flex items-center justify-center gap-2"
-        title={hasSelections ? "Clear selection history" : "No selections to clear"}
+        title={hasSelections ? 'Clear selection history' : 'No selections to clear'}
       >
         <Eraser className="w-4 h-4" />
         CLEAR
@@ -48,7 +48,7 @@ function BulkActionsPanelComponent({
                    text-white/70 font-mono text-xs tracking-wider
                    disabled:opacity-30 disabled:cursor-not-allowed
                    flex items-center justify-center gap-2"
-        title={hasNames ? "Reset selections and exclusions" : "No names to reset"}
+        title={hasNames ? 'Reset selections and exclusions' : 'No names to reset'}
       >
         <RotateCcw className="w-4 h-4" />
         RESET

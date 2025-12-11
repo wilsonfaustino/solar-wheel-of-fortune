@@ -1,19 +1,16 @@
-import { memo, useState, useCallback } from "react";
-import { Plus, Upload } from "lucide-react";
+import { Plus, Upload } from 'lucide-react';
+import { memo, useCallback, useState } from 'react';
 
 interface AddNameFormProps {
   onAddName: (name: string) => void;
   onBulkImport: (names: string[]) => void;
 }
 
-function AddNameFormComponent({
-  onAddName,
-  onBulkImport,
-}: AddNameFormProps) {
-  const [inputValue, setInputValue] = useState("");
+function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
+  const [inputValue, setInputValue] = useState('');
   const [showBulkImport, setShowBulkImport] = useState(false);
-  const [bulkText, setBulkText] = useState("");
-  const [error, setError] = useState("");
+  const [bulkText, setBulkText] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -21,36 +18,36 @@ function AddNameFormComponent({
       const trimmed = inputValue.trim();
 
       if (trimmed.length === 0) {
-        setError("Name cannot be empty");
+        setError('Name cannot be empty');
         return;
       }
       if (trimmed.length > 100) {
-        setError("Name must be 100 characters or less");
+        setError('Name must be 100 characters or less');
         return;
       }
 
       onAddName(trimmed);
-      setInputValue("");
-      setError("");
+      setInputValue('');
+      setError('');
     },
     [inputValue, onAddName]
   );
 
   const handleBulkImport = useCallback(() => {
     const names = bulkText
-      .split("\n")
+      .split('\n')
       .map((n) => n.trim())
       .filter((n) => n.length > 0 && n.length <= 100);
 
     if (names.length === 0) {
-      setError("No valid names to import");
+      setError('No valid names to import');
       return;
     }
 
     onBulkImport(names);
-    setBulkText("");
+    setBulkText('');
     setShowBulkImport(false);
-    setError("");
+    setError('');
   }, [bulkText, onBulkImport]);
 
   const charCount = inputValue.length;
@@ -66,7 +63,7 @@ function AddNameFormComponent({
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
-              setError("");
+              setError('');
             }}
             placeholder="Enter name..."
             className="w-full px-3 py-2 bg-black/50 border border-cyan-400/30
@@ -78,14 +75,12 @@ function AddNameFormComponent({
           {showCharCount && (
             <div
               className={`text-xs font-mono mt-1
-                            ${charCount >= 100 ? "text-red-400" : "text-white/50"}`}
+                            ${charCount >= 100 ? 'text-red-400' : 'text-white/50'}`}
             >
               {charCount}/100
             </div>
           )}
-          {error && (
-            <div className="text-xs text-red-400 font-mono mt-1">{error}</div>
-          )}
+          {error && <div className="text-xs text-red-400 font-mono mt-1">{error}</div>}
         </div>
         <button
           type="submit"
@@ -100,6 +95,7 @@ function AddNameFormComponent({
 
       {/* Bulk Import Link */}
       <button
+        type="button"
         onClick={() => setShowBulkImport(true)}
         className="mt-3 text-xs text-cyan-400/70 hover:text-cyan-400
                    font-mono tracking-wider flex items-center gap-1"
@@ -111,29 +107,37 @@ function AddNameFormComponent({
       {/* Bulk Import Modal */}
       {showBulkImport && (
         <div
+          role="presentation"
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50
                         flex items-center justify-center p-4"
           onClick={() => {
             setShowBulkImport(false);
-            setBulkText("");
-            setError("");
+            setBulkText('');
+            setError('');
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setShowBulkImport(false);
+              setBulkText('');
+              setError('');
+            }
           }}
         >
           <div
+            role="dialog"
+            aria-label="Bulk import names"
             className="bg-black border border-cyan-400/30 p-6 max-w-lg w-full"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-cyan-400 font-mono text-lg mb-4 tracking-wider">
-              BULK IMPORT
-            </h3>
+            <h3 className="text-cyan-400 font-mono text-lg mb-4 tracking-wider">BULK IMPORT</h3>
             <textarea
               value={bulkText}
               onChange={(e) => setBulkText(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Escape') {
                   setShowBulkImport(false);
-                  setBulkText("");
-                  setError("");
+                  setBulkText('');
+                  setError('');
                 }
               }}
               placeholder="Paste names (one per line)"
@@ -141,10 +145,10 @@ function AddNameFormComponent({
                          text-white font-mono text-sm
                          focus:outline-none focus:ring-2 focus:ring-cyan-400
                          placeholder:text-white/30 resize-none"
-              autoFocus
             />
             <div className="flex gap-2 mt-4">
               <button
+                type="button"
                 onClick={handleBulkImport}
                 className="flex-1 px-4 py-2 bg-cyan-400/10 border border-cyan-400/30
                            hover:bg-cyan-400/20 transition-colors
@@ -153,10 +157,11 @@ function AddNameFormComponent({
                 IMPORT
               </button>
               <button
+                type="button"
                 onClick={() => {
                   setShowBulkImport(false);
-                  setBulkText("");
-                  setError("");
+                  setBulkText('');
+                  setError('');
                 }}
                 className="px-4 py-2 border border-white/20
                            hover:bg-white/5 transition-colors

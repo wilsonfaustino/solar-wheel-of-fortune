@@ -45,9 +45,7 @@ describe('useNameStore', () => {
       state.deleteName(nameIdToDelete);
 
       const updatedState = useNameStore.getState();
-      const activeList = updatedState.lists.find(
-        (l) => l.id === updatedState.activeListId
-      );
+      const activeList = updatedState.lists.find((l) => l.id === updatedState.activeListId);
       expect(activeList?.names).toHaveLength(1);
       expect(activeList?.names[0].id).not.toBe(nameIdToDelete);
     });
@@ -57,9 +55,7 @@ describe('useNameStore', () => {
 
       useNameStore.getState().deleteName('non-existent-id');
 
-      expect(useNameStore.getState().lists[0].names.length).toBe(
-        initialLength
-      );
+      expect(useNameStore.getState().lists[0].names.length).toBe(initialLength);
     });
   });
 
@@ -71,9 +67,7 @@ describe('useNameStore', () => {
       state.updateName(nameId, { value: 'UPDATED' });
 
       const updatedState = useNameStore.getState();
-      const updatedName = updatedState.lists[0].names.find(
-        (n) => n.id === nameId
-      );
+      const updatedName = updatedState.lists[0].names.find((n) => n.id === nameId);
       expect(updatedName?.value).toBe('UPDATED');
     });
 
@@ -84,9 +78,7 @@ describe('useNameStore', () => {
       state.updateName(nameId, { value: 'NEW', weight: 2.0 });
 
       const updatedState = useNameStore.getState();
-      const updatedName = updatedState.lists[0].names.find(
-        (n) => n.id === nameId
-      );
+      const updatedName = updatedState.lists[0].names.find((n) => n.id === nameId);
       expect(updatedName?.value).toBe('NEW');
       expect(updatedName?.weight).toBe(2.0);
     });
@@ -100,9 +92,7 @@ describe('useNameStore', () => {
       state.markSelected(nameId);
 
       const updatedState = useNameStore.getState();
-      const selectedName = updatedState.lists[0].names.find(
-        (n) => n.id === nameId
-      );
+      const selectedName = updatedState.lists[0].names.find((n) => n.id === nameId);
       expect(selectedName?.selectionCount).toBe(1);
       expect(selectedName?.lastSelectedAt).not.toBeNull();
     });
@@ -116,9 +106,7 @@ describe('useNameStore', () => {
       state.markSelected(nameId);
 
       const updatedState = useNameStore.getState();
-      const selectedName = updatedState.lists[0].names.find(
-        (n) => n.id === nameId
-      );
+      const selectedName = updatedState.lists[0].names.find((n) => n.id === nameId);
       expect(selectedName?.selectionCount).toBe(3);
     });
   });
@@ -128,9 +116,7 @@ describe('useNameStore', () => {
       const state = useNameStore.getState();
       state.createList('New List');
 
-      const newListId = useNameStore
-        .getState()
-        .lists[useNameStore.getState().lists.length - 1].id;
+      const newListId = useNameStore.getState().lists[useNameStore.getState().lists.length - 1].id;
 
       useNameStore.getState().setActiveList(newListId);
 
@@ -175,9 +161,7 @@ describe('useNameStore', () => {
       useNameStore.getState().deleteList(listIdToDelete);
 
       expect(useNameStore.getState().lists.length).toBe(initialCount - 1);
-      expect(
-        useNameStore.getState().lists.find((l) => l.id === listIdToDelete)
-      ).toBeUndefined();
+      expect(useNameStore.getState().lists.find((l) => l.id === listIdToDelete)).toBeUndefined();
     });
 
     it('should not delete if only one list remains', () => {
@@ -193,7 +177,8 @@ describe('useNameStore', () => {
       const state = useNameStore.getState();
       const firstListId = state.lists[0].id;
       state.createList('Second List');
-      const secondListId = useNameStore.getState().lists[useNameStore.getState().lists.length - 1].id;
+      const secondListId =
+        useNameStore.getState().lists[useNameStore.getState().lists.length - 1].id;
       state.setActiveList(secondListId);
 
       state.deleteList(secondListId);
@@ -256,9 +241,7 @@ describe('useNameStore', () => {
       state.clearSelections();
 
       const updatedState = useNameStore.getState();
-      const activeList = updatedState.lists.find(
-        (l) => l.id === updatedState.activeListId
-      );
+      const activeList = updatedState.lists.find((l) => l.id === updatedState.activeListId);
       activeList?.names.forEach((name) => {
         expect(name.selectionCount).toBe(0);
         expect(name.lastSelectedAt).toBeNull();
@@ -306,9 +289,7 @@ describe('useNameStore', () => {
       state.resetList();
 
       const updatedState = useNameStore.getState();
-      const activeList = updatedState.lists.find(
-        (l) => l.id === updatedState.activeListId
-      );
+      const activeList = updatedState.lists.find((l) => l.id === updatedState.activeListId);
       activeList?.names.forEach((name) => {
         expect(name.selectionCount).toBe(0);
         expect(name.lastSelectedAt).toBeNull();
@@ -333,9 +314,7 @@ describe('useNameStore', () => {
     it('should filter out invalid names', () => {
       const initialLength = useNameStore.getState().lists[0].names.length;
 
-      useNameStore
-        .getState()
-        .bulkAddNames(['Valid', '   ', 'A'.repeat(101), 'Another']);
+      useNameStore.getState().bulkAddNames(['Valid', '   ', 'A'.repeat(101), 'Another']);
 
       const state = useNameStore.getState();
       expect(state.lists[0].names.length).toBe(initialLength + 2);
@@ -356,9 +335,7 @@ describe('useNameStore', () => {
 
       useNameStore.getState().bulkAddNames([]);
 
-      expect(useNameStore.getState().lists[0].names.length).toBe(
-        initialLength
-      );
+      expect(useNameStore.getState().lists[0].names.length).toBe(initialLength);
     });
   });
 
@@ -371,16 +348,10 @@ describe('useNameStore', () => {
 
       useNameStore.getState().addName('Name in Second List');
 
-      expect(
-        useNameStore
-          .getState()
-          .lists.find((l) => l.id === firstListId)?.names.length
-      ).toBe(2);
-      expect(
-        useNameStore
-          .getState()
-          .lists.find((l) => l.id === secondListId)?.names.length
-      ).toBe(1);
+      expect(useNameStore.getState().lists.find((l) => l.id === firstListId)?.names.length).toBe(2);
+      expect(useNameStore.getState().lists.find((l) => l.id === secondListId)?.names.length).toBe(
+        1
+      );
     });
 
     it('should maintain separate selection states', () => {
@@ -394,9 +365,8 @@ describe('useNameStore', () => {
       const secondListId = useNameStore.getState().lists[1].id;
       state.setActiveList(secondListId);
       state.addName('Test');
-      const secondListNameId = useNameStore
-        .getState()
-        .lists.find((l) => l.id === secondListId)?.names[0].id;
+      const secondListNameId = useNameStore.getState().lists.find((l) => l.id === secondListId)
+        ?.names[0].id;
 
       state.markSelected(secondListNameId!);
 
