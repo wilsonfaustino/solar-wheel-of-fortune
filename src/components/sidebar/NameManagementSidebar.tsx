@@ -1,8 +1,9 @@
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 import { useNameStore } from '../../stores/useNameStore';
 import { AddNameForm } from './AddNameForm';
 import { BulkActionsPanel } from './BulkActionsPanel';
+import { HistoryPanel } from './HistoryPanel';
 import { ListSelector } from './ListSelector';
 import { NameListDisplay } from './NameListDisplay';
 
@@ -11,6 +12,8 @@ interface NameManagementSidebarProps {
 }
 
 function NameManagementSidebarComponent({ className = '' }: NameManagementSidebarProps) {
+  const [activeTab, setActiveTab] = useState<'names' | 'history'>('names');
+
   // Select store state
   const { lists, activeListId } = useNameStore(
     useShallow((state) => ({
@@ -61,34 +64,70 @@ function NameManagementSidebarComponent({ className = '' }: NameManagementSideba
 
   return (
     <div className={`w-80 bg-black/90 border-r border-white/10 flex flex-col ${className}`}>
-      {/* List Selector */}
-      <ListSelector
-        lists={lists}
-        activeListId={activeListId}
-        onSelectList={setActiveList}
-        onCreateList={handleCreateList}
-        onDeleteList={deleteList}
-        onRenameList={updateListTitle}
-      />
+      {/* Tab Navigation */}
+      <div className="flex border-b border-white/10">
+        <button
+          type="button"
+          onClick={() => setActiveTab('names')}
+          className={`flex-1 px-4 py-3 font-mono text-sm transition-colors
+                      ${
+                        activeTab === 'names'
+                          ? 'border-b-2 border-cyan-400 text-cyan-400'
+                          : 'text-white/50 hover:text-white/70'
+                      }`}
+        >
+          Names
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('history')}
+          className={`flex-1 px-4 py-3 font-mono text-sm transition-colors
+                      ${
+                        activeTab === 'history'
+                          ? 'border-b-2 border-cyan-400 text-cyan-400'
+                          : 'text-white/50 hover:text-white/70'
+                      }`}
+        >
+          History
+        </button>
+      </div>
 
-      {/* Add Name Form */}
-      <AddNameForm onAddName={addName} onBulkImport={bulkAddNames} />
+      {/* Names Tab Content */}
+      {activeTab === 'names' && (
+        <>
+          {/* List Selector */}
+          <ListSelector
+            lists={lists}
+            activeListId={activeListId}
+            onSelectList={setActiveList}
+            onCreateList={handleCreateList}
+            onDeleteList={deleteList}
+            onRenameList={updateListTitle}
+          />
 
-      {/* Name List Display */}
-      <NameListDisplay
-        names={activeList?.names || []}
-        onEdit={handleEditName}
-        onDelete={deleteName}
-        onToggleExclude={toggleNameExclusion}
-      />
+          {/* Add Name Form */}
+          <AddNameForm onAddName={addName} onBulkImport={bulkAddNames} />
 
-      {/* Bulk Actions */}
-      <BulkActionsPanel
-        hasNames={!!activeList && activeList.names.length > 0}
-        hasSelections={hasSelections}
-        onClearSelections={clearSelections}
-        onResetList={resetList}
-      />
+          {/* Name List Display */}
+          <NameListDisplay
+            names={activeList?.names || []}
+            onEdit={handleEditName}
+            onDelete={deleteName}
+            onToggleExclude={toggleNameExclusion}
+          />
+
+          {/* Bulk Actions */}
+          <BulkActionsPanel
+            hasNames={!!activeList && activeList.names.length > 0}
+            hasSelections={hasSelections}
+            onClearSelections={clearSelections}
+            onResetList={resetList}
+          />
+        </>
+      )}
+
+      {/* History Tab Content */}
+      {activeTab === 'history' && <HistoryPanel />}
     </div>
   );
 }

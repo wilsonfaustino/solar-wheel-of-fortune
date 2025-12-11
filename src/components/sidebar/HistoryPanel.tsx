@@ -1,0 +1,84 @@
+import { Trash2 } from 'lucide-react';
+import { memo, useCallback, useMemo } from 'react';
+import { useNameStore } from '../../stores/useNameStore';
+import type { SelectionRecord } from '../../types/name';
+import { HistoryItem } from './HistoryItem';
+
+const DISPLAY_LIMIT = 20;
+
+function HistoryPanelComponent() {
+  const history = useNameStore((state) => state.history);
+  const deleteHistoryItem = useNameStore((state) => state.deleteHistoryItem);
+  const clearHistory = useNameStore((state) => state.clearHistory);
+
+  const stats = useMemo(() => {
+    const total = history.length;
+    const uniqueNames = new Set(history.map((r) => r.nameId)).size;
+    const lastSelection = history.at(-1)?.timestamp ?? null;
+    return {
+      total,
+      unique: uniqueNames,
+      lastSelection,
+    };
+  }, [history]);
+
+  const handleDeleteItem = useCallback(
+    (recordId: string) => {
+      deleteHistoryItem(recordId);
+    },
+    [deleteHistoryItem]
+  );
+
+  const handleClearHistory = useCallback(() => {
+    if (confirm('Clear all selection history? This cannot be undone.')) {
+      clearHistory();
+    }
+  }, [clearHistory]);
+
+  const displayedHistory = useMemo(() => history.slice(-DISPLAY_LIMIT).reverse(), [history]);
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="px-4 py-3 border-b border-cyan-400/30">
+        <h2 className="text-white font-mono text-sm font-semibold">History</h2>
+        <p className="text-white/50 text-xs mt-1">
+          {stats.total === 0
+            ? 'No selections yet'
+            : `${stats.total} total • ${stats.unique} unique`}
+        </p>
+      </div>
+
+      {history.length === 0 ? (
+        <div className="flex-1 flex items-center justify-center px-4 py-8">
+          <p className="text-white/40 text-sm text-center">
+            Spin the wheel to record selections here
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="flex-1 overflow-y-auto">
+            {displayedHistory.map((record: SelectionRecord) => (
+              <HistoryItem key={record.id} record={record} onDelete={handleDeleteItem} />
+            ))}
+          </div>
+
+          <div className="border-t border-white/5 px-4 py-3">
+            <button
+              type="button"
+              onClick={handleClearHistory}
+              className="w-full px-4 py-2 border border-red-400/30 hover:bg-red-400/20
+                         transition-colors text-red-400 font-mono text-sm
+                         flex items-center justify-center gap-2"
+              aria-label="Clear all history"
+            >
+              <Trash2 className="w-4 h-4" />
+              Clear History
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+export const HistoryPanel = memo(HistoryPanelComponent);
