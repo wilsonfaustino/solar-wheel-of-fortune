@@ -1,6 +1,7 @@
-export function formatRelativeTime(date: Date): string {
+export function formatRelativeTime(date: Date | string): string {
   const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
+  const dateObj = date instanceof Date ? date : new Date(date);
+  const diffMs = now.getTime() - dateObj.getTime();
   const diffSec = Math.floor(diffMs / 1000);
   const diffMin = Math.floor(diffSec / 60);
   const diffHour = Math.floor(diffMin / 60);
@@ -22,5 +23,5 @@ export function formatRelativeTime(date: Date): string {
     return `${diffDay}d ago`;
   }
 
-  return date.toLocaleDateString();
+  return dateObj.toLocaleDateString();
 }
