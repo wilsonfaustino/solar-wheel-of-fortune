@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { DEFAULT_NAMES } from '../constants/defaults';
-import type { Name, NameList } from '../types/name';
+import type { Name, NameList, SelectionRecord } from '../types/name';
 
 function generateId(): string {
   return crypto.randomUUID();
@@ -36,6 +36,7 @@ const initialList = createDefaultList();
 interface NameState {
   lists: NameList[];
   activeListId: string | null;
+  history: SelectionRecord[];
 }
 
 interface NameActions {
@@ -51,6 +52,9 @@ interface NameActions {
   clearSelections: () => void;
   resetList: () => void;
   bulkAddNames: (names: string[]) => void;
+  recordSelection: (nameValue: string, nameId: string) => void;
+  clearHistory: () => void;
+  deleteHistoryItem: (id: string) => void;
 }
 
 type NameStore = NameState & NameActions;
@@ -60,6 +64,7 @@ export const useNameStore = create<NameStore>()(
     immer((set) => ({
       lists: [initialList],
       activeListId: initialList.id,
+      history: [],
 
       addName: (value: string) => {
         const trimmedValue = value.trim().toUpperCase();
@@ -210,12 +215,44 @@ export const useNameStore = create<NameStore>()(
           }
         });
       },
+
+      recordSelection: (nameValue: string, nameId: string) => {
+        set((draft) => {
+          const record: SelectionRecord = {
+            id: generateId(),
+            nameId,
+            nameValue,
+            listId: draft.activeListId || '',
+            timestamp: new Date(),
+            sessionId: '',
+            spinDuration: 0,
+          };
+          draft.history.push(record);
+          // Keep only last 100 records (FIFO)
+          if (draft.history.length > 100) {
+            draft.history = draft.history.slice(-100);
+          }
+        });
+      },
+
+      clearHistory: () => {
+        set((draft) => {
+          draft.history = [];
+        });
+      },
+
+      deleteHistoryItem: (id: string) => {
+        set((draft) => {
+          draft.history = draft.history.filter((item) => item.id !== id);
+        });
+      },
     })),
     {
       name: 'radial-randomizer-v1-state',
       partialize: (state) => ({
         lists: state.lists,
         activeListId: state.activeListId,
+        history: state.history,
       }),
     }
   )
@@ -230,4 +267,17 @@ export const selectActiveNames = (state: NameStore): Name[] => {
   const activeList = state.lists.find((list) => list.id === state.activeListId);
   if (!activeList) return [];
   return activeList.names.filter((name) => !name.isExcluded);
+};
+
+export const selectHistoryStats = (
+  state: NameStore
+): { total: number; unique: number; lastSelection: Date | null } => {
+  const total = state.history.length;
+  const uniqueNames = new Set(state.history.map((r) => r.nameId)).size;
+  const lastSelection = state.history.at(-1)?.timestamp ?? null;
+  return {
+    total,
+    unique: uniqueNames,
+    lastSelection,
+  };
 };

@@ -32,4 +32,5 @@ export const mockTestList: NameList = {
 export const mockInitialState = {
   lists: [mockTestList],
   activeListId: mockTestList.id,
+  history: [],
 };

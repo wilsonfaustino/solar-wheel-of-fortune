@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { WHEEL_CONFIG } from '../../constants/defaults';
+import { useNameStore } from '../../stores/useNameStore';
 import type { Name } from '../../types/name';
 import { CenterButton } from './CenterButton';
 import { NameLabel } from './NameLabel';
@@ -19,6 +20,7 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
     const [rotation, setRotation] = useState(0);
     const [isSpinning, setIsSpinning] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+    const recordSelection = useNameStore((state) => state.recordSelection);
 
     const handleSpin = useCallback(() => {
       if (isSpinning || names.length === 0) return;
@@ -35,11 +37,13 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
       setRotation(targetRotation);
 
       setTimeout(() => {
+        const selectedName = names[finalIndex];
         setIsSpinning(false);
         setSelectedIndex(finalIndex);
-        onSelect(names[finalIndex]);
+        onSelect(selectedName);
+        recordSelection(selectedName.value, selectedName.id);
       }, WHEEL_CONFIG.spinDuration);
-    }, [isSpinning, names, rotation, onSelect]);
+    }, [isSpinning, names, rotation, onSelect, recordSelection]);
 
     useImperativeHandle(
       ref,
