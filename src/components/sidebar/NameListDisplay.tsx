@@ -1,6 +1,6 @@
-import { memo } from "react";
-import { NameListItem } from "./NameListItem";
-import type { Name } from "../../types/name";
+import { memo } from 'react';
+import type { Name } from '../../types/name';
+import { NameListItem } from './NameListItem';
 
 interface NameListDisplayProps {
   names: Name[];
@@ -23,9 +23,7 @@ function NameListDisplayComponent({
       <div className="flex-1 flex items-center justify-center py-12">
         <div className="text-center">
           <div className="text-white/30 font-mono text-sm mb-2">No names yet</div>
-          <div className="text-white/20 font-mono text-xs">
-            Add names above to get started
-          </div>
+          <div className="text-white/20 font-mono text-xs">Add names above to get started</div>
         </div>
       </div>
     );
@@ -56,9 +54,7 @@ function NameListDisplayComponent({
       {excludedNames.length > 0 && (
         <>
           <div className="px-4 py-2 bg-white/5 border-t border-white/10">
-            <div className="text-xs text-white/40 font-mono tracking-wider">
-              EXCLUDED
-            </div>
+            <div className="text-xs text-white/40 font-mono tracking-wider">EXCLUDED</div>
           </div>
           {excludedNames.map((name) => (
             <NameListItem

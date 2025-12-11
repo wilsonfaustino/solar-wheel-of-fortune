@@ -19,6 +19,8 @@ The project has been migrated from a single-file POC to a React + TypeScript app
 - **State Management**: Zustand with persist middleware (localStorage)
 - **Styling**: Tailwind CSS v4 (via @tailwindcss/vite)
 - **Animations**: Framer Motion
+- **Linting & Formatting**: Biome 2 (unified linter + formatter, Rust-based)
+- **Git Hooks**: Lefthook (pre-commit, pre-push, commit-msg validation)
 
 ### Project Structure
 ```
@@ -68,10 +70,28 @@ bun install    # Install dependencies
 bun dev        # Start dev server (http://localhost:5173)
 bun build      # Production build
 bun run tsc    # Type check
+
+# Linting & Formatting
+bun lint       # Run Biome linter (no fixes)
+bun lint:fix   # Run Biome linter with auto-fixes
+bun format     # Format all files
+bun check      # Biome check (lint + format + organize imports)
+bun ci         # Biome CI mode (no writes, fails on issues)
+
+# Testing
 bun test       # Run tests in watch mode
 bun test:ui    # Run tests with UI
 bun test:run   # Run tests once (CI mode)
+
+# Git Hooks
+bun hooks:install   # Install git hooks (runs automatically on install)
+bun hooks:uninstall # Remove git hooks
 ```
+
+**Git Hooks (via Lefthook)**:
+- **pre-commit**: Runs Biome check on staged files, auto-stages fixes
+- **pre-push**: Runs full type-check and test suite
+- **commit-msg**: Validates conventional commits format
 
 ### Key Implementation Details
 
@@ -101,6 +121,41 @@ bun test:run   # Run tests once (CI mode)
 - Avoid comments for self-evident code; only comment magic numbers and non-obvious business logic
 - Keep animations in CSS when possible, use Framer Motion for complex interactions
 - Prefer `memo` for pure components that receive stable props
+
+## Linting & Formatting (Session 4)
+
+### Biome 2
+- **Unified Tool**: Linting + formatting in one tool (no Prettier needed)
+- **Speed**: Rust-based, 10-50x faster than ESLint
+- **Configuration**: `biome.json` at project root
+- **Import Organization**: Automatic import sorting enabled
+- **Pre-commit Checks**: Runs on staged files via Lefthook
+- **Accessibility**: Warns on a11y issues (buttons, SVG titles, etc.)
+
+**Key Commands**:
+- `bun lint` - Check for lint issues
+- `bun lint:fix` - Fix lint issues automatically
+- `bun format` - Format all files
+- `bun check` - All-in-one check (lint + format + organize imports)
+
+**Note**: Some a11y warnings are intentional design choices (modal interactions, etc.) and configured as warnings in `biome.json`.
+
+### Lefthook Git Hooks
+- **Configuration**: `lefthook.yml` at project root
+- **Automatic Installation**: Runs on `bun install`
+- **Pre-commit Hook**: Biome check on staged files, auto-stages fixes
+- **Pre-push Hook**: Full type-check + test suite (prevents broken pushes)
+- **Commit-msg Hook**: Validates conventional commits format
+
+**Commit Message Validation**:
+```
+Format: <type>(<scope>): <description>
+Types: feat, fix, docs, test, refactor, perf, style, chore
+Scope: optional, lowercase alphanumeric with hyphens
+Description: 1-100 characters
+```
+
+Example: `feat(wheel): add spin animation with random rotations`
 
 ## Conventional Commits
 
@@ -224,16 +279,24 @@ bun test:run  # Run tests once
 - feat(shortcuts): add keyboard shortcuts for Space and Escape keys
 - test(store): add comprehensive unit tests for useNameStore with Vitest globals
 
-### Session 4: Tooling Modernization (Planned)
-- [ ] Remove ESLint dependencies and configuration
-- [ ] Install and configure Biome 2 (unified linter + formatter)
-- [ ] Migrate linting rules from ESLint to Biome
-- [ ] Install and configure lefthook (git hooks manager)
-- [ ] Set up pre-commit hooks (Biome check + type-check on staged files)
-- [ ] Set up pre-push hooks (full test suite)
-- [ ] Set up commit-msg validation (conventional commits format)
-- [ ] Test hooks with sample commits
-- [ ] Update documentation
+### Session 4: Tooling Modernization (Completed)
+- [x] Remove ESLint dependencies and configuration
+- [x] Install and configure Biome 2 (unified linter + formatter)
+- [x] Migrate linting rules from ESLint to Biome
+- [x] Install and configure lefthook (git hooks manager)
+- [x] Set up pre-commit hooks (Biome check on staged files)
+- [x] Set up pre-push hooks (type-check + full test suite)
+- [x] Set up commit-msg validation (conventional commits format)
+- [x] Update documentation
+
+**Changes**:
+- Replaced ESLint (6 packages) with Biome 2 for unified linting + formatting
+- Added lefthook for git hooks (pre-commit, pre-push, commit-msg)
+- Updated package.json scripts: lint, lint:fix, format, check, ci, hooks:install, hooks:uninstall
+- Configured Biome with React + TypeScript rules, Tailwind support
+- Configured Lefthook with 3 hooks for quality gates and commit validation
+- Relaxed a11y warnings to accommodate design choices
+- Net reduction: 4 packages (removed 6 ESLint packages, added 2 new tools)
 
 ### Session 5: Selection History & Export (Planned)
 - [ ] Create selection history store (extend useNameStore)

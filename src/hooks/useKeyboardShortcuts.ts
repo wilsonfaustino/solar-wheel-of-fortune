@@ -1,27 +1,24 @@
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
 interface KeyboardShortcutsOptions {
   onSpinTrigger?: () => void;
   onEscapePress?: () => void;
 }
 
-export function useKeyboardShortcuts({
-  onSpinTrigger,
-  onEscapePress,
-}: KeyboardShortcutsOptions) {
+export function useKeyboardShortcuts({ onSpinTrigger, onEscapePress }: KeyboardShortcutsOptions) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.code === "Space") {
+      if (event.code === 'Space') {
         event.preventDefault();
         onSpinTrigger?.();
       }
 
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         onEscapePress?.();
       }
     };
 
-    globalThis.addEventListener("keydown", handleKeyDown);
-    return () => globalThis.removeEventListener("keydown", handleKeyDown);
+    globalThis.addEventListener('keydown', handleKeyDown);
+    return () => globalThis.removeEventListener('keydown', handleKeyDown);
   }, [onSpinTrigger, onEscapePress]);
 }

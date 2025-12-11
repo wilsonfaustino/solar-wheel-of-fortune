@@ -1,0 +1,47 @@
+skip_output:
+  - meta
+  - summary
+
+pre-commit:
+  parallel: true
+  commands:
+    biome-check:
+      glob: "*.{ts,tsx,json}"
+      run: bunx @biomejs/biome check --write {staged_files}
+      stage_fixed: true
+
+pre-push:
+  commands:
+    typecheck:
+      run: bun run tsc -b
+
+    test:
+      run: bun test:run
+
+commit-msg:
+  commands:
+    validate-commit-msg:
+      run: |
+        commit_msg=$(cat {1})
+        pattern="^(feat|fix|docs|test|refactor|perf|style|chore)(\([a-z0-9-]+\))?: .{1,100}$"
+
+        if ! echo "$commit_msg" | head -n1 | grep -qE "$pattern"; then
+          echo ""
+          echo "ERROR: Commit message does not follow Conventional Commits format"
+          echo ""
+          echo "Format: <type>(<scope>): <description>"
+          echo ""
+          echo "Types: feat, fix, docs, test, refactor, perf, style, chore"
+          echo "Scope: optional, lowercase alphanumeric with hyphens"
+          echo "Description: 1-100 characters"
+          echo ""
+          echo "Examples:"
+          echo "  feat(wheel): add spin animation with random rotations"
+          echo "  fix(sidebar): resolve name validation edge case"
+          echo "  docs(readme): update API documentation"
+          echo ""
+          echo "Your commit message:"
+          echo "$commit_msg"
+          echo ""
+          exit 1
+        fi

@@ -5,9 +5,12 @@
       "Bash(bun install:*)",
       "Bash(bun add:*)",
       "Bash(bun run tsc:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(bun test:run:*)"
     ],
-    "deny": [],
+    "deny": [
+      "Bash(sleep)"
+    ],
     "ask": []
   }
 }

@@ -1,18 +1,16 @@
-import { memo, useCallback, useMemo } from "react";
-import { useShallow } from "zustand/shallow";
-import { useNameStore } from "../../stores/useNameStore";
-import { ListSelector } from "./ListSelector";
-import { AddNameForm } from "./AddNameForm";
-import { NameListDisplay } from "./NameListDisplay";
-import { BulkActionsPanel } from "./BulkActionsPanel";
+import { memo, useCallback, useMemo } from 'react';
+import { useShallow } from 'zustand/shallow';
+import { useNameStore } from '../../stores/useNameStore';
+import { AddNameForm } from './AddNameForm';
+import { BulkActionsPanel } from './BulkActionsPanel';
+import { ListSelector } from './ListSelector';
+import { NameListDisplay } from './NameListDisplay';
 
 interface NameManagementSidebarProps {
   className?: string;
 }
 
-function NameManagementSidebarComponent({
-  className = "",
-}: NameManagementSidebarProps) {
+function NameManagementSidebarComponent({ className = '' }: NameManagementSidebarProps) {
   // Select store state
   const { lists, activeListId } = useNameStore(
     useShallow((state) => ({
@@ -25,9 +23,7 @@ function NameManagementSidebarComponent({
   const addName = useNameStore((state) => state.addName);
   const updateName = useNameStore((state) => state.updateName);
   const deleteName = useNameStore((state) => state.deleteName);
-  const toggleNameExclusion = useNameStore(
-    (state) => state.toggleNameExclusion
-  );
+  const toggleNameExclusion = useNameStore((state) => state.toggleNameExclusion);
   const setActiveList = useNameStore((state) => state.setActiveList);
   const createList = useNameStore((state) => state.createList);
   const deleteList = useNameStore((state) => state.deleteList);
@@ -50,8 +46,8 @@ function NameManagementSidebarComponent({
 
   // Callbacks
   const handleCreateList = useCallback(() => {
-    const title = prompt("Enter list name:", "New List");
-    if (title && title.trim()) {
+    const title = prompt('Enter list name:', 'New List');
+    if (title?.trim()) {
       createList(title.trim());
     }
   }, [createList]);
@@ -64,9 +60,7 @@ function NameManagementSidebarComponent({
   );
 
   return (
-    <div
-      className={`w-80 bg-black/90 border-r border-white/10 flex flex-col ${className}`}
-    >
+    <div className={`w-80 bg-black/90 border-r border-white/10 flex flex-col ${className}`}>
       {/* List Selector */}
       <ListSelector
         lists={lists}

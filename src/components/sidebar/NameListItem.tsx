@@ -1,6 +1,6 @@
-import { memo, useState, useRef, useEffect } from "react";
-import { Edit2, Trash2, Eye, EyeOff } from "lucide-react";
-import type { Name } from "../../types/name";
+import { Edit2, Eye, EyeOff, Trash2 } from 'lucide-react';
+import { memo, useEffect, useRef, useState } from 'react';
+import type { Name } from '../../types/name';
 
 interface NameListItemProps {
   name: Name;
@@ -9,12 +9,7 @@ interface NameListItemProps {
   onToggleExclude: (nameId: string) => void;
 }
 
-function NameListItemComponent({
-  name,
-  onEdit,
-  onDelete,
-  onToggleExclude,
-}: NameListItemProps) {
+function NameListItemComponent({ name, onEdit, onDelete, onToggleExclude }: NameListItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(name.value);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -43,7 +38,7 @@ function NameListItemComponent({
     <div
       className={`px-4 py-3 border-b border-white/5 last:border-b-0
                  hover:bg-white/5 transition-colors group
-                 ${name.isExcluded ? "opacity-50" : ""}`}
+                 ${name.isExcluded ? 'opacity-50' : ''}`}
     >
       {isEditing ? (
         <input
@@ -53,8 +48,8 @@ function NameListItemComponent({
           onChange={(e) => setEditValue(e.target.value)}
           onBlur={handleSave}
           onKeyDown={(e) => {
-            if (e.key === "Enter") handleSave();
-            if (e.key === "Escape") handleCancel();
+            if (e.key === 'Enter') handleSave();
+            if (e.key === 'Escape') handleCancel();
           }}
           className="w-full px-2 py-1 bg-black/50 border border-cyan-400/50
                      text-white font-mono text-sm
@@ -69,13 +64,15 @@ function NameListItemComponent({
           >
             <span
               className={`text-white font-mono text-sm
-                             ${name.isExcluded ? "line-through" : ""}`}
+                             ${name.isExcluded ? 'line-through' : ''}`}
             >
               {name.value}
             </span>
             {name.selectionCount > 0 && (
-              <span className="px-2 py-0.5 bg-cyan-400/20 text-cyan-400
-                               text-xs font-mono rounded">
+              <span
+                className="px-2 py-0.5 bg-cyan-400/20 text-cyan-400
+                               text-xs font-mono rounded"
+              >
                 {name.selectionCount}x
               </span>
             )}
@@ -85,15 +82,11 @@ function NameListItemComponent({
             <button
               onClick={() => onToggleExclude(name.id)}
               className={`p-1.5 hover:bg-white/10 rounded transition-colors
-                         ${name.isExcluded ? "text-white/30" : "text-cyan-400/70"}`}
-              aria-label={name.isExcluded ? "Include name" : "Exclude name"}
-              title={name.isExcluded ? "Include in spins" : "Exclude from spins"}
+                         ${name.isExcluded ? 'text-white/30' : 'text-cyan-400/70'}`}
+              aria-label={name.isExcluded ? 'Include name' : 'Exclude name'}
+              title={name.isExcluded ? 'Include in spins' : 'Exclude from spins'}
             >
-              {name.isExcluded ? (
-                <EyeOff className="w-4 h-4" />
-              ) : (
-                <Eye className="w-4 h-4" />
-              )}
+              {name.isExcluded ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
             <button
               onClick={() => setIsEditing(true)}

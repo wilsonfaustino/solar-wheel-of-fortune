@@ -1,16 +1,16 @@
 export const DEFAULT_NAMES = [
-  "ALEX",
-  "JORDAN",
-  "CASEY",
-  "MORGAN",
-  "RILEY",
-  "AVERY",
-  "TAYLOR",
-  "SKYLAR",
-  "QUINN",
-  "SAGE",
-  "ROWAN",
-  "DAKOTA",
+  'ALEX',
+  'JORDAN',
+  'CASEY',
+  'MORGAN',
+  'RILEY',
+  'AVERY',
+  'TAYLOR',
+  'SKYLAR',
+  'QUINN',
+  'SAGE',
+  'ROWAN',
+  'DAKOTA',
 ];
 
 export const WHEEL_CONFIG = {
@@ -24,5 +24,5 @@ export const WHEEL_CONFIG = {
 } as const;
 
 export const ANIMATION_CONFIG = {
-  spinEasing: "cubic-bezier(0.17, 0.67, 0.3, 0.98)",
+  spinEasing: 'cubic-bezier(0.17, 0.67, 0.3, 0.98)',
 } as const;
