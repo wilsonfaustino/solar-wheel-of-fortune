@@ -1,7 +1,8 @@
-import { Trash2 } from 'lucide-react';
-import { memo, useCallback, useMemo } from 'react';
+import { Download, Trash2 } from 'lucide-react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { useNameStore } from '../../stores/useNameStore';
 import type { SelectionRecord } from '../../types/name';
+import { ExportModal } from './ExportModal';
 import { HistoryItem } from './HistoryItem';
 
 const DISPLAY_LIMIT = 20;
@@ -10,6 +11,7 @@ function HistoryPanelComponent() {
   const history = useNameStore((state) => state.history);
   const deleteHistoryItem = useNameStore((state) => state.deleteHistoryItem);
   const clearHistory = useNameStore((state) => state.clearHistory);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   const stats = useMemo(() => {
     const total = history.length;
@@ -34,6 +36,14 @@ function HistoryPanelComponent() {
       clearHistory();
     }
   }, [clearHistory]);
+
+  const handleOpenExport = useCallback(() => {
+    setShowExportModal(true);
+  }, []);
+
+  const handleCloseExport = useCallback(() => {
+    setShowExportModal(false);
+  }, []);
 
   const displayedHistory = useMemo(() => history.slice(-DISPLAY_LIMIT).reverse(), [history]);
 
@@ -62,21 +72,34 @@ function HistoryPanelComponent() {
             ))}
           </div>
 
-          <div className="border-t border-white/5 px-4 py-3">
+          <div className="border-t border-white/5 px-4 py-3 flex gap-2">
+            <button
+              type="button"
+              onClick={handleOpenExport}
+              className="flex-1 px-4 py-2 border border-cyan-400/30 hover:bg-cyan-400/20
+                         transition-colors text-cyan-400 font-mono text-sm
+                         flex items-center justify-center gap-2"
+              aria-label="Export selection history"
+            >
+              <Download className="w-4 h-4" />
+              Export
+            </button>
             <button
               type="button"
               onClick={handleClearHistory}
-              className="w-full px-4 py-2 border border-red-400/30 hover:bg-red-400/20
+              className="flex-1 px-4 py-2 border border-red-400/30 hover:bg-red-400/20
                          transition-colors text-red-400 font-mono text-sm
                          flex items-center justify-center gap-2"
               aria-label="Clear all history"
             >
               <Trash2 className="w-4 h-4" />
-              Clear History
+              Clear
             </button>
           </div>
         </>
       )}
+
+      {showExportModal && <ExportModal records={history} onClose={handleCloseExport} />}
     </div>
   );
 }

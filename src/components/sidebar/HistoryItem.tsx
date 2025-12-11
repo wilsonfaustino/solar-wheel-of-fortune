@@ -22,10 +22,10 @@ function HistoryItemComponent({ record, onDelete }: HistoryItemProps) {
       <button
         type="button"
         onClick={() => onDelete(record.id)}
-        className="ml-2 p-1.5 hover:bg-white/10 rounded transition-colors text-red-400/70 flex-shrink-0"
+        className="ml-2 p-1.5 hover:bg-white/10 rounded transition-colors text-red-400/70 shrink-0"
         aria-label={`Delete ${record.nameValue} from history`}
       >
-        <Trash2 className="w-4 h-4" />
+        <Trash2 className="size-4" />
       </button>
     </div>
   );
