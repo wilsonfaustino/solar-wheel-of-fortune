@@ -23,6 +23,8 @@ A visually distinctive name selection tool with an engaging radial interface. Pe
 - Framer Motion (animations)
 - Tailwind CSS v4
 - Bun (package manager)
+- Biome 2 (linting & formatting)
+- Lefthook (git hooks manager)
 
 ## Getting Started
 
@@ -54,6 +56,10 @@ The app will be available at `http://localhost:5173`
 | `bun build` | Build for production |
 | `bun preview` | Preview production build |
 | `bun run tsc` | Type check |
+| `bun lint` | Check for lint issues |
+| `bun lint:fix` | Auto-fix lint issues |
+| `bun format` | Format all files |
+| `bun check` | Unified check (lint + format + organize imports) |
 | `bun test` | Run tests in watch mode |
 | `bun test:ui` | Run tests with UI dashboard |
 | `bun test:run` | Run tests once (CI mode) |
@@ -118,12 +124,13 @@ See [radial-randomizer-prd.md](./radial-randomizer-prd.md) for the complete prod
 - [x] Unit tests (Vitest + React Testing Library)
 - [x] 30 comprehensive store tests
 
-**Session 4: Tooling Modernization** 🚧 In Progress
-- [ ] Migrate from ESLint to Biome 2 (unified linter + formatter)
-- [ ] Install and configure lefthook (git hooks manager)
-- [ ] Pre-commit validation (lint + type-check)
-- [ ] Pre-push tests
-- [ ] Commit message validation
+**Session 4: Tooling Modernization** ✅ Complete
+- [x] Migrate from ESLint to Biome 2 (unified linter + formatter)
+- [x] Install and configure lefthook (git hooks manager)
+- [x] Pre-commit validation (lint + auto-fix on staged files)
+- [x] Pre-push validation (type-check + test suite)
+- [x] Commit message validation (conventional commits format)
+- [x] VSCode integration (format on save, auto-fix)
 
 **Session 5: Selection History & Export**
 - [ ] Selection history panel (track spins)
