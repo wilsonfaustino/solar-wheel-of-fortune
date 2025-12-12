@@ -31,7 +31,7 @@ export const THEMES: Record<Theme, ThemeConfig> = {
     colors: {
       accent: '#FF6B35',
       accentGlow: 'rgba(255, 107, 53, 0.8)',
-      background: '#1A0A00',
+      background: '#000000',
       text: '#FFFFFF',
       border: '#FF6B35',
       borderLight: 'rgba(255, 107, 53, 0.3)',
