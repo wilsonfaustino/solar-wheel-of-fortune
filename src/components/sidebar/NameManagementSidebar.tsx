@@ -63,7 +63,9 @@ function NameManagementSidebarComponent({ className = '' }: NameManagementSideba
   );
 
   return (
-    <div className={`w-80 bg-black/90 border-r border-white/10 flex flex-col ${className}`}>
+    <div
+      className={`w-80 bg-black/90 border-r border-white/10 flex flex-col h-screen ${className}`}
+    >
       {/* Tab Navigation */}
       <div className="flex border-b border-white/10">
         <button
