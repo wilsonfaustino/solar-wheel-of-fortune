@@ -2,7 +2,9 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { DEFAULT_NAMES } from '../constants/defaults';
+import { DEFAULT_THEME } from '../constants/themes';
 import type { Name, NameList, SelectionRecord } from '../types/name';
+import type { Theme } from '../types/theme';
 
 function generateId(): string {
   return crypto.randomUUID();
@@ -37,6 +39,7 @@ interface NameState {
   lists: NameList[];
   activeListId: string | null;
   history: SelectionRecord[];
+  currentTheme: Theme;
 }
 
 interface NameActions {
@@ -55,6 +58,7 @@ interface NameActions {
   recordSelection: (nameValue: string, nameId: string) => void;
   clearHistory: () => void;
   deleteHistoryItem: (id: string) => void;
+  setTheme: (theme: Theme) => void;
 }
 
 type NameStore = NameState & NameActions;
@@ -65,6 +69,7 @@ export const useNameStore = create<NameStore>()(
       lists: [initialList],
       activeListId: initialList.id,
       history: [],
+      currentTheme: DEFAULT_THEME,
 
       addName: (value: string) => {
         const trimmedValue = value.trim().toUpperCase();
@@ -246,6 +251,12 @@ export const useNameStore = create<NameStore>()(
           draft.history = draft.history.filter((item) => item.id !== id);
         });
       },
+
+      setTheme: (theme: Theme) => {
+        set((draft) => {
+          draft.currentTheme = theme;
+        });
+      },
     })),
     {
       name: 'radial-randomizer-v1-state',
@@ -253,6 +264,7 @@ export const useNameStore = create<NameStore>()(
         lists: state.lists,
         activeListId: state.activeListId,
         history: state.history,
+        currentTheme: state.currentTheme,
       }),
     }
   )

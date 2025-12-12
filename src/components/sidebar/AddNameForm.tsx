@@ -54,7 +54,7 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
   const showCharCount = charCount > 80;
 
   return (
-    <div className="px-4 py-4 border-b border-white/10">
+    <div className="px-4 py-4 border-b" style={{ borderBottomColor: 'var(--color-border-light)' }}>
       {/* Add Name Form */}
       <form onSubmit={handleSubmit} className="flex gap-2">
         <div className="flex-1">
@@ -66,10 +66,19 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
               setError('');
             }}
             placeholder="Enter name..."
-            className="w-full px-3 py-2 bg-black/50 border border-cyan-400/30
-                       text-white font-mono text-sm
-                       focus:outline-none focus:ring-2 focus:ring-cyan-400
-                       placeholder:text-white/30"
+            className="w-full px-3 py-2 font-mono text-sm focus:outline-none placeholder:text-white/30"
+            style={{
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              borderColor: 'var(--color-border-light)',
+              borderWidth: '1px',
+              color: 'var(--color-text)',
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 0 2px var(--color-accent)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.boxShadow = 'none';
+            }}
             maxLength={100}
           />
           {showCharCount && (
@@ -84,9 +93,13 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
         </div>
         <button
           type="submit"
-          className="px-4 py-2 bg-cyan-400/10 border border-cyan-400/30
-                     hover:bg-cyan-400/20 transition-colors
-                     text-cyan-400 font-mono text-sm tracking-wider"
+          className="px-4 py-2 font-mono text-sm tracking-wider transition-colors"
+          style={{
+            backgroundColor: 'var(--color-accent-10)',
+            borderColor: 'var(--color-border-light)',
+            borderWidth: '1px',
+            color: 'var(--color-accent)',
+          }}
           aria-label="Add name"
         >
           <Plus className="w-5 h-5" />
@@ -97,8 +110,11 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
       <button
         type="button"
         onClick={() => setShowBulkImport(true)}
-        className="mt-3 text-xs text-cyan-400/70 hover:text-cyan-400
-                   font-mono tracking-wider flex items-center gap-1"
+        className="mt-3 text-xs font-mono tracking-wider flex items-center gap-1"
+        style={{
+          color: 'var(--color-accent)',
+          opacity: 0.7,
+        }}
       >
         <Upload className="w-3 h-3" />
         BULK IMPORT
@@ -126,10 +142,20 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
           <div
             role="dialog"
             aria-label="Bulk import names"
-            className="bg-black border border-cyan-400/30 p-6 max-w-lg w-full"
+            className="p-6 max-w-lg w-full"
+            style={{
+              backgroundColor: 'black',
+              borderColor: 'var(--color-border-light)',
+              borderWidth: '1px',
+            }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-cyan-400 font-mono text-lg mb-4 tracking-wider">BULK IMPORT</h3>
+            <h3
+              className="font-mono text-lg mb-4 tracking-wider"
+              style={{ color: 'var(--color-accent)' }}
+            >
+              BULK IMPORT
+            </h3>
             <textarea
               value={bulkText}
               onChange={(e) => setBulkText(e.target.value)}
@@ -141,18 +167,31 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
                 }
               }}
               placeholder="Paste names (one per line)"
-              className="w-full h-64 px-3 py-2 bg-black/50 border border-cyan-400/30
-                         text-white font-mono text-sm
-                         focus:outline-none focus:ring-2 focus:ring-cyan-400
-                         placeholder:text-white/30 resize-none"
+              className="w-full h-64 px-3 py-2 font-mono text-sm focus:outline-none placeholder:text-white/30 resize-none"
+              style={{
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                borderColor: 'var(--color-border-light)',
+                borderWidth: '1px',
+                color: 'var(--color-text)',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.boxShadow = '0 0 0 2px var(--color-accent)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.boxShadow = 'none';
+              }}
             />
             <div className="flex gap-2 mt-4">
               <button
                 type="button"
                 onClick={handleBulkImport}
-                className="flex-1 px-4 py-2 bg-cyan-400/10 border border-cyan-400/30
-                           hover:bg-cyan-400/20 transition-colors
-                           text-cyan-400 font-mono text-sm tracking-wider"
+                className="flex-1 px-4 py-2 font-mono text-sm tracking-wider transition-colors"
+                style={{
+                  backgroundColor: 'var(--color-accent-10)',
+                  borderColor: 'var(--color-border-light)',
+                  borderWidth: '1px',
+                  color: 'var(--color-accent)',
+                }}
               >
                 IMPORT
               </button>
@@ -163,9 +202,13 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
                   setBulkText('');
                   setError('');
                 }}
-                className="px-4 py-2 border border-white/20
-                           hover:bg-white/5 transition-colors
-                           text-white/70 font-mono text-sm tracking-wider"
+                className="px-4 py-2 font-mono text-sm tracking-wider transition-colors"
+                style={{
+                  borderColor: 'var(--color-border-light)',
+                  borderWidth: '1px',
+                  color: 'var(--color-text)',
+                  opacity: 0.7,
+                }}
               >
                 CANCEL
               </button>

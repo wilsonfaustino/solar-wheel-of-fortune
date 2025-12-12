@@ -72,45 +72,88 @@ function ListSelectorComponent({
       {/* Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-4 py-3 bg-black/60 border border-cyan-400/30
-                   hover:bg-white/5 transition-colors duration-200
-                   flex items-center justify-between group"
+        className="w-full px-4 py-3 transition-colors duration-200 flex items-center justify-between group"
+        style={{
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          borderColor: 'var(--color-border-light)',
+          borderWidth: '1px',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+        }}
       >
         <div className="flex-1 text-left">
-          <div className="text-xs text-white/50 tracking-wider mb-1 font-mono">ACTIVE LIST</div>
-          <div className="text-cyan-400 tracking-wider font-light font-mono">
+          <div
+            className="text-xs tracking-wider mb-1 font-mono"
+            style={{ color: 'var(--color-text)', opacity: 0.5 }}
+          >
+            ACTIVE LIST
+          </div>
+          <div
+            className="tracking-wider font-light font-mono"
+            style={{ color: 'var(--color-accent)' }}
+          >
             {activeList?.title || 'No List'}
           </div>
         </div>
         <ChevronDown
-          className={`w-5 h-5 text-cyan-400/50 transition-transform
-                      ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-5 h-5 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          style={{ color: 'var(--color-accent)', opacity: 0.5 }}
         />
       </button>
 
       {/* Dropdown */}
       {isOpen && (
         <div
-          className="absolute top-full left-0 right-0 mt-2 bg-black/90
-                        border border-cyan-400/30 backdrop-blur-sm z-50
-                        max-h-80 overflow-y-auto"
+          className="absolute top-full left-0 right-0 mt-2 backdrop-blur-sm z-50 max-h-80 overflow-y-auto"
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            borderColor: 'var(--color-border-light)',
+            borderWidth: '1px',
+          }}
         >
           {/* List Items */}
           {lists.map((list) => (
             <div
               key={list.id}
-              className={`px-4 py-3 border-b border-white/5 last:border-b-0
-                         hover:bg-white/5 transition-colors group
-                         ${list.id === activeListId ? 'bg-cyan-400/10' : ''}`}
+              className="px-4 py-3 last:border-b-0 transition-colors group"
+              style={{
+                borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+                borderBottomWidth: '1px',
+                backgroundColor:
+                  list.id === activeListId ? 'var(--color-accent-10)' : 'transparent',
+              }}
+              onMouseEnter={(e) => {
+                if (list.id !== activeListId) {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (list.id !== activeListId) {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }
+              }}
             >
               {editingId === list.id ? (
                 <input
                   type="text"
                   defaultValue={list.title}
-                  className="w-full bg-black/50 border border-cyan-400/50
-                             px-2 py-1 text-white font-mono text-sm
-                             focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                  className="w-full px-2 py-1 font-mono text-sm focus:outline-none"
+                  style={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    borderColor: 'var(--color-accent)',
+                    borderWidth: '1px',
+                    color: 'var(--color-text)',
+                    opacity: 0.5,
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.boxShadow = '0 0 0 2px var(--color-accent)';
+                  }}
                   onBlur={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
                     onRenameList(list.id, e.target.value);
                     setEditingId(null);
                   }}
@@ -132,8 +175,15 @@ function ListSelectorComponent({
                     }}
                     className="flex-1 text-left"
                   >
-                    <div className="text-white font-mono text-sm">{list.title}</div>
-                    <div className="text-white/40 text-xs font-mono">{list.names.length} names</div>
+                    <div className="font-mono text-sm" style={{ color: 'var(--color-text)' }}>
+                      {list.title}
+                    </div>
+                    <div
+                      className="text-xs font-mono"
+                      style={{ color: 'var(--color-text)', opacity: 0.4 }}
+                    >
+                      {list.names.length} names
+                    </div>
                   </button>
 
                   {list.id !== activeListId && (
@@ -143,21 +193,34 @@ function ListSelectorComponent({
                           e.stopPropagation();
                           setEditingId(list.id);
                         }}
-                        className="p-1 hover:bg-white/10 rounded"
+                        className="p-1 rounded"
+                        style={{ color: 'var(--color-accent)', opacity: 0.7 }}
                         aria-label={`Edit ${list.title}`}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
                       >
-                        <Edit2 className="w-4 h-4 text-cyan-400/70" />
+                        <Edit2 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteClick(list.id);
                         }}
-                        className="p-1 hover:bg-white/10 rounded"
+                        className="p-1 rounded text-red-400/70"
                         aria-label={`Delete ${list.title}`}
                         disabled={lists.length === 1}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
                       >
-                        <Trash2 className="w-4 h-4 text-red-400/70" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   )}
@@ -172,12 +235,26 @@ function ListSelectorComponent({
               onCreateList();
               setIsOpen(false);
             }}
-            className="w-full px-4 py-3 bg-cyan-400/5 hover:bg-cyan-400/10
-                       transition-colors flex items-center gap-2
-                       border-t border-cyan-400/30"
+            className="w-full px-4 py-3 transition-colors flex items-center gap-2"
+            style={{
+              backgroundColor: 'var(--color-accent-05)',
+              borderTopColor: 'var(--color-border-light)',
+              borderTopWidth: '1px',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--color-accent-10)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--color-accent-05)';
+            }}
           >
-            <Plus className="w-5 h-5 text-cyan-400" />
-            <span className="text-cyan-400 font-mono text-sm tracking-wider">CREATE NEW LIST</span>
+            <Plus className="w-5 h-5" style={{ color: 'var(--color-accent)' }} />
+            <span
+              className="font-mono text-sm tracking-wider"
+              style={{ color: 'var(--color-accent)' }}
+            >
+              CREATE NEW LIST
+            </span>
           </button>
         </div>
       )}

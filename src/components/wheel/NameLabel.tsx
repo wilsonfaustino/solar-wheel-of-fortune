@@ -27,7 +27,7 @@ function NameLabelComponent({ name, index, totalNames, isSelected }: NameLabelPr
         y="-5"
         fontSize={isSelected ? '24' : '13'}
         fontWeight={isSelected ? '600' : '300'}
-        fill={isSelected ? '#00ffff' : 'white'}
+        fill={isSelected ? 'var(--color-accent)' : 'var(--color-text)'}
         opacity={isSelected ? 1 : 0.85}
         letterSpacing="2"
         style={{

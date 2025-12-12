@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 import { NameManagementSidebar } from './components/sidebar';
 import { RadialWheel, type RadialWheelRef } from './components/wheel';
@@ -9,10 +9,18 @@ import type { Name } from './types/name';
 function App() {
   const wheelRef = useRef<RadialWheelRef>(null);
 
-  const { lists, activeListId } = useNameStore(
-    useShallow((state) => ({ lists: state.lists, activeListId: state.activeListId }))
+  const { lists, activeListId, currentTheme } = useNameStore(
+    useShallow((state) => ({
+      lists: state.lists,
+      activeListId: state.activeListId,
+      currentTheme: state.currentTheme,
+    }))
   );
   const markSelected = useNameStore((state) => state.markSelected);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', currentTheme);
+  }, [currentTheme]);
 
   const names = useMemo(() => {
     const activeList = lists.find((list) => list.id === activeListId);
@@ -34,7 +42,7 @@ function App() {
   });
 
   return (
-    <div className="bg-black min-h-screen flex">
+    <div className="min-h-screen flex" style={{ backgroundColor: 'var(--color-background)' }}>
       {/* Sidebar */}
       <NameManagementSidebar />
 
@@ -45,16 +53,34 @@ function App() {
 
           {selectedName && (
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-              <div className="px-6 py-3 border border-cyan-400/30 bg-black/60 backdrop-blur-sm rounded">
-                <div className="text-xs text-white/50 tracking-wider mb-1 font-mono">SELECTED</div>
-                <div className="text-2xl text-cyan-400 tracking-wider font-light font-mono">
+              <div
+                className="px-6 py-3 backdrop-blur-sm rounded"
+                style={{
+                  borderColor: 'var(--color-border-light)',
+                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                  borderWidth: '1px',
+                }}
+              >
+                <div
+                  className="text-xs tracking-wider mb-1 font-mono"
+                  style={{ color: 'var(--color-text)', opacity: 0.5 }}
+                >
+                  SELECTED
+                </div>
+                <div
+                  className="text-2xl tracking-wider font-light font-mono"
+                  style={{ color: 'var(--color-accent)' }}
+                >
                   {selectedName.value}
                 </div>
               </div>
             </div>
           )}
 
-          <div className="absolute top-8 left-1/2 -translate-x-1/2 text-white/40 text-xs tracking-wider font-mono">
+          <div
+            className="absolute top-8 left-1/2 -translate-x-1/2 text-xs tracking-wider font-mono"
+            style={{ color: 'var(--color-text)', opacity: 0.4 }}
+          >
             CLICK CENTER TO RANDOMIZE
           </div>
         </div>

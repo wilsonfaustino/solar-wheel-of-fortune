@@ -36,9 +36,18 @@ function NameListItemComponent({ name, onEdit, onDelete, onToggleExclude }: Name
 
   return (
     <div
-      className={`px-4 py-3 border-b border-white/5 last:border-b-0
-                 hover:bg-white/5 transition-colors group
-                 ${name.isExcluded ? 'opacity-50' : ''}`}
+      className="px-4 py-3 last:border-b-0 transition-colors group"
+      style={{
+        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+        borderBottomWidth: '1px',
+        opacity: name.isExcluded ? 0.5 : 1,
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'transparent';
+      }}
     >
       {isEditing ? (
         <input
@@ -51,9 +60,17 @@ function NameListItemComponent({ name, onEdit, onDelete, onToggleExclude }: Name
             if (e.key === 'Enter') handleSave();
             if (e.key === 'Escape') handleCancel();
           }}
-          className="w-full px-2 py-1 bg-black/50 border border-cyan-400/50
-                     text-white font-mono text-sm
-                     focus:outline-none focus:ring-2 focus:ring-cyan-400"
+          className="w-full px-2 py-1 font-mono text-sm focus:outline-none"
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            borderColor: 'var(--color-accent)',
+            borderWidth: '1px',
+            color: 'var(--color-text)',
+            opacity: 0.5,
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.boxShadow = '0 0 0 2px var(--color-accent)';
+          }}
           maxLength={100}
         />
       ) : (
@@ -63,15 +80,18 @@ function NameListItemComponent({ name, onEdit, onDelete, onToggleExclude }: Name
             className="flex-1 text-left flex items-center gap-2"
           >
             <span
-              className={`text-white font-mono text-sm
-                             ${name.isExcluded ? 'line-through' : ''}`}
+              className={`font-mono text-sm ${name.isExcluded ? 'line-through' : ''}`}
+              style={{ color: 'var(--color-text)' }}
             >
               {name.value}
             </span>
             {name.selectionCount > 0 && (
               <span
-                className="px-2 py-0.5 bg-cyan-400/20 text-cyan-400
-                               text-xs font-mono rounded"
+                className="px-2 py-0.5 text-xs font-mono rounded"
+                style={{
+                  backgroundColor: 'var(--color-accent-20)',
+                  color: 'var(--color-accent)',
+                }}
               >
                 {name.selectionCount}x
               </span>
@@ -81,24 +101,46 @@ function NameListItemComponent({ name, onEdit, onDelete, onToggleExclude }: Name
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={() => onToggleExclude(name.id)}
-              className={`p-1.5 hover:bg-white/10 rounded transition-colors
-                         ${name.isExcluded ? 'text-white/30' : 'text-cyan-400/70'}`}
+              className="p-1.5 rounded transition-colors"
+              style={{
+                color: name.isExcluded ? 'var(--color-text)' : 'var(--color-accent)',
+                opacity: name.isExcluded ? 0.3 : 0.7,
+              }}
               aria-label={name.isExcluded ? 'Include name' : 'Exclude name'}
               title={name.isExcluded ? 'Include in spins' : 'Exclude from spins'}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
               {name.isExcluded ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
             <button
               onClick={() => setIsEditing(true)}
-              className="p-1.5 hover:bg-white/10 rounded transition-colors text-cyan-400/70"
+              className="p-1.5 rounded transition-colors"
+              style={{ color: 'var(--color-accent)', opacity: 0.7 }}
               aria-label={`Edit ${name.value}`}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
               <Edit2 className="w-4 h-4" />
             </button>
             <button
               onClick={() => onDelete(name.id)}
-              className="p-1.5 hover:bg-white/10 rounded transition-colors text-red-400/70"
+              className="p-1.5 rounded transition-colors text-red-400/70"
               aria-label={`Delete ${name.value}`}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
               <Trash2 className="w-4 h-4" />
             </button>

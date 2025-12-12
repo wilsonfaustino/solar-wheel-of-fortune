@@ -11,7 +11,7 @@ function RadialLineComponent({ isSelected }: RadialLineProps) {
       y1="0"
       x2="120"
       y2="0"
-      stroke="white"
+      stroke="var(--color-text)"
       strokeWidth="0.5"
       opacity={isSelected ? 0.6 : 0.12}
       style={{ transition: 'opacity 0.3s ease' }}

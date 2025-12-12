@@ -1,4 +1,5 @@
 import type { NameList } from '../types/name';
+import type { Theme } from '../types/theme';
 
 export const mockTestList: NameList = {
   id: 'test-list-1',
@@ -33,4 +34,5 @@ export const mockInitialState = {
   lists: [mockTestList],
   activeListId: mockTestList.id,
   history: [],
+  currentTheme: 'cyan' as Theme,
 };
