@@ -54,7 +54,8 @@ describe('ExportModal', () => {
     render(<ExportModal records={mockRecords} onClose={mockOnClose as () => void} />);
 
     const csvButton = screen.getByRole('button', { name: 'CSV' });
-    expect(csvButton).toHaveClass('bg-cyan-400/20');
+    expect(csvButton.style.backgroundColor).toBe('var(--color-accent-20)');
+    expect(csvButton.style.borderColor).toBe('var(--color-accent)');
   });
 
   it('should switch format when JSON button is clicked', async () => {
@@ -62,10 +63,13 @@ describe('ExportModal', () => {
     render(<ExportModal records={mockRecords} onClose={mockOnClose as () => void} />);
 
     const jsonButton = screen.getByRole('button', { name: 'JSON' });
+    const csvButton = screen.getByRole('button', { name: 'CSV' });
+
     await user.click(jsonButton);
 
-    expect(jsonButton).toHaveClass('bg-cyan-400/20');
-    expect(screen.getByRole('button', { name: 'CSV' })).not.toHaveClass('bg-cyan-400/20');
+    expect(jsonButton.style.backgroundColor).toBe('var(--color-accent-20)');
+    expect(jsonButton.style.borderColor).toBe('var(--color-accent)');
+    expect(csvButton.style.backgroundColor).toBe('transparent');
   });
 
   it('should display record count', () => {
