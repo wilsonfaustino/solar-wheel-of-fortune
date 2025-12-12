@@ -182,6 +182,12 @@ test(store): add tests for list creation
 refactor(components): extract shared validation utilities
 ```
 
+**IMPORTANT - Commit Attribution**:
+- Do NOT add "Co-Authored-By" trailers with Claude model information to commits
+- Do NOT sign commits with the AI model as author
+- Commits should reflect human authorship only
+- Use your own name and email for git commits (configured via `git config user.name` and `git config user.email`)
+
 ## MVP Progress
 
 ### Session 1: Core Features (Completed)

@@ -28,6 +28,7 @@ function BulkActionsPanelComponent({
   return (
     <div className="px-4 py-4 border-t border-white/10 flex gap-2">
       <button
+        type="button"
         onClick={onClearSelections}
         disabled={!hasSelections}
         className="flex-1 px-3 py-2 border border-white/20
@@ -37,10 +38,11 @@ function BulkActionsPanelComponent({
                    flex items-center justify-center gap-2"
         title={hasSelections ? 'Clear selection history' : 'No selections to clear'}
       >
-        <Eraser className="w-4 h-4" />
+        <Eraser className="size-4" />
         CLEAR
       </button>
       <button
+        type="button"
         onClick={handleReset}
         disabled={!hasNames}
         className="flex-1 px-3 py-2 border border-white/20
@@ -50,7 +52,7 @@ function BulkActionsPanelComponent({
                    flex items-center justify-center gap-2"
         title={hasNames ? 'Reset selections and exclusions' : 'No names to reset'}
       >
-        <RotateCcw className="w-4 h-4" />
+        <RotateCcw className="size-4" />
         RESET
       </button>
     </div>

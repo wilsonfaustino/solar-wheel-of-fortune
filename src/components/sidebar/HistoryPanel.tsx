@@ -81,7 +81,7 @@ function HistoryPanelComponent() {
                          flex items-center justify-center gap-2"
               aria-label="Export selection history"
             >
-              <Download className="w-4 h-4" />
+              <Download className="size-4" />
               Export
             </button>
             <button
@@ -92,7 +92,7 @@ function HistoryPanelComponent() {
                          flex items-center justify-center gap-2"
               aria-label="Clear all history"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="size-4" />
               Clear
             </button>
           </div>
