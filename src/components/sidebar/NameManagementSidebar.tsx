@@ -6,13 +6,14 @@ import { BulkActionsPanel } from './BulkActionsPanel';
 import { HistoryPanel } from './HistoryPanel';
 import { ListSelector } from './ListSelector';
 import { NameListDisplay } from './NameListDisplay';
+import { ThemeSwitcher } from './ThemeSwitcher';
 
 interface NameManagementSidebarProps {
   className?: string;
 }
 
 function NameManagementSidebarComponent({ className = '' }: NameManagementSidebarProps) {
-  const [activeTab, setActiveTab] = useState<'names' | 'history'>('names');
+  const [activeTab, setActiveTab] = useState<'names' | 'history' | 'settings'>('names');
 
   // Select store state
   const { lists, activeListId } = useNameStore(
@@ -64,33 +65,56 @@ function NameManagementSidebarComponent({ className = '' }: NameManagementSideba
 
   return (
     <div
-      className={`w-80 bg-black/90 border-r border-white/10 flex flex-col h-screen ${className}`}
+      className={`w-80 border-r flex flex-col h-screen ${className}`}
+      style={{
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        borderRightColor: 'var(--color-border-light)',
+        borderRightWidth: '1px',
+      }}
     >
       {/* Tab Navigation */}
-      <div className="flex border-b border-white/10">
+      <div
+        className="flex"
+        style={{
+          borderBottomColor: 'var(--color-border-light)',
+          borderBottomWidth: '1px',
+        }}
+      >
         <button
           type="button"
           onClick={() => setActiveTab('names')}
-          className={`flex-1 px-4 py-3 font-mono text-sm transition-colors
-                      ${
-                        activeTab === 'names'
-                          ? 'border-b-2 border-cyan-400 text-cyan-400'
-                          : 'text-white/50 hover:text-white/70'
-                      }`}
+          className="flex-1 px-4 py-3 font-mono text-sm transition-colors"
+          style={{
+            borderBottom: activeTab === 'names' ? '2px solid var(--color-accent)' : 'none',
+            color: activeTab === 'names' ? 'var(--color-accent)' : 'var(--color-text)',
+            opacity: activeTab === 'names' ? 1 : 0.5,
+          }}
         >
           Names
         </button>
         <button
           type="button"
           onClick={() => setActiveTab('history')}
-          className={`flex-1 px-4 py-3 font-mono text-sm transition-colors
-                      ${
-                        activeTab === 'history'
-                          ? 'border-b-2 border-cyan-400 text-cyan-400'
-                          : 'text-white/50 hover:text-white/70'
-                      }`}
+          className="flex-1 px-4 py-3 font-mono text-sm transition-colors"
+          style={{
+            borderBottom: activeTab === 'history' ? '2px solid var(--color-accent)' : 'none',
+            color: activeTab === 'history' ? 'var(--color-accent)' : 'var(--color-text)',
+            opacity: activeTab === 'history' ? 1 : 0.5,
+          }}
         >
           History
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('settings')}
+          className="flex-1 px-4 py-3 font-mono text-sm transition-colors"
+          style={{
+            borderBottom: activeTab === 'settings' ? '2px solid var(--color-accent)' : 'none',
+            color: activeTab === 'settings' ? 'var(--color-accent)' : 'var(--color-text)',
+            opacity: activeTab === 'settings' ? 1 : 0.5,
+          }}
+        >
+          Settings
         </button>
       </div>
 
@@ -130,6 +154,9 @@ function NameManagementSidebarComponent({ className = '' }: NameManagementSideba
 
       {/* History Tab Content */}
       {activeTab === 'history' && <HistoryPanel />}
+
+      {/* Settings Tab Content */}
+      {activeTab === 'settings' && <ThemeSwitcher />}
     </div>
   );
 }

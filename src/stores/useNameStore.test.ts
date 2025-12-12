@@ -512,4 +512,41 @@ describe('useNameStore', () => {
       expect(stats.lastSelection).toBeNull();
     });
   });
+
+  describe('Theme Management', () => {
+    it('should set theme and update state', () => {
+      const { setTheme } = useNameStore.getState();
+
+      setTheme('matrix');
+
+      const state = useNameStore.getState();
+      expect(state.currentTheme).toBe('matrix');
+    });
+
+    it('should persist theme to localStorage', () => {
+      const { setTheme } = useNameStore.getState();
+
+      setTheme('sunset');
+
+      const state = useNameStore.getState();
+      expect(state.currentTheme).toBe('sunset');
+    });
+
+    it('should switch between all 3 themes', () => {
+      const { setTheme } = useNameStore.getState();
+      const themes = ['cyan', 'matrix', 'sunset'] as const;
+
+      themes.forEach((theme) => {
+        setTheme(theme);
+        expect(useNameStore.getState().currentTheme).toBe(theme);
+      });
+    });
+
+    it('should default to cyan theme', () => {
+      useNameStore.setState(mockInitialState);
+
+      const state = useNameStore.getState();
+      expect(state.currentTheme).toBe('cyan');
+    });
+  });
 });

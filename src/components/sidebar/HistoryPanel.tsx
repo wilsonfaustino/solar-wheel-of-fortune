@@ -49,9 +49,17 @@ function HistoryPanelComponent() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-4 py-3 border-b border-cyan-400/30">
-        <h2 className="text-white font-mono text-sm font-semibold">History</h2>
-        <p className="text-white/50 text-xs mt-1">
+      <div
+        className="px-4 py-3"
+        style={{
+          borderBottomColor: 'var(--color-border-light)',
+          borderBottomWidth: '1px',
+        }}
+      >
+        <h2 className="font-mono text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
+          History
+        </h2>
+        <p className="text-xs mt-1" style={{ color: 'var(--color-text)', opacity: 0.5 }}>
           {stats.total === 0
             ? 'No selections yet'
             : `${stats.total} total • ${stats.unique} unique`}
@@ -60,7 +68,7 @@ function HistoryPanelComponent() {
 
       {history.length === 0 ? (
         <div className="flex-1 flex items-center justify-center px-4 py-8">
-          <p className="text-white/40 text-sm text-center">
+          <p className="text-sm text-center" style={{ color: 'var(--color-text)', opacity: 0.4 }}>
             Spin the wheel to record selections here
           </p>
         </div>
@@ -72,14 +80,29 @@ function HistoryPanelComponent() {
             ))}
           </div>
 
-          <div className="border-t border-white/5 px-4 py-3 flex gap-2">
+          <div
+            className="px-4 py-3 flex gap-2"
+            style={{
+              borderTopColor: 'rgba(255, 255, 255, 0.05)',
+              borderTopWidth: '1px',
+            }}
+          >
             <button
               type="button"
               onClick={handleOpenExport}
-              className="flex-1 px-4 py-2 border border-cyan-400/30 hover:bg-cyan-400/20
-                         transition-colors text-cyan-400 font-mono text-sm
-                         flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2 transition-colors font-mono text-sm flex items-center justify-center gap-2"
+              style={{
+                borderColor: 'var(--color-border-light)',
+                borderWidth: '1px',
+                color: 'var(--color-accent)',
+              }}
               aria-label="Export selection history"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-accent-20)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
               <Download className="size-4" />
               Export
@@ -87,10 +110,18 @@ function HistoryPanelComponent() {
             <button
               type="button"
               onClick={handleClearHistory}
-              className="flex-1 px-4 py-2 border border-red-400/30 hover:bg-red-400/20
-                         transition-colors text-red-400 font-mono text-sm
-                         flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2 transition-colors font-mono text-sm flex items-center justify-center gap-2 text-red-400"
+              style={{
+                borderColor: 'rgba(239, 68, 68, 0.3)',
+                borderWidth: '1px',
+              }}
               aria-label="Clear all history"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
               <Trash2 className="size-4" />
               Clear

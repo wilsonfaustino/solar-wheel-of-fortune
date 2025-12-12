@@ -26,17 +26,33 @@ function BulkActionsPanelComponent({
   };
 
   return (
-    <div className="px-4 py-4 border-t border-white/10 flex gap-2">
+    <div
+      className="px-4 py-4 flex gap-2"
+      style={{
+        borderTopColor: 'rgba(255, 255, 255, 0.1)',
+        borderTopWidth: '1px',
+      }}
+    >
       <button
         type="button"
         onClick={onClearSelections}
         disabled={!hasSelections}
-        className="flex-1 px-3 py-2 border border-white/20
-                   hover:bg-white/5 transition-colors
-                   text-white/70 font-mono text-xs tracking-wider
-                   disabled:opacity-30 disabled:cursor-not-allowed
-                   flex items-center justify-center gap-2"
+        className="flex-1 px-3 py-2 transition-colors font-mono text-xs tracking-wider disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        style={{
+          borderColor: 'rgba(255, 255, 255, 0.2)',
+          borderWidth: '1px',
+          color: 'var(--color-text)',
+          opacity: hasSelections ? 0.7 : 0.3,
+        }}
         title={hasSelections ? 'Clear selection history' : 'No selections to clear'}
+        onMouseEnter={(e) => {
+          if (hasSelections) {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'transparent';
+        }}
       >
         <Eraser className="size-4" />
         CLEAR
@@ -45,12 +61,22 @@ function BulkActionsPanelComponent({
         type="button"
         onClick={handleReset}
         disabled={!hasNames}
-        className="flex-1 px-3 py-2 border border-white/20
-                   hover:bg-white/5 transition-colors
-                   text-white/70 font-mono text-xs tracking-wider
-                   disabled:opacity-30 disabled:cursor-not-allowed
-                   flex items-center justify-center gap-2"
+        className="flex-1 px-3 py-2 transition-colors font-mono text-xs tracking-wider disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        style={{
+          borderColor: 'rgba(255, 255, 255, 0.2)',
+          borderWidth: '1px',
+          color: 'var(--color-text)',
+          opacity: hasNames ? 0.7 : 0.3,
+        }}
         title={hasNames ? 'Reset selections and exclusions' : 'No names to reset'}
+        onMouseEnter={(e) => {
+          if (hasNames) {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'transparent';
+        }}
       >
         <RotateCcw className="size-4" />
         RESET

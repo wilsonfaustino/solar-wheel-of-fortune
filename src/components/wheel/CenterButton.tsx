@@ -16,17 +16,30 @@ function CenterButtonComponent({ onClick, isSpinning, disabled }: CenterButtonPr
       className="relative z-10 group"
       aria-label="Randomize selection"
     >
-      <div className="relative flex items-center justify-center w-24 h-24 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm transition-all duration-300 hover:border-white/40 hover:bg-white/5 disabled:cursor-not-allowed">
+      <div
+        className="relative flex items-center justify-center w-24 h-24 rounded-full backdrop-blur-sm transition-all duration-300 disabled:cursor-not-allowed"
+        style={{
+          border: '1px solid var(--color-text)',
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        }}
+      >
         <Sparkles
-          className="w-8 h-8 text-white/80 transition-transform duration-300 group-hover:scale-150"
+          className="w-8 h-8 transition-transform duration-300 group-hover:scale-150"
           strokeWidth={2}
+          style={{ color: 'var(--color-text)', opacity: 0.8 }}
         />
       </div>
 
       {isSpinning && (
         <>
-          <div className="absolute inset-0 rounded-full border border-white/30 animate-ping-custom" />
-          <div className="absolute inset-0 rounded-full border border-white/20 animate-ping-custom delay-500" />
+          <div
+            className="absolute inset-0 rounded-full animate-ping-custom"
+            style={{ border: '1px solid var(--color-text)', opacity: 0.3 }}
+          />
+          <div
+            className="absolute inset-0 rounded-full animate-ping-custom delay-500"
+            style={{ border: '1px solid var(--color-text)', opacity: 0.2 }}
+          />
         </>
       )}
     </button>
