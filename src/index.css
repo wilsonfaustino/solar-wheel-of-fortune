@@ -67,7 +67,45 @@
 
 html,
 body {
-  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Desktop: prevent overflow */
+@media (min-width: 1024px) {
+  html,
+  body {
+    overflow: hidden;
+  }
+}
+
+/* Tablet and Mobile: allow scroll for sidebar drawer */
+@media (max-width: 1023px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+}
+
+/* Mobile responsive text sizes */
+@media (max-width: 639px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+/* Tablet responsive text sizes */
+@media (min-width: 640px) and (max-width: 1023px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+/* Desktop text sizes */
+@media (min-width: 1024px) {
+  html {
+    font-size: 16px;
+  }
 }
 
 @keyframes pulse-glow {
