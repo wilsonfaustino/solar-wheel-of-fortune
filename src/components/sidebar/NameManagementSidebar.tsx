@@ -10,9 +10,13 @@ import { ThemeSwitcher } from './ThemeSwitcher';
 
 interface NameManagementSidebarProps {
   className?: string;
+  isMobile?: boolean;
 }
 
-function NameManagementSidebarComponent({ className = '' }: NameManagementSidebarProps) {
+function NameManagementSidebarComponent({
+  className = '',
+  isMobile: _isMobile = false,
+}: NameManagementSidebarProps) {
   const [activeTab, setActiveTab] = useState<'names' | 'history' | 'settings'>('names');
 
   // Select store state

@@ -37,7 +37,7 @@ function BulkActionsPanelComponent({
         type="button"
         onClick={onClearSelections}
         disabled={!hasSelections}
-        className="flex-1 px-3 py-2 transition-colors font-mono text-xs tracking-wider disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="flex-1 px-3 py-3 h-11 transition-colors font-mono text-xs tracking-wider disabled:cursor-not-allowed flex items-center justify-center gap-2"
         style={{
           borderColor: 'rgba(255, 255, 255, 0.2)',
           borderWidth: '1px',
@@ -61,7 +61,7 @@ function BulkActionsPanelComponent({
         type="button"
         onClick={handleReset}
         disabled={!hasNames}
-        className="flex-1 px-3 py-2 transition-colors font-mono text-xs tracking-wider disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="flex-1 px-3 py-3 h-11 transition-colors font-mono text-xs tracking-wider disabled:cursor-not-allowed flex items-center justify-center gap-2"
         style={{
           borderColor: 'rgba(255, 255, 255, 0.2)',
           borderWidth: '1px',
