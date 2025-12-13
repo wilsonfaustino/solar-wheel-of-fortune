@@ -66,7 +66,7 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
               setError('');
             }}
             placeholder="Enter name..."
-            className="w-full px-3 py-2 font-mono text-sm focus:outline-none placeholder:text-white/30"
+            className="w-full px-3 py-3 h-11 font-mono text-sm focus:outline-none placeholder:text-white/30"
             style={{
               backgroundColor: 'rgba(0, 0, 0, 0.5)',
               borderColor: 'var(--color-border-light)',
@@ -93,7 +93,7 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
         </div>
         <button
           type="submit"
-          className="px-4 py-2 font-mono text-sm tracking-wider transition-colors"
+          className="px-4 py-3 h-11 font-mono text-sm tracking-wider transition-colors flex items-center justify-center"
           style={{
             backgroundColor: 'var(--color-accent-10)',
             borderColor: 'var(--color-border-light)',
@@ -185,7 +185,7 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
               <button
                 type="button"
                 onClick={handleBulkImport}
-                className="flex-1 px-4 py-2 font-mono text-sm tracking-wider transition-colors"
+                className="flex-1 px-4 py-3 h-11 font-mono text-sm tracking-wider transition-colors"
                 style={{
                   backgroundColor: 'var(--color-accent-10)',
                   borderColor: 'var(--color-border-light)',
@@ -202,7 +202,7 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
                   setBulkText('');
                   setError('');
                 }}
-                className="px-4 py-2 font-mono text-sm tracking-wider transition-colors"
+                className="px-4 py-3 h-11 font-mono text-sm tracking-wider transition-colors"
                 style={{
                   borderColor: 'var(--color-border-light)',
                   borderWidth: '1px',

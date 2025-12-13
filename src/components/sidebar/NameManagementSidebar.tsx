@@ -10,9 +10,13 @@ import { ThemeSwitcher } from './ThemeSwitcher';
 
 interface NameManagementSidebarProps {
   className?: string;
+  isMobile?: boolean;
 }
 
-function NameManagementSidebarComponent({ className = '' }: NameManagementSidebarProps) {
+function NameManagementSidebarComponent({
+  className = '',
+  isMobile = false,
+}: NameManagementSidebarProps) {
   const [activeTab, setActiveTab] = useState<'names' | 'history' | 'settings'>('names');
 
   // Select store state
@@ -65,7 +69,7 @@ function NameManagementSidebarComponent({ className = '' }: NameManagementSideba
 
   return (
     <div
-      className={`w-80 border-r flex flex-col h-screen ${className}`}
+      className={`w-80 border-r flex flex-col ${isMobile ? 'h-full' : 'h-screen'} ${className}`}
       style={{
         backgroundColor: 'rgba(0, 0, 0, 0.9)',
         borderRightColor: 'var(--color-border-light)',

@@ -98,10 +98,11 @@ function NameListItemComponent({ name, onEdit, onDelete, onToggleExclude }: Name
             )}
           </button>
 
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
+              type="button"
               onClick={() => onToggleExclude(name.id)}
-              className="p-1.5 rounded transition-colors"
+              className="p-2 rounded transition-colors h-10 w-10 flex items-center justify-center"
               style={{
                 color: name.isExcluded ? 'var(--color-text)' : 'var(--color-accent)',
                 opacity: name.isExcluded ? 0.3 : 0.7,
@@ -115,11 +116,12 @@ function NameListItemComponent({ name, onEdit, onDelete, onToggleExclude }: Name
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
             >
-              {name.isExcluded ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              {name.isExcluded ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
             <button
+              type="button"
               onClick={() => setIsEditing(true)}
-              className="p-1.5 rounded transition-colors"
+              className="p-2 rounded transition-colors h-10 w-10 flex items-center justify-center"
               style={{ color: 'var(--color-accent)', opacity: 0.7 }}
               aria-label={`Edit ${name.value}`}
               onMouseEnter={(e) => {
@@ -129,11 +131,12 @@ function NameListItemComponent({ name, onEdit, onDelete, onToggleExclude }: Name
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
             >
-              <Edit2 className="w-4 h-4" />
+              <Edit2 className="w-5 h-5" />
             </button>
             <button
+              type="button"
               onClick={() => onDelete(name.id)}
-              className="p-1.5 rounded transition-colors text-red-400/70"
+              className="p-2 rounded transition-colors text-red-400/70 h-10 w-10 flex items-center justify-center"
               aria-label={`Delete ${name.value}`}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
@@ -142,7 +145,7 @@ function NameListItemComponent({ name, onEdit, onDelete, onToggleExclude }: Name
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-5 h-5" />
             </button>
           </div>
         </div>

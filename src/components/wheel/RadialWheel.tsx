@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
-import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useMemo, useState } from 'react';
 import { WHEEL_CONFIG } from '../../constants/defaults';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useNameStore } from '../../stores/useNameStore';
 import type { Name } from '../../types/name';
 import { CenterButton } from './CenterButton';
@@ -21,6 +22,17 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
     const [isSpinning, setIsSpinning] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
     const recordSelection = useNameStore((state) => state.recordSelection);
+    const { isSmallScreen, isMediumScreen } = useMediaQuery();
+
+    const responsiveStyles = useMemo(() => {
+      if (isSmallScreen) {
+        return { maxWidth: '350px' };
+      }
+      if (isMediumScreen) {
+        return { maxWidth: '500px' };
+      }
+      return { maxWidth: '900px' };
+    }, [isSmallScreen, isMediumScreen]);
 
     const handleSpin = useCallback(() => {
       if (isSpinning || names.length === 0) return;
@@ -54,7 +66,10 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
     );
 
     return (
-      <div className="relative w-full max-w-4xl aspect-square flex items-center justify-center">
+      <div
+        className="relative w-full aspect-square flex items-center justify-center"
+        style={responsiveStyles}
+      >
         <motion.div
           className="absolute inset-0 flex items-center justify-center"
           animate={{ rotate: rotation }}
