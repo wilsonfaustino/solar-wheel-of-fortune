@@ -22,35 +22,18 @@ function NameListDisplayComponent({
     return (
       <div className="flex-1 flex items-center justify-center py-12">
         <div className="text-center">
-          <div
-            className="font-mono text-sm mb-2"
-            style={{ color: 'var(--color-text)', opacity: 0.3 }}
-          >
-            No names yet
-          </div>
-          <div className="font-mono text-xs" style={{ color: 'var(--color-text)', opacity: 0.2 }}>
-            Add names above to get started
-          </div>
+          <div className="font-mono text-sm mb-2 text-text/30">No names yet</div>
+          <div className="font-mono text-xs text-text/20">Add names above to get started</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto scrollbar-themed">
       {/* Name Count Header */}
-      <div
-        className="px-4 py-3 sticky top-0"
-        style={{
-          borderBottomColor: 'rgba(255, 255, 255, 0.1)',
-          borderBottomWidth: '1px',
-          backgroundColor: 'rgba(0, 0, 0, 0.9)',
-        }}
-      >
-        <div
-          className="text-xs font-mono tracking-wider"
-          style={{ color: 'var(--color-text)', opacity: 0.5 }}
-        >
+      <div className="px-4 py-3 sticky top-0 bg-black/90 border-b border-b-white/10">
+        <div className="text-xs font-mono tracking-wider text-text/50">
           {activeNames.length} ACTIVE
           {excludedNames.length > 0 && ` · ${excludedNames.length} EXCLUDED`}
         </div>
@@ -78,12 +61,7 @@ function NameListDisplayComponent({
               borderTopWidth: '1px',
             }}
           >
-            <div
-              className="text-xs font-mono tracking-wider"
-              style={{ color: 'var(--color-text)', opacity: 0.4 }}
-            >
-              EXCLUDED
-            </div>
+            <div className="text-xs font-mono tracking-wider text-text/40">EXCLUDED</div>
           </div>
           {excludedNames.map((name) => (
             <NameListItem
