@@ -32,11 +32,7 @@ function MobileSidebarComponent({ isOpen, onClose, children }: MobileSidebarProp
       {/* Backdrop */}
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-30"
-          style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            backdropFilter: 'blur(2px)',
-          }}
+          className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -46,35 +42,20 @@ function MobileSidebarComponent({ isOpen, onClose, children }: MobileSidebarProp
 
       {/* Drawer */}
       <motion.div
-        className="fixed top-0 left-0 h-screen w-80 z-40 border-r flex flex-col overflow-hidden"
-        style={{
-          backgroundColor: 'rgba(0, 0, 0, 0.9)',
-          borderRightColor: 'var(--color-border-light)',
-          borderRightWidth: '1px',
-        }}
+        className="fixed top-0 left-0 h-screen z-40 border-r flex flex-col overflow-hidden bg-black/90 border-r-(--color-border-light)"
         initial={{ x: '-100%' }}
         animate={{ x: isOpen ? 0 : '-100%' }}
         transition={{ type: 'spring', damping: 20, stiffness: 300 }}
       >
         {/* Drawer Header */}
-        <div
-          className="px-4 py-4 border-b flex items-center justify-between"
-          style={{
-            borderBottomColor: 'var(--color-border-light)',
-            borderBottomWidth: '1px',
-          }}
-        >
-          <h2
-            className="font-mono text-sm tracking-widest font-light"
-            style={{ color: 'var(--color-accent)' }}
-          >
+        <div className="px-4 py-4 border-b flex items-center justify-between border-b-(--color-border-light)">
+          <h2 className="font-mono text-sm tracking-widest font-light text-(--color-accent)">
             MENU
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded transition-colors"
-            style={{ color: 'var(--color-accent)' }}
+            className="p-1.5 rounded transition-colors text-(--color-accent)"
             aria-label="Close sidebar"
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
