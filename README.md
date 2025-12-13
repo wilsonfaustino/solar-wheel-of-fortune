@@ -45,7 +45,7 @@ All touch targets meet WCAG AAA standards (44px minimum height). The mobile draw
 - Vite 7
 - Zustand 5 + Immer (state management with draft-style mutations)
 - Framer Motion (animations)
-- Tailwind CSS v4
+- Tailwind CSS v4 with clsx & tailwind-merge (class composition)
 - Bun (package manager)
 - Biome 2 (linting & formatting)
 - Lefthook (git hooks manager)
@@ -102,6 +102,7 @@ src/
 │   ├── MobileHeader.tsx         # Mobile header with hamburger menu
 │   └── sidebar/        # Name management sidebar
 │       ├── NameManagementSidebar.tsx
+│       ├── TabSelectionButton.tsx    # Reusable tab button component
 │       ├── ListSelector.tsx
 │       ├── AddNameForm.tsx
 │       ├── NameListDisplay.tsx
@@ -122,6 +123,7 @@ src/
 │   ├── useMediaQuery.ts        # Responsive breakpoint detection
 │   └── index.ts
 ├── utils/              # Utility functions
+│   ├── cn.ts                   # Class name composition (clsx + tailwind-merge)
 │   ├── export.ts               # CSV/JSON export utilities
 │   ├── formatRelativeTime.ts   # Timestamp formatting
 │   └── index.ts
