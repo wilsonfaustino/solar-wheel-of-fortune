@@ -189,11 +189,116 @@ test(store): add tests for list creation
 refactor(components): extract shared validation utilities
 ```
 
+### Atomic Commits Best Practice
+
+**Use atomic commits** - Each commit should represent one logical, self-contained change:
+
+**Benefits**:
+- **Reviewability**: PRs with atomic commits are easier to review (each commit tells a clear story)
+- **Bisectability**: Easier to find bugs with `git bisect` when commits are focused
+- **Revertability**: Can safely revert individual commits without breaking others
+- **History clarity**: Git history reads like a changelog of intentional changes
+
+**Guidelines**:
+- One feature/fix per commit, not multiple unrelated changes
+- Commits should build and pass tests independently (when possible)
+- Break large changes into logical steps (e.g., "add type definitions" → "add store logic" → "add UI component")
+- Don't combine refactoring with new features in same commit
+
+**Example workflow** (3 atomic commits):
+```bash
+git commit -m "feat(history): add SelectionRecord type definitions"
+git commit -m "feat(history): extend store with history tracking logic"
+git commit -m "feat(history): create history UI components and tests"
+```
+
 **IMPORTANT - Commit Attribution**:
 - Do NOT add "Co-Authored-By" trailers with Claude model information to commits
 - Do NOT sign commits with the AI model as author
 - Commits should reflect human authorship only
 - Use your own name and email for git commits (configured via `git config user.name` and `git config user.email`)
+
+## Task Documentation (.claude/tasks)
+
+The `.claude/tasks` directory maintains comprehensive documentation of all sessions, features, and development progress. This documentation is committed to the repository for team collaboration and future reference.
+
+### Directory Structure
+
+```
+.claude/tasks/
+├── README.md                              # Navigation hub for all task documentation
+├── CODE_REFERENCE.md                      # Code patterns, styles, and quick lookup
+│
+├── sessions/                              # Session documentation (consolidated, one file per session)
+│   ├── session-02-sidebar.md              # Session 2: Name Management Sidebar
+│   ├── session-03-shortcuts-testing.md    # Session 3: Keyboard Shortcuts & Testing
+│   ├── session-04-tooling.md              # Session 4: Tooling Modernization
+│   ├── session-05-history-export.md       # Session 5: Selection History & Export
+│   ├── session-06-theming.md              # Session 6: Dynamic Theming System
+│   └── session-07-responsive.md           # Session 7: Responsive Layout (MVP 100%)
+│
+├── features/                              # Feature tasks (organized by status)
+│   ├── active/
+│   │   └── mobile-fixes.md                # In-progress feature tasks
+│   └── completed/
+│       ├── fira-code-integration.md       # Completed feature tasks
+│       └── sidebar-scrolling-fix.md
+│
+└── prompts/                               # Session prompt templates for reuse
+    └── session-templates.md               # Reusable prompts for starting sessions
+```
+
+### How to Use Task Documentation
+
+**Starting a New Session**:
+1. Read `README.md` to understand current status and navigation
+2. Check `features/active/` for pending work or `features/completed/` for context
+3. Use prompts in `prompts/session-templates.md` as starting point
+4. Create a plan in `.claude/plans/` before implementation
+
+**During Implementation**:
+- Reference `CODE_REFERENCE.md` for code patterns and component templates
+- Check previous session summaries for context and architectural decisions
+- Keep `.claude/tasks/README.md` updated with progress
+
+**End of Session**:
+1. Create atomic commits (see "Atomic Commits Best Practice" above)
+2. Write session summary in `sessions/session-XX.md`
+3. Move completed features from `features/active/` to `features/completed/`
+4. Update `README.md` with new session information
+5. Commit documentation changes: `git push origin [branch-name]`
+
+### Session Documentation Template
+
+Each session file contains:
+- **Overview**: What was accomplished, duration, test counts
+- **What Was Done**: Detailed breakdown of features/changes
+- **Files Modified**: List of all changed files with impact descriptions
+- **Commits**: Atomic commits created during session
+- **Verification**: Test results, type check, build status
+- **Key Learnings**: Patterns discovered or lessons learned
+- **Next Steps**: Recommendations for future sessions
+
+### Feature Task Template
+
+Each feature task contains:
+- **Status**: Current state (Active/Completed/Ready for Implementation)
+- **Context**: Background and relationship to sessions
+- **Problem Statement**: What needs to be fixed/implemented
+- **Solution**: Detailed implementation steps
+- **Implementation Checklist**: Step-by-step verification
+- **Files to Modify**: Exact files affected and changes needed
+
+### Benefits of This Approach
+
+- **Traceability**: Every change linked to session/feature documentation
+- **Knowledge Preservation**: Decisions and learnings recorded for team
+- **Onboarding**: New team members can understand project history and architecture
+- **Reference**: Quick access to patterns, templates, and previous solutions
+- **Continuity**: Sessions can be resumed with full context preserved
+- **PR Context**: Documentation helps reviewers understand scope and rationale
+
+---
 
 ## MVP Progress
 
