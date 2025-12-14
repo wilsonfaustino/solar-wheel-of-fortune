@@ -1,5 +1,6 @@
 import { Plus, Upload } from 'lucide-react';
 import { memo, useCallback, useState } from 'react';
+import { cn } from '../../utils/cn';
 
 interface AddNameFormProps {
   onAddName: (name: string) => void;
@@ -54,7 +55,7 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
   const showCharCount = charCount > 80;
 
   return (
-    <div className="px-4 py-4 border-b" style={{ borderBottomColor: 'var(--color-border-light)' }}>
+    <div className="px-4 py-4 border-b border-b-border-light">
       {/* Add Name Form */}
       <form onSubmit={handleSubmit} className="flex gap-2">
         <div className="flex-1">
@@ -66,25 +67,15 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
               setError('');
             }}
             placeholder="Enter name..."
-            className="w-full px-3 py-3 h-11 font-mono text-sm focus:outline-none placeholder:text-white/30"
-            style={{
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              borderColor: 'var(--color-border-light)',
-              borderWidth: '1px',
-              color: 'var(--color-text)',
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 0 2px var(--color-accent)';
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.boxShadow = 'none';
-            }}
+            className="w-full px-3 py-3 h-11 font-mono text-sm text-text bg-black/50 border border-border-light shadow-none focus:shadow-xs focus:shadow-accent focus:outline-none placeholder:text-white/30 "
             maxLength={100}
           />
           {showCharCount && (
             <div
-              className={`text-xs font-mono mt-1
-                            ${charCount >= 100 ? 'text-red-400' : 'text-white/50'}`}
+              className={cn(
+                'text-xs font-mono mt-1',
+                charCount >= 100 ? 'text-red-400' : 'text-white/50'
+              )}
             >
               {charCount}/100
             </div>
@@ -93,13 +84,7 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
         </div>
         <button
           type="submit"
-          className="px-4 py-3 h-11 font-mono text-sm tracking-wider transition-colors flex items-center justify-center"
-          style={{
-            backgroundColor: 'var(--color-accent-10)',
-            borderColor: 'var(--color-border-light)',
-            borderWidth: '1px',
-            color: 'var(--color-accent)',
-          }}
+          className="px-4 py-3 h-11 font-mono text-sm text-accent border border-border-light bg-accent-10 tracking-wider transition-colors flex items-center justify-center"
           aria-label="Add name"
         >
           <Plus className="w-5 h-5" />
@@ -110,11 +95,7 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
       <button
         type="button"
         onClick={() => setShowBulkImport(true)}
-        className="mt-3 text-xs font-mono tracking-wider flex items-center gap-1"
-        style={{
-          color: 'var(--color-accent)',
-          opacity: 0.7,
-        }}
+        className="mt-3 text-xs text-accent/70 font-mono tracking-wider flex items-center gap-1"
       >
         <Upload className="w-3 h-3" />
         BULK IMPORT
@@ -124,8 +105,7 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
       {showBulkImport && (
         <div
           role="presentation"
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50
-                        flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           onClick={() => {
             setShowBulkImport(false);
             setBulkText('');
@@ -142,20 +122,10 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
           <div
             role="dialog"
             aria-label="Bulk import names"
-            className="p-6 max-w-lg w-full"
-            style={{
-              backgroundColor: 'black',
-              borderColor: 'var(--color-border-light)',
-              borderWidth: '1px',
-            }}
+            className="p-6 max-w-lg w-full bg-black border border-border-light"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3
-              className="font-mono text-lg mb-4 tracking-wider"
-              style={{ color: 'var(--color-accent)' }}
-            >
-              BULK IMPORT
-            </h3>
+            <h3 className="font-mono text-lg mb-4 tracking-wider text-accent">BULK IMPORT</h3>
             <textarea
               value={bulkText}
               onChange={(e) => setBulkText(e.target.value)}
@@ -167,31 +137,13 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
                 }
               }}
               placeholder="Paste names (one per line)"
-              className="w-full h-64 px-3 py-2 font-mono text-sm focus:outline-none placeholder:text-white/30 resize-none"
-              style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                borderColor: 'var(--color-border-light)',
-                borderWidth: '1px',
-                color: 'var(--color-text)',
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 0 2px var(--color-accent)';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.boxShadow = 'none';
-              }}
+              className="w-full h-64 px-3 py-2 font-mono text-sm text-text border border-border-light bg-black/50 shadow-none focus:shadow-xs focus:shadow-accent focus:outline-none placeholder:text-white/30 resize-none"
             />
             <div className="flex gap-2 mt-4">
               <button
                 type="button"
                 onClick={handleBulkImport}
-                className="flex-1 px-4 py-3 h-11 font-mono text-sm tracking-wider transition-colors"
-                style={{
-                  backgroundColor: 'var(--color-accent-10)',
-                  borderColor: 'var(--color-border-light)',
-                  borderWidth: '1px',
-                  color: 'var(--color-accent)',
-                }}
+                className="flex-1 px-4 py-3 h-11 font-mono text-sm text-accent border border-border-light bg-accent-10 tracking-wider transition-colors"
               >
                 IMPORT
               </button>
@@ -202,13 +154,7 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
                   setBulkText('');
                   setError('');
                 }}
-                className="px-4 py-3 h-11 font-mono text-sm tracking-wider transition-colors"
-                style={{
-                  borderColor: 'var(--color-border-light)',
-                  borderWidth: '1px',
-                  color: 'var(--color-text)',
-                  opacity: 0.7,
-                }}
+                className="px-4 py-3 h-11 font-mono text-sm text-text/70 border border-border-light tracking-wider transition-colors"
               >
                 CANCEL
               </button>
