@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion';
 import { forwardRef, useCallback, useImperativeHandle, useMemo, useState } from 'react';
-import { WHEEL_CONFIG } from '../../constants/defaults';
+import { ANIMATION_CONFIG, WHEEL_CONFIG } from '../../constants/defaults';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useNameStore } from '../../stores/useNameStore';
 import type { Name } from '../../types/name';
 import { CenterButton } from './CenterButton';
 import { NameLabel } from './NameLabel';
+import { calculateTargetRotation } from './wheel.utils';
 
 interface RadialWheelProps {
   names: Name[];
@@ -21,6 +22,7 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
     const [rotation, setRotation] = useState(0);
     const [isSpinning, setIsSpinning] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+    const [pendingSelectionIndex, setPendingSelectionIndex] = useState<number | null>(null);
     const recordSelection = useNameStore((state) => state.recordSelection);
     const { isSmallScreen, isMediumScreen } = useMediaQuery();
 
@@ -40,22 +42,11 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
       setIsSpinning(true);
       setSelectedIndex(null);
 
-      const spins =
-        WHEEL_CONFIG.minSpins + Math.random() * (WHEEL_CONFIG.maxSpins - WHEEL_CONFIG.minSpins);
-      const finalIndex = Math.floor(Math.random() * names.length);
-      const degreesPerName = 360 / names.length;
-      const targetRotation = rotation - (spins * 360 + finalIndex * degreesPerName);
+      const { targetRotation, finalIndex } = calculateTargetRotation(rotation, names.length);
 
+      setPendingSelectionIndex(finalIndex);
       setRotation(targetRotation);
-
-      setTimeout(() => {
-        const selectedName = names[finalIndex];
-        setIsSpinning(false);
-        setSelectedIndex(finalIndex);
-        onSelect(selectedName);
-        recordSelection(selectedName.value, selectedName.id);
-      }, WHEEL_CONFIG.spinDuration);
-    }, [isSpinning, names, rotation, onSelect, recordSelection]);
+    }, [isSpinning, names, rotation]);
 
     useImperativeHandle(
       ref,
@@ -74,8 +65,21 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
           className="absolute inset-0 flex items-center justify-center"
           animate={{ rotate: rotation }}
           transition={{
-            duration: WHEEL_CONFIG.spinDuration / 1000,
-            ease: [0.17, 0.67, 0.3, 0.98],
+            type: 'spring',
+            damping: ANIMATION_CONFIG.spring.damping,
+            stiffness: ANIMATION_CONFIG.spring.stiffness,
+            mass: ANIMATION_CONFIG.spring.mass,
+            velocity: ANIMATION_CONFIG.spring.velocity,
+          }}
+          onAnimationComplete={() => {
+            if (pendingSelectionIndex !== null) {
+              const selectedName = names[pendingSelectionIndex];
+              setIsSpinning(false);
+              setSelectedIndex(pendingSelectionIndex);
+              onSelect(selectedName);
+              recordSelection(selectedName.value, selectedName.id);
+              setPendingSelectionIndex(null);
+            }
           }}
         >
           <svg
