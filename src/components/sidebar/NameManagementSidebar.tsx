@@ -1,11 +1,13 @@
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 import { useNameStore } from '../../stores/useNameStore';
+import { cn } from '../../utils/cn';
 import { AddNameForm } from './AddNameForm';
 import { BulkActionsPanel } from './BulkActionsPanel';
 import { HistoryPanel } from './HistoryPanel';
 import { ListSelector } from './ListSelector';
 import { NameListDisplay } from './NameListDisplay';
+import { TabSelectionButton } from './TabSelectionButton';
 import { ThemeSwitcher } from './ThemeSwitcher';
 
 interface NameManagementSidebarProps {
@@ -69,62 +71,40 @@ function NameManagementSidebarComponent({
 
   return (
     <div
-      className={`w-80 border-r flex flex-col ${isMobile ? 'h-full' : 'h-screen'} ${className}`}
-      style={{
-        backgroundColor: 'rgba(0, 0, 0, 0.9)',
-        borderRightColor: 'var(--color-border-light)',
-        borderRightWidth: '1px',
-      }}
+      className={cn(
+        'w-80 border-r flex flex-col bg-black/90 border-r-border-light',
+        isMobile ? 'h-full' : 'h-screen',
+        className
+      )}
     >
       {/* Tab Navigation */}
-      <div
-        className="flex"
-        style={{
-          borderBottomColor: 'var(--color-border-light)',
-          borderBottomWidth: '1px',
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => setActiveTab('names')}
-          className="flex-1 px-4 py-3 font-mono text-sm transition-colors"
-          style={{
-            borderBottom: activeTab === 'names' ? '2px solid var(--color-accent)' : 'none',
-            color: activeTab === 'names' ? 'var(--color-accent)' : 'var(--color-text)',
-            opacity: activeTab === 'names' ? 1 : 0.5,
-          }}
+      <div className="flex border-b border-b-border-light">
+        <TabSelectionButton
+          aria-label="Names tab"
+          isActiveTab={activeTab === 'names'}
+          onSelectTab={() => setActiveTab('names')}
         >
           Names
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('history')}
-          className="flex-1 px-4 py-3 font-mono text-sm transition-colors"
-          style={{
-            borderBottom: activeTab === 'history' ? '2px solid var(--color-accent)' : 'none',
-            color: activeTab === 'history' ? 'var(--color-accent)' : 'var(--color-text)',
-            opacity: activeTab === 'history' ? 1 : 0.5,
-          }}
+        </TabSelectionButton>
+        <TabSelectionButton
+          aria-label="History tab"
+          isActiveTab={activeTab === 'history'}
+          onSelectTab={() => setActiveTab('history')}
         >
           History
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('settings')}
-          className="flex-1 px-4 py-3 font-mono text-sm transition-colors"
-          style={{
-            borderBottom: activeTab === 'settings' ? '2px solid var(--color-accent)' : 'none',
-            color: activeTab === 'settings' ? 'var(--color-accent)' : 'var(--color-text)',
-            opacity: activeTab === 'settings' ? 1 : 0.5,
-          }}
+        </TabSelectionButton>
+        <TabSelectionButton
+          aria-label="Settings tab"
+          isActiveTab={activeTab === 'settings'}
+          onSelectTab={() => setActiveTab('settings')}
         >
           Settings
-        </button>
+        </TabSelectionButton>
       </div>
 
       {/* Names Tab Content */}
       {activeTab === 'names' && (
-        <>
+        <div className="flex flex-col flex-1 min-h-0">
           {/* List Selector */}
           <ListSelector
             lists={lists}
@@ -153,14 +133,22 @@ function NameManagementSidebarComponent({
             onClearSelections={clearSelections}
             onResetList={resetList}
           />
-        </>
+        </div>
       )}
 
       {/* History Tab Content */}
-      {activeTab === 'history' && <HistoryPanel />}
+      {activeTab === 'history' && (
+        <div className="flex flex-col flex-1 min-h-0">
+          <HistoryPanel />
+        </div>
+      )}
 
       {/* Settings Tab Content */}
-      {activeTab === 'settings' && <ThemeSwitcher />}
+      {activeTab === 'settings' && (
+        <div className="flex flex-col flex-1 min-h-0">
+          <ThemeSwitcher />
+        </div>
+      )}
     </div>
   );
 }

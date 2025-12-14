@@ -66,7 +66,7 @@ function HistoryPanelComponent() {
         </div>
       ) : (
         <>
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto scrollbar-themed">
             {displayedHistory.map((record: SelectionRecord) => (
               <HistoryItem key={record.id} record={record} onDelete={handleDeleteItem} />
             ))}

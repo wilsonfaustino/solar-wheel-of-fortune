@@ -55,21 +55,15 @@ function MobileSidebarComponent({ isOpen, onClose, children }: MobileSidebarProp
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded transition-colors text-(--color-accent)"
+            className="p-1.5 rounded transition-colors text-accent bg-transparent hover:bg-white/10"
             aria-label="Close sidebar"
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
           >
-            <X className="w-5 h-5" />
+            <X className="size-5" />
           </button>
         </div>
 
         {/* Drawer Content */}
-        <div className="flex-1 overflow-y-auto">{children}</div>
+        <div className="flex-1 overflow-y-auto scrollbar-themed">{children}</div>
       </motion.div>
     </>
   );
