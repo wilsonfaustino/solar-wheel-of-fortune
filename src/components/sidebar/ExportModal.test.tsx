@@ -39,8 +39,16 @@ describe('ExportModal', () => {
   it('should render modal dialog with title', () => {
     render(<ExportModal records={mockRecords} onClose={mockOnClose as () => void} />);
 
-    expect(screen.getByRole('dialog', { name: /export selection history/i })).toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByText(/EXPORT HISTORY/i)).toBeInTheDocument();
+  });
+
+  it('should have proper ARIA attributes', () => {
+    render(<ExportModal records={mockRecords} onClose={mockOnClose as () => void} />);
+
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toBeInTheDocument();
+    expect(dialog).toHaveAttribute('aria-labelledby');
   });
 
   it('should display format selection buttons', () => {
@@ -140,11 +148,20 @@ describe('ExportModal', () => {
       <ExportModal records={mockRecords} onClose={mockOnClose as () => void} />
     );
 
-    const backdrop = container.querySelector('[role="presentation"]');
+    // Radix Dialog.Overlay doesn't have role="presentation", find it by class
+    const backdrop = container.querySelector('[data-radix-dialog-overlay]');
     if (backdrop) {
       await user.click(backdrop);
       expect(mockOnClose).toHaveBeenCalled();
     }
+  });
+
+  it('should close on Escape key', async () => {
+    const user = userEvent.setup();
+    render(<ExportModal records={mockRecords} onClose={mockOnClose as () => void} />);
+
+    await user.keyboard('{Escape}');
+    expect(mockOnClose).toHaveBeenCalled();
   });
 
   it('should close modal after download with CSV format', async () => {

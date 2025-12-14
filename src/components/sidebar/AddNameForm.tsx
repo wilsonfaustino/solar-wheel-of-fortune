@@ -1,3 +1,4 @@
+import * as Dialog from '@radix-ui/react-dialog';
 import { Plus, Upload } from 'lucide-react';
 import { memo, useCallback, useState } from 'react';
 import { cn } from '../../utils/cn';
@@ -103,64 +104,46 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
 
       {/* Bulk Import Modal */}
       {showBulkImport && (
-        <div
-          role="presentation"
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={() => {
+        <Dialog.Root
+          open
+          onOpenChange={() => {
             setShowBulkImport(false);
             setBulkText('');
             setError('');
           }}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') {
-              setShowBulkImport(false);
-              setBulkText('');
-              setError('');
-            }
-          }}
         >
-          <div
-            role="dialog"
-            aria-label="Bulk import names"
-            className="p-6 max-w-lg w-full bg-black border border-border-light"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="font-mono text-lg mb-4 tracking-wider text-accent">BULK IMPORT</h3>
-            <textarea
-              value={bulkText}
-              onChange={(e) => setBulkText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Escape') {
-                  setShowBulkImport(false);
-                  setBulkText('');
-                  setError('');
-                }
-              }}
-              placeholder="Paste names (one per line)"
-              className="w-full h-64 px-3 py-2 font-mono text-sm text-text border border-border-light bg-black/50 shadow-none focus:shadow-xs focus:shadow-accent focus:outline-none placeholder:text-white/30 resize-none"
-            />
-            <div className="flex gap-2 mt-4">
-              <button
-                type="button"
-                onClick={handleBulkImport}
-                className="flex-1 px-4 py-3 h-11 font-mono text-sm text-accent border border-border-light bg-accent-10 tracking-wider transition-colors"
-              >
-                IMPORT
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowBulkImport(false);
-                  setBulkText('');
-                  setError('');
-                }}
-                className="px-4 py-3 h-11 font-mono text-sm text-text/70 border border-border-light tracking-wider transition-colors"
-              >
-                CANCEL
-              </button>
-            </div>
-          </div>
-        </div>
+          <Dialog.Portal>
+            <Dialog.Overlay className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50" />
+            <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-6 max-w-lg w-full bg-black border border-border-light z-50 focus:outline-none">
+              <Dialog.Title className="font-mono text-lg mb-4 tracking-wider text-accent">
+                BULK IMPORT
+              </Dialog.Title>
+              <textarea
+                value={bulkText}
+                onChange={(e) => setBulkText(e.target.value)}
+                placeholder="Paste names (one per line)"
+                className="w-full h-64 px-3 py-2 font-mono text-sm text-text border border-border-light bg-black/50 shadow-none focus:shadow-xs focus:shadow-accent focus:outline-none placeholder:text-white/30 resize-none"
+              />
+              <div className="flex gap-2 mt-4">
+                <button
+                  type="button"
+                  onClick={handleBulkImport}
+                  className="flex-1 px-4 py-3 h-11 font-mono text-sm text-accent border border-border-light bg-accent-10 tracking-wider transition-colors"
+                >
+                  IMPORT
+                </button>
+                <Dialog.Close asChild>
+                  <button
+                    type="button"
+                    className="px-4 py-3 h-11 font-mono text-sm text-text/70 border border-border-light tracking-wider transition-colors"
+                  >
+                    CANCEL
+                  </button>
+                </Dialog.Close>
+              </div>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
       )}
     </div>
   );
