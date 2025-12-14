@@ -1,5 +1,6 @@
 import { Eraser, RotateCcw } from 'lucide-react';
 import { memo } from 'react';
+import { ActionButtons } from './names-list/ActionButtons';
 
 interface BulkActionsPanelProps {
   hasNames: boolean;
@@ -26,61 +27,23 @@ function BulkActionsPanelComponent({
   };
 
   return (
-    <div
-      className="px-4 py-4 flex gap-2"
-      style={{
-        borderTopColor: 'rgba(255, 255, 255, 0.1)',
-        borderTopWidth: '1px',
-      }}
-    >
-      <button
-        type="button"
+    <div className="px-4 py-4 flex gap-2 border-t border-t-white/10">
+      <ActionButtons
+        hasTargetContent={hasSelections}
         onClick={onClearSelections}
-        disabled={!hasSelections}
-        className="flex-1 px-3 py-3 h-11 transition-colors font-mono text-xs tracking-wider disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        style={{
-          borderColor: 'rgba(255, 255, 255, 0.2)',
-          borderWidth: '1px',
-          color: 'var(--color-text)',
-          opacity: hasSelections ? 0.7 : 0.3,
-        }}
         title={hasSelections ? 'Clear selection history' : 'No selections to clear'}
-        onMouseEnter={(e) => {
-          if (hasSelections) {
-            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-          }
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'transparent';
-        }}
       >
         <Eraser className="size-4" />
         CLEAR
-      </button>
-      <button
-        type="button"
+      </ActionButtons>
+      <ActionButtons
+        hasTargetContent={hasNames}
         onClick={handleReset}
-        disabled={!hasNames}
-        className="flex-1 px-3 py-3 h-11 transition-colors font-mono text-xs tracking-wider disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        style={{
-          borderColor: 'rgba(255, 255, 255, 0.2)',
-          borderWidth: '1px',
-          color: 'var(--color-text)',
-          opacity: hasNames ? 0.7 : 0.3,
-        }}
         title={hasNames ? 'Reset selections and exclusions' : 'No names to reset'}
-        onMouseEnter={(e) => {
-          if (hasNames) {
-            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-          }
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'transparent';
-        }}
       >
         <RotateCcw className="size-4" />
         RESET
-      </button>
+      </ActionButtons>
     </div>
   );
 }
