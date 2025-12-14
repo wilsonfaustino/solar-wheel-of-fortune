@@ -25,6 +25,7 @@ function NameLabelComponent({ name, index, totalNames, isSelected }: NameLabelPr
       <text
         x="0"
         y="-5"
+        className="font-mono"
         fontSize={isSelected ? '24' : '13'}
         fontWeight={isSelected ? '600' : '300'}
         fill={isSelected ? 'var(--color-accent)' : 'var(--color-text)'}
@@ -32,7 +33,6 @@ function NameLabelComponent({ name, index, totalNames, isSelected }: NameLabelPr
         letterSpacing="2"
         style={{
           transition: 'all 0.3s ease',
-          fontFamily: '"Courier New", monospace',
         }}
       >
         {name}
