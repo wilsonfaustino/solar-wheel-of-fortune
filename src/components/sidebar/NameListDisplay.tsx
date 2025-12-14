@@ -53,14 +53,7 @@ function NameListDisplayComponent({
       {/* Excluded Names Section */}
       {excludedNames.length > 0 && (
         <>
-          <div
-            className="px-4 py-2"
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              borderTopColor: 'rgba(255, 255, 255, 0.1)',
-              borderTopWidth: '1px',
-            }}
-          >
+          <div className="px-4 py-2 bg-white/5 border-t border-t-white/10">
             <div className="text-xs font-mono tracking-wider text-text/40">EXCLUDED</div>
           </div>
           {excludedNames.map((name) => (

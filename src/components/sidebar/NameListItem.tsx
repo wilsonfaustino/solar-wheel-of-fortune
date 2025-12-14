@@ -1,6 +1,7 @@
 import { Edit2, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
 import type { Name } from '../../types/name';
+import { cn } from '../../utils/cn';
 
 interface NameListItemProps {
   name: Name;
@@ -36,18 +37,10 @@ function NameListItemComponent({ name, onEdit, onDelete, onToggleExclude }: Name
 
   return (
     <div
-      className="px-4 py-3 last:border-b-0 transition-colors group"
-      style={{
-        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
-        borderBottomWidth: '1px',
-        opacity: name.isExcluded ? 0.5 : 1,
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = 'transparent';
-      }}
+      className={cn(
+        'px-4 py-3 last:border-b-0 transition-colors group bg-transparent border-b border-b-white/5 hover:bg-white/5',
+        name.isExcluded ? 'opacity-50' : 'opacity-100'
+      )}
     >
       {isEditing ? (
         <input
@@ -60,39 +53,21 @@ function NameListItemComponent({ name, onEdit, onDelete, onToggleExclude }: Name
             if (e.key === 'Enter') handleSave();
             if (e.key === 'Escape') handleCancel();
           }}
-          className="w-full px-2 py-1 font-mono text-sm focus:outline-none"
-          style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            borderColor: 'var(--color-accent)',
-            borderWidth: '1px',
-            color: 'var(--color-text)',
-            opacity: 0.5,
-          }}
-          onFocus={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 0 2px var(--color-accent)';
-          }}
+          className="w-full px-2 py-1 font-mono text-sm text-text bg-black/50 border border-accent shadow-none focus:outline-none focus:shadow-accent focus:shadow-xs"
           maxLength={100}
         />
       ) : (
         <div className="flex items-center justify-between">
           <button
+            type="button"
             onDoubleClick={() => setIsEditing(true)}
             className="flex-1 text-left flex items-center gap-2"
           >
-            <span
-              className={`font-mono text-sm ${name.isExcluded ? 'line-through' : ''}`}
-              style={{ color: 'var(--color-text)' }}
-            >
+            <span className={cn('font-mono text-sm text-text', name.isExcluded && 'line-through')}>
               {name.value}
             </span>
             {name.selectionCount > 0 && (
-              <span
-                className="px-2 py-0.5 text-xs font-mono rounded"
-                style={{
-                  backgroundColor: 'var(--color-accent-20)',
-                  color: 'var(--color-accent)',
-                }}
-              >
+              <span className="px-2 py-0.5 text-xs font-mono rounded text-accent bg-accent-20">
                 {name.selectionCount}x
               </span>
             )}
@@ -102,50 +77,30 @@ function NameListItemComponent({ name, onEdit, onDelete, onToggleExclude }: Name
             <button
               type="button"
               onClick={() => onToggleExclude(name.id)}
-              className="p-2 rounded transition-colors h-10 w-10 flex items-center justify-center"
-              style={{
-                color: name.isExcluded ? 'var(--color-text)' : 'var(--color-accent)',
-                opacity: name.isExcluded ? 0.3 : 0.7,
-              }}
+              className={cn(
+                'p-2 rounded transition-colors h-10 w-10 flex items-center justify-center bg-transparent hover:bg-white/10',
+                name.isExcluded ? 'text-text opacity-30' : 'text-accent opacity-70'
+              )}
               aria-label={name.isExcluded ? 'Include name' : 'Exclude name'}
               title={name.isExcluded ? 'Include in spins' : 'Exclude from spins'}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
             >
-              {name.isExcluded ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              {name.isExcluded ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
             </button>
             <button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="p-2 rounded transition-colors h-10 w-10 flex items-center justify-center"
-              style={{ color: 'var(--color-accent)', opacity: 0.7 }}
+              className="p-2 rounded transition-colors h-10 w-10 flex items-center justify-center bg-transparent text-accent opacity-70 hover:bg-white/10"
               aria-label={`Edit ${name.value}`}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
             >
-              <Edit2 className="w-5 h-5" />
+              <Edit2 className="size-5" />
             </button>
             <button
               type="button"
               onClick={() => onDelete(name.id)}
-              className="p-2 rounded transition-colors text-red-400/70 h-10 w-10 flex items-center justify-center"
+              className="p-2 rounded transition-colors text-red-400/70 h-10 w-10 flex items-center justify-center bg-transparent hover:bg-white/10"
               aria-label={`Delete ${name.value}`}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
             >
-              <Trash2 className="w-5 h-5" />
+              <Trash2 className="size-5" />
             </button>
           </div>
         </div>

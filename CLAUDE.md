@@ -39,6 +39,8 @@ src/
 │       ├── NameListDisplay.tsx        # Scrollable list, empty state
 │       ├── NameListItem.tsx           # Single name: edit/delete/exclude
 │       ├── BulkActionsPanel.tsx       # Clear selections, reset list
+│       ├── names-list/
+│       │   └── ActionButtons.tsx      # Reusable button component for bulk actions
 │       └── index.ts                   # Barrel exports
 ├── stores/
 │   ├── useNameStore.ts        # Zustand store with Immer middleware + localStorage
@@ -53,7 +55,8 @@ src/
 │   └── index.ts               # Barrel exports
 ├── test/
 │   └── setup.ts               # Vitest setup with jest-dom matchers
-├── utils/                     # Utility functions (empty, for future use)
+├── utils/
+│   └── cn.ts                  # Class name composition utility (clsx + tailwind-merge)
 ├── App.tsx                    # Main app component with keyboard shortcuts integration
 ├── main.tsx                   # React entry point
 └── index.css                  # Tailwind imports + custom animations + overflow: hidden
@@ -114,6 +117,9 @@ bun hooks:uninstall # Remove git hooks
 **Styling**
 - Tailwind v4 uses CSS-based config via `@theme` directive in `index.css`
 - Custom animations defined in `index.css` (pulse-glow, ping)
+- Use `cn()` utility for conditional class composition (combines clsx + tailwind-merge)
+- Avoid inline styles - prefer Tailwind utility classes for consistency and maintainability
+- Extract reusable button/component patterns into shared components (e.g., ActionButtons)
 
 ## Code Style
 
@@ -121,6 +127,7 @@ bun hooks:uninstall # Remove git hooks
 - Avoid comments for self-evident code; only comment magic numbers and non-obvious business logic
 - Keep animations in CSS when possible, use Framer Motion for complex interactions
 - Prefer `memo` for pure components that receive stable props
+- Use `cn()` for conditional className logic instead of template literals or ternaries
 
 ## Linting & Formatting (Session 4)
 
@@ -303,6 +310,26 @@ bun test:run  # Run tests once
 - Configured Lefthook with 3 hooks for quality gates and commit validation
 - Relaxed a11y warnings to accommodate design choices
 - Net reduction: 4 packages (removed 6 ESLint packages, added 2 new tools)
+
+### Session 4.5: Styling Architecture Refactor (Completed)
+- [x] Add cn() utility function for class name composition
+- [x] Create reusable ActionButtons component
+- [x] Migrate all 8 components from inline styles to Tailwind classes
+- [x] Remove all style event handlers (onMouseEnter, onMouseLeave, onFocus, onBlur)
+- [x] Standardize conditional styling with cn() utility
+- [x] Update documentation with styling best practices
+
+**Components Migrated**:
+- AddNameForm, NameListItem, NameListDisplay, BulkActionsPanel
+- ExportModal, HistoryItem, ThemeSwitcher, CenterButton
+
+**Benefits**:
+- Eliminated ~300 lines of inline style code
+- Improved consistency across components
+- Better maintainability with Tailwind utilities
+- Reusable component pattern established
+
+**Commits**: 9 atomic commits (1 infrastructure + 8 component migrations)
 
 ### Session 5: Selection History & Export (Planned)
 - [ ] Create selection history store (extend useNameStore)
