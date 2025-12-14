@@ -10,19 +10,7 @@ interface HistoryItemProps {
 
 function HistoryItemComponent({ record, onDelete }: HistoryItemProps) {
   return (
-    <div
-      className="px-4 py-3 last:border-b-0 transition-colors group flex items-center justify-between"
-      style={{
-        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
-        borderBottomWidth: '1px',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = 'transparent';
-      }}
-    >
+    <div className="px-4 py-3 last:border-b-0 transition-colors group flex items-center justify-between border-b border-b-white/5 bg-transparent hover:bg-white/5">
       <div className="flex-1 min-w-0">
         <div className="font-mono text-sm truncate" style={{ color: 'var(--color-text)' }}>
           {record.nameValue}
@@ -35,14 +23,8 @@ function HistoryItemComponent({ record, onDelete }: HistoryItemProps) {
       <button
         type="button"
         onClick={() => onDelete(record.id)}
-        className="ml-2 p-1.5 rounded transition-colors text-red-400/70 shrink-0"
+        className="ml-2 p-1.5 rounded transition-colors text-red-400/70 shrink-0 bg-transparent hover:bg-white/10"
         aria-label={`Delete ${record.nameValue} from history`}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'transparent';
-        }}
       >
         <Trash2 className="size-4" />
       </button>
