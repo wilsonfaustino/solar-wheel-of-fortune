@@ -6,6 +6,20 @@ Quick navigation for ongoing development sessions.
 
 ## Current Session Tasks
 
+### Session 8: Radix Dialog Migration (Complete ✅)
+**Summary**: [sessions/session-08-radix-dialog.md](./sessions/session-08-radix-dialog.md) - Accessible modals with Radix primitives
+**Status**: ExportModal ✅ | BulkImportModal ✅ | Tests ✅ | Build ✅
+
+**All Steps Completed**:
+- ✅ Install @radix-ui/react-dialog dependency
+- ✅ Migrate ExportModal to Radix Dialog primitive
+- ✅ Update ExportModal tests for Radix Dialog
+- ✅ Migrate BulkImportModal to Radix Dialog primitive
+- ✅ **122 tests passing** (100% - all existing tests pass)
+- ✅ Type-safe (0 errors, strict mode)
+- ✅ Production build succeeds (414.42 KB, gzip: 133.21 KB)
+- ✅ 3 atomic commits created (focused, reviewable changes)
+
 ### Session 7: Responsive Layout (Complete ✅)
 **Summary**: [sessions/session-07-responsive.md](./sessions/session-07-responsive.md) - MVP 100% Complete!
 **Status**: Hook ✅ | Components ✅ | Layout ✅ | Wheel ✅ | Buttons ✅ | Typography ✅ | Tests ✅
@@ -38,6 +52,25 @@ Quick navigation for ongoing development sessions.
 
 **Estimated Time**: 30-45 minutes
 
+#### Feature Task: Radix UI Migration (In Progress 🚧)
+**Summary**: [features/active/radix-ui-migration.md](./features/active/radix-ui-migration.md) - Migrate to accessible primitives
+**Status**: Session 8 Complete ✅ | Sessions 9-11 Remaining
+
+**Progress**: 2/5 components complete (ExportModal ✅, BulkImportModal ✅)
+**Remaining**: ListSelector, AlertDialogs, MobileSidebar (Sessions 9-11)
+
+**Benefits**:
+- WCAG 2.1 AA accessibility compliance
+- Better keyboard navigation (Escape, Tab, Arrow keys)
+- Automatic focus management
+- ~200 lines of manual code removed (40 lines done, 160 remaining)
+
+**Session Prompts**:
+- ✅ [Session 8: Dialog Migration](./prompts/session-08-radix-dialog-prompt.md) - ExportModal, BulkImportModal
+- 📋 [Session 9: Dropdown Migration](./prompts/session-09-radix-dropdown-prompt.md) - ListSelector (Next)
+- 📋 [Session 10: AlertDialog Migration](./prompts/session-10-radix-alert-dialog-prompt.md) - Confirmations
+- 📋 [Session 11: Mobile Drawer](./prompts/session-11-radix-mobile-drawer-prompt.md) - MobileSidebar
+
 **MVP Status**: 🎉 **100% COMPLETE** - Application is production-ready! (pending mobile UX polish)
 
 **Previous Session**: [sessions/session-06-theming.md](./sessions/session-06-theming.md) - Theming system (3 themes) (Completed)
@@ -46,18 +79,18 @@ Quick navigation for ongoing development sessions.
 
 ## Session Context
 
-### What Just Happened (Session 7)
-**File**: [sessions/session-07-responsive.md](./sessions/session-07-responsive.md)
+### What Just Happened (Session 8)
+**File**: [sessions/session-08-radix-dialog.md](./sessions/session-08-radix-dialog.md)
 
 Review this if you need to understand:
-- Responsive layout system with mobile drawer sidebar
-- useMediaQuery hook for screen size detection
-- MobileHeader and MobileSidebar components
-- Responsive wheel sizing (350px/500px/900px)
-- Touch-friendly button sizes (44px minimum)
-- Responsive typography (14px/15px/16px per breakpoint)
-- Conditional rendering patterns for desktop/mobile
-- Framer Motion drawer animation
+- Radix Dialog primitive integration (@radix-ui/react-dialog)
+- ExportModal migration (Dialog.Root, Dialog.Overlay, Dialog.Content, Dialog.Title, Dialog.Close)
+- BulkImportModal migration (AddNameForm component)
+- Automatic keyboard handling (Escape key)
+- Automatic focus management (trapping and restoration)
+- Automatic ARIA attributes (aria-labelledby auto-linking)
+- Test updates for Radix Dialog
+- Code simplification (~40 lines of manual keyboard handling removed)
 
 ### What's Next (Feature Task: Mobile Fixes)
 **File**: [features/active/mobile-fixes.md](./features/active/mobile-fixes.md)
