@@ -23,6 +23,4 @@ coverage
 *.njsproj
 *.sln
 *.sw?
-.claude/*
-!.claude/tasks/
 lefthook-local.yml
