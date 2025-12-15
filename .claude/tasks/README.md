@@ -6,6 +6,34 @@ Quick navigation for ongoing development sessions.
 
 ## Current Session Tasks
 
+### Session 11: Radix Mobile Drawer Enhancement (Complete ✅)
+**Summary**: [sessions/session-11-radix-mobile-drawer.md](./sessions/session-11-radix-mobile-drawer.md) - Mobile drawer with Radix Dialog
+**Status**: MobileSidebar ✅ | Tests ✅ | Build ✅ | Migration Complete ✅
+
+**All Steps Completed**:
+- ✅ Migrate MobileSidebar to Radix Dialog primitive
+- ✅ Remove manual Escape key handler (~15 lines removed)
+- ✅ Remove manual body scroll lock (Radix handles it)
+- ✅ Combine Radix Dialog with Framer Motion animations (asChild pattern)
+- ✅ Create 9 comprehensive MobileSidebar tests
+- ✅ **139 tests passing** (100% - all existing + 9 new tests)
+- ✅ Type-safe (0 errors, strict mode)
+- ✅ Production build succeeds (152.05 KB gzipped)
+- ✅ Radix UI Migration Complete! All 6 components now use Radix primitives
+
+### Session 10: Radix AlertDialog Migration (Complete ✅)
+**Summary**: [sessions/session-10-radix-alert-dialog.md](./sessions/session-10-radix-alert-dialog.md) - Accessible confirmations
+**Status**: ConfirmDialog ✅ | Tests ✅ | Build ✅
+
+**All Steps Completed**:
+- ✅ Create reusable ConfirmDialog component with Radix AlertDialog
+- ✅ Migrate delete confirmations (browser confirm() → AlertDialog)
+- ✅ Add variant-based color coding (danger, warning, info)
+- ✅ Create 8 comprehensive ConfirmDialog tests
+- ✅ **130 tests passing** (100% - all existing tests pass)
+- ✅ Type-safe (0 errors, strict mode)
+- ✅ 3 atomic commits created (focused, reviewable changes)
+
 ### Session 9: Radix DropdownMenu Migration (Complete ✅)
 **Summary**: [sessions/session-09-radix-dropdown.md](./sessions/session-09-radix-dropdown.md) - Accessible dropdown with arrow navigation
 **Status**: ListSelector ✅ | Tests ✅ | Build ✅
@@ -66,24 +94,30 @@ Quick navigation for ongoing development sessions.
 
 **Estimated Time**: 30-45 minutes
 
-#### Feature Task: Radix UI Migration (In Progress 🚧)
-**Summary**: [features/active/radix-ui-migration.md](./features/active/radix-ui-migration.md) - Migrate to accessible primitives
-**Status**: Sessions 8-9 Complete ✅ | Sessions 10-11 Remaining
+#### Feature Task: Radix UI Migration (Complete ✅)
+**Summary**: [features/completed/radix-ui-migration.md](./features/completed/radix-ui-migration.md) - Migrate to accessible primitives
+**Status**: All 6 Components Complete ✅ | All Tests Passing ✅
 
-**Progress**: 3/5 components complete (ExportModal ✅, BulkImportModal ✅, ListSelector ✅)
-**Remaining**: AlertDialogs, MobileSidebar (Sessions 10-11)
+**Progress**: 6/6 components complete
+- ✅ ExportModal (Session 8)
+- ✅ BulkImportModal (Session 8)
+- ✅ ListSelector (Session 9)
+- ✅ ConfirmDialog (Session 10)
+- ✅ Delete confirmations (Session 10)
+- ✅ MobileSidebar (Session 11)
 
-**Benefits**:
-- WCAG 2.1 AA accessibility compliance
+**Benefits Achieved**:
+- WCAG 2.1 AA accessibility compliance on all 6 components
 - Better keyboard navigation (Escape, Tab, Arrow keys, type-ahead)
-- Automatic focus management
-- ~200 lines of manual code removed (82 lines done, 118 remaining)
+- Automatic focus management and trapping
+- ~200 lines of manual event handler code removed
+- +35kb gzipped (one-time investment for accessibility)
 
 **Session Prompts**:
 - ✅ [Session 8: Dialog Migration](./prompts/session-08-radix-dialog-prompt.md) - ExportModal, BulkImportModal
 - ✅ [Session 9: Dropdown Migration](./prompts/session-09-radix-dropdown-prompt.md) - ListSelector
-- 📋 [Session 10: AlertDialog Migration](./prompts/session-10-radix-alert-dialog-prompt.md) - Confirmations (Next)
-- 📋 [Session 11: Mobile Drawer](./prompts/session-11-radix-mobile-drawer-prompt.md) - MobileSidebar
+- ✅ [Session 10: AlertDialog Migration](./prompts/session-10-radix-alert-dialog-prompt.md) - Confirmations
+- ✅ [Session 11: Mobile Drawer](./prompts/session-11-radix-mobile-drawer-prompt.md) - MobileSidebar
 
 **MVP Status**: 🎉 **100% COMPLETE** - Application is production-ready! (pending mobile UX polish)
 
@@ -220,6 +254,10 @@ Example: Need to add a store action? Go to CODE_REFERENCE.md → Store section �
 | 5 | ✅ Complete | Selection history (Phase 1-3): tracking, UI, export - 88 tests |
 | 6 | ✅ Complete | Theming (3 themes: Cyan, Matrix, Sunset) - 96 tests |
 | 7 | ✅ Complete | Responsive layout (mobile drawer, hamburger, 44px buttons) - 96 tests |
+| 8 | ✅ Complete | Radix Dialog migration (ExportModal, BulkImportModal) - 122 tests |
+| 9 | ✅ Complete | Radix DropdownMenu migration (ListSelector) - 122 tests |
+| 10 | ✅ Complete | Radix AlertDialog migration (ConfirmDialog, delete confirmations) - 130 tests |
+| 11 | ✅ Complete | Radix Mobile Drawer enhancement (MobileSidebar) - 139 tests |
 
 ---
 
