@@ -26,8 +26,6 @@ Migrate ListSelector dropdown from manual implementation to Radix DropdownMenu p
 
 **Task 1.1**: Create feature branch
 ```bash
-git checkout main
-git pull origin main
 git checkout -b feat/radix-dropdown-migration
 ```
 

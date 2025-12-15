@@ -6,6 +6,20 @@ Quick navigation for ongoing development sessions.
 
 ## Current Session Tasks
 
+### Session 9: Radix DropdownMenu Migration (Complete ✅)
+**Summary**: [sessions/session-09-radix-dropdown.md](./sessions/session-09-radix-dropdown.md) - Accessible dropdown with arrow navigation
+**Status**: ListSelector ✅ | Tests ✅ | Build ✅
+
+**All Steps Completed**:
+- ✅ Install @radix-ui/react-dropdown-menu dependency
+- ✅ Migrate ListSelector to Radix DropdownMenu primitive
+- ✅ Remove manual click-outside detection (42 lines removed)
+- ✅ Remove manual Escape key handler (Radix handles it)
+- ✅ Add automatic arrow key navigation (Up/Down/Home/End)
+- ✅ **122 tests passing** (100% - all existing tests pass)
+- ✅ Type-safe (0 errors, strict mode)
+- ✅ 2 atomic commits created (focused, reviewable changes)
+
 ### Session 8: Radix Dialog Migration (Complete ✅)
 **Summary**: [sessions/session-08-radix-dialog.md](./sessions/session-08-radix-dialog.md) - Accessible modals with Radix primitives
 **Status**: ExportModal ✅ | BulkImportModal ✅ | Tests ✅ | Build ✅
@@ -54,21 +68,21 @@ Quick navigation for ongoing development sessions.
 
 #### Feature Task: Radix UI Migration (In Progress 🚧)
 **Summary**: [features/active/radix-ui-migration.md](./features/active/radix-ui-migration.md) - Migrate to accessible primitives
-**Status**: Session 8 Complete ✅ | Sessions 9-11 Remaining
+**Status**: Sessions 8-9 Complete ✅ | Sessions 10-11 Remaining
 
-**Progress**: 2/5 components complete (ExportModal ✅, BulkImportModal ✅)
-**Remaining**: ListSelector, AlertDialogs, MobileSidebar (Sessions 9-11)
+**Progress**: 3/5 components complete (ExportModal ✅, BulkImportModal ✅, ListSelector ✅)
+**Remaining**: AlertDialogs, MobileSidebar (Sessions 10-11)
 
 **Benefits**:
 - WCAG 2.1 AA accessibility compliance
-- Better keyboard navigation (Escape, Tab, Arrow keys)
+- Better keyboard navigation (Escape, Tab, Arrow keys, type-ahead)
 - Automatic focus management
-- ~200 lines of manual code removed (40 lines done, 160 remaining)
+- ~200 lines of manual code removed (82 lines done, 118 remaining)
 
 **Session Prompts**:
 - ✅ [Session 8: Dialog Migration](./prompts/session-08-radix-dialog-prompt.md) - ExportModal, BulkImportModal
-- 📋 [Session 9: Dropdown Migration](./prompts/session-09-radix-dropdown-prompt.md) - ListSelector (Next)
-- 📋 [Session 10: AlertDialog Migration](./prompts/session-10-radix-alert-dialog-prompt.md) - Confirmations
+- ✅ [Session 9: Dropdown Migration](./prompts/session-09-radix-dropdown-prompt.md) - ListSelector
+- 📋 [Session 10: AlertDialog Migration](./prompts/session-10-radix-alert-dialog-prompt.md) - Confirmations (Next)
 - 📋 [Session 11: Mobile Drawer](./prompts/session-11-radix-mobile-drawer-prompt.md) - MobileSidebar
 
 **MVP Status**: 🎉 **100% COMPLETE** - Application is production-ready! (pending mobile UX polish)
@@ -79,7 +93,19 @@ Quick navigation for ongoing development sessions.
 
 ## Session Context
 
-### What Just Happened (Session 8)
+### What Just Happened (Session 9)
+**File**: [sessions/session-09-radix-dropdown.md](./sessions/session-09-radix-dropdown.md)
+
+Review this if you need to understand:
+- Radix DropdownMenu primitive integration (@radix-ui/react-dropdown-menu)
+- ListSelector migration (DropdownMenu.Root, DropdownMenu.Trigger, DropdownMenu.Content, DropdownMenu.Item)
+- Automatic keyboard handling (Escape, Arrow keys, Home, End, type-ahead)
+- Automatic click-outside detection (no manual useEffect needed)
+- Automatic positioning (align, sideOffset props)
+- Inline editing preservation (separate div outside DropdownMenu.Item)
+- Code simplification (~42 lines of manual event handlers removed)
+
+### Previous Session (Session 8)
 **File**: [sessions/session-08-radix-dialog.md](./sessions/session-08-radix-dialog.md)
 
 Review this if you need to understand:
