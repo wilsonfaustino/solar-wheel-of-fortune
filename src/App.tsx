@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
+import { Footer } from './components/Footer';
 import { MobileHeader } from './components/MobileHeader';
 import { MobileSidebar, NameManagementSidebar } from './components/sidebar';
 import { RadialWheel, type RadialWheelRef } from './components/wheel';
@@ -71,7 +72,7 @@ function App() {
         )}
 
         {/* Main Wheel Area */}
-        <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative">
           <div className="relative w-full max-w-sm sm:max-w-2xl lg:max-w-4xl aspect-square flex items-center justify-center">
             <RadialWheel ref={wheelRef} names={names} onSelect={handleSelect} />
 
@@ -90,6 +91,7 @@ function App() {
               CLICK CENTER TO RANDOMIZE
             </div>
           </div>
+          <Footer />
         </div>
       </div>
     </div>
