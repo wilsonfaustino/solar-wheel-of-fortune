@@ -1,6 +1,6 @@
 export type Theme = 'cyan' | 'matrix' | 'sunset';
 
-export interface ThemeColors {
+interface ThemeColors {
   accent: string;
   accentGlow: string;
   background: string;
