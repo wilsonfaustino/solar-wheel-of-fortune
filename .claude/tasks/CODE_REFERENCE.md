@@ -191,6 +191,60 @@ const [confirmState, setConfirmState] = useState<{ id: string } | null>(null);
 
 ---
 
+### Dialog with Framer Motion (Drawer Pattern)
+**Components**: MobileSidebar
+**Packages**: `@radix-ui/react-dialog` + `framer-motion`
+
+**Combining Radix Dialog with Framer Motion animations**:
+
+```typescript
+import * as Dialog from '@radix-ui/react-dialog';
+import { motion } from 'framer-motion';
+
+<Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+  <Dialog.Portal>
+    {/* Animated Overlay */}
+    <Dialog.Overlay asChild>
+      <motion.div
+        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-30"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      />
+    </Dialog.Overlay>
+
+    {/* Animated Drawer */}
+    <Dialog.Content asChild>
+      <motion.div
+        className="fixed top-0 left-0 h-screen z-40 bg-black/90 focus:outline-none"
+        initial={{ x: '-100%' }}
+        animate={{ x: 0 }}
+        exit={{ x: '-100%' }}
+        transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+      >
+        <Dialog.Title>Drawer Title</Dialog.Title>
+        <Dialog.Close asChild>
+          <button>Close</button>
+        </Dialog.Close>
+        {/* Drawer content */}
+      </motion.div>
+    </Dialog.Content>
+  </Dialog.Portal>
+</Dialog.Root>
+```
+
+**Key points**:
+- Use `asChild` prop to combine Radix primitives with Framer Motion components
+- Radix handles accessibility (focus trapping, keyboard navigation, ARIA)
+- Framer Motion handles visual animations (entry/exit transitions)
+- Best of both worlds: accessible + animated
+- Add `exit` animation for smooth close transitions
+- Remove manual Escape handling and body scroll lock (Radix handles it)
+
+**Reference**: Session 11 ([sessions/session-11-radix-mobile-drawer.md](./sessions/session-11-radix-mobile-drawer.md))
+
+---
+
 ## Store Patterns
 
 ### Zustand Store with Immer
@@ -523,5 +577,5 @@ it('should work with mock data', () => {
 
 ---
 
-**Last Updated**: Session 10 (December 14, 2024)
+**Last Updated**: Session 11 (December 14, 2024)
 **Maintained By**: Claude Code session documentation
