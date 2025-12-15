@@ -3,6 +3,7 @@ import { ChevronDown, Edit2, Plus, Trash2 } from 'lucide-react';
 import { memo, useState } from 'react';
 import type { NameList } from '../../types/name';
 import { cn } from '../../utils/cn';
+import { ConfirmDialog } from '../shared';
 
 interface ListSelectorProps {
   lists: NameList[];
@@ -22,6 +23,9 @@ function ListSelectorComponent({
   onRenameList,
 }: ListSelectorProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ listId: string; title: string } | null>(
+    null
+  );
 
   const activeList = lists.find((list) => list.id === activeListId);
 
@@ -30,18 +34,28 @@ function ListSelectorComponent({
     if (!list) return;
 
     if (lists.length === 1) {
-      alert('Cannot delete the only list');
+      setDeleteConfirm({
+        listId: 'error',
+        title: 'Cannot delete the only list',
+      });
       return;
     }
 
     if (list.names.length > 5) {
-      const confirmed = confirm(
-        `Delete "${list.title}" with ${list.names.length} names? This cannot be undone.`
-      );
-      if (!confirmed) return;
+      setDeleteConfirm({
+        listId: list.id,
+        title: list.title,
+      });
+    } else {
+      onDeleteList(listId);
     }
+  };
 
-    onDeleteList(listId);
+  const handleConfirmDelete = () => {
+    if (deleteConfirm && deleteConfirm.listId !== 'error') {
+      onDeleteList(deleteConfirm.listId);
+    }
+    setDeleteConfirm(null);
   };
 
   return (
@@ -161,6 +175,20 @@ function ListSelectorComponent({
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
+
+      <ConfirmDialog
+        open={deleteConfirm !== null}
+        onOpenChange={(open) => !open && setDeleteConfirm(null)}
+        title={deleteConfirm?.listId === 'error' ? 'Cannot Delete List' : 'Delete List?'}
+        description={
+          deleteConfirm?.listId === 'error'
+            ? 'You must have at least one list. Create another list before deleting this one.'
+            : `Delete "${deleteConfirm?.title}" with names? This action cannot be undone.`
+        }
+        confirmLabel={deleteConfirm?.listId === 'error' ? undefined : 'Delete'}
+        onConfirm={handleConfirmDelete}
+        variant={deleteConfirm?.listId === 'error' ? 'info' : 'danger'}
+      />
     </DropdownMenu.Root>
   );
 }

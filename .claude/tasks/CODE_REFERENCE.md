@@ -123,6 +123,74 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 
 ---
 
+### AlertDialog Pattern
+**Components**: ConfirmDialog (shared), ListSelector
+**Package**: `@radix-ui/react-alert-dialog`
+
+**Basic structure**:
+```typescript
+import * as AlertDialog from '@radix-ui/react-alert-dialog';
+
+<AlertDialog.Root open={isOpen} onOpenChange={setIsOpen}>
+  <AlertDialog.Portal>
+    <AlertDialog.Overlay className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50" />
+    <AlertDialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-6 max-w-md w-full bg-black border border-border-light z-50 focus:outline-none">
+      <AlertDialog.Title className="font-mono text-lg text-accent">
+        Confirm Action?
+      </AlertDialog.Title>
+      <AlertDialog.Description className="font-mono text-sm text-text/70 mb-6">
+        This action cannot be undone.
+      </AlertDialog.Description>
+
+      <div className="flex gap-2">
+        <AlertDialog.Action asChild>
+          <button onClick={handleConfirm}>Confirm</button>
+        </AlertDialog.Action>
+        <AlertDialog.Cancel asChild>
+          <button>Cancel</button>
+        </AlertDialog.Cancel>
+      </div>
+    </AlertDialog.Content>
+  </AlertDialog.Portal>
+</AlertDialog.Root>
+```
+
+**Shared Component** (`src/components/shared/ConfirmDialog.tsx`):
+- Reusable AlertDialog wrapper
+- Props: `open`, `onOpenChange`, `title`, `description`, `confirmLabel`, `cancelLabel`, `onConfirm`, `variant`
+- Variants: `danger` (red), `warning` (yellow), `info` (cyan)
+- Handles confirm action and closes automatically after confirmation
+
+**Usage example**:
+```typescript
+import { ConfirmDialog } from '../shared';
+
+const [confirmState, setConfirmState] = useState<{ id: string } | null>(null);
+
+<ConfirmDialog
+  open={confirmState !== null}
+  onOpenChange={(open) => !open && setConfirmState(null)}
+  title="Delete Item?"
+  description="This action cannot be undone."
+  confirmLabel="Delete"
+  cancelLabel="Cancel"
+  onConfirm={() => deleteItem(confirmState.id)}
+  variant="danger"
+/>
+```
+
+**Key features**:
+- Automatic Escape key handling
+- Automatic focus trapping
+- Portal rendering (outside DOM hierarchy)
+- Accessible (WCAG 2.1 AA)
+- Theme-consistent styling (no browser-native dialogs)
+- Variant-based color coding (danger, warning, info)
+
+**Reference**: Session 10 ([sessions/session-10-radix-alert-dialog.md](./sessions/session-10-radix-alert-dialog.md))
+
+---
+
 ## Store Patterns
 
 ### Zustand Store with Immer
@@ -455,5 +523,5 @@ it('should work with mock data', () => {
 
 ---
 
-**Last Updated**: Session 9 (December 14, 2024)
+**Last Updated**: Session 10 (December 14, 2024)
 **Maintained By**: Claude Code session documentation
