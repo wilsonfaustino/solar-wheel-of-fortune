@@ -26,8 +26,6 @@ Replace browser `confirm()` and `alert()` dialogs with Radix AlertDialog for bet
 
 **Task 1.1**: Create feature branch
 ```bash
-git checkout main
-git pull origin main
 git checkout -b feat/radix-alert-dialog
 ```
 
