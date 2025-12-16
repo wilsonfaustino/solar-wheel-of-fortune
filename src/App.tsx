@@ -3,6 +3,7 @@ import { useShallow } from 'zustand/shallow';
 import { Footer } from './components/Footer';
 import { MobileHeader } from './components/MobileHeader';
 import { MobileSidebar, NameManagementSidebar } from './components/sidebar';
+import { showSelectionToast, Toaster } from './components/toast';
 import { RadialWheel, type RadialWheelRef } from './components/wheel';
 import { useKeyboardShortcuts, useMediaQuery } from './hooks';
 import { useNameStore } from './stores/useNameStore';
@@ -32,12 +33,11 @@ function App() {
     if (!activeList) return [];
     return activeList.names.filter((name) => !name.isExcluded);
   }, [lists, activeListId]);
-  const [selectedName, setSelectedName] = useState<Name | null>(null);
 
   const handleSelect = useCallback(
     (name: Name) => {
-      setSelectedName(name);
       markSelected(name.id);
+      showSelectionToast(name);
     },
     [markSelected]
   );
@@ -56,6 +56,7 @@ function App() {
 
   return (
     <div className="flex flex-col h-screen w-screen bg-background">
+      <Toaster />
       {/* Mobile Header */}
       {(isSmallScreen || isMediumScreen) && <MobileHeader onToggleSidebar={handleToggleSidebar} />}
 
@@ -73,19 +74,8 @@ function App() {
 
         {/* Main Wheel Area */}
         <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative">
-          <div className="relative w-full max-w-sm sm:max-w-2xl lg:max-w-4xl aspect-square flex items-center justify-center">
+          <div className="relative w-full sm:max-w-2xl lg:max-w-4xl h-full flex items-center justify-center">
             <RadialWheel ref={wheelRef} names={names} onSelect={handleSelect} />
-
-            {selectedName && (
-              <div className="absolute bottom-2 sm:bottom-4 lg:bottom-8 left-1/2 -translate-x-1/2">
-                <div className="px-6 py-3 backdrop-blur-sm rounded bg-black/60 border border-(--color-border-light)">
-                  <div className="text-xs tracking-wider mb-1 font-mono text-text/50">SELECTED</div>
-                  <div className="text-2xl tracking-wider font-light font-mono text-(--color-accent)">
-                    {selectedName.value}
-                  </div>
-                </div>
-              </div>
-            )}
 
             <div className="absolute top-2 sm:top-4 lg:top-8 left-1/2 -translate-x-1/2 text-xs tracking-wider font-mono text-text/40">
               CLICK CENTER TO RANDOMIZE

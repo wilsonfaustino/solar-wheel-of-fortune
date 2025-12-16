@@ -16,8 +16,9 @@ A visually distinctive name selection tool with an engaging radial interface. Pe
 - **Tab navigation** - Switch between Names, History, and Settings tabs
 - **Fully responsive design** - Mobile drawer, tablet, and desktop layouts
 - **Touch-friendly UI** - 44px touch targets (WCAG AAA compliance)
+- **Toast notifications** - Sonner-based toast system with auto-dismiss and stacking (max 3)
 - **Keyboard shortcuts** - Space to spin, Escape to close modals
-- **Unit tests** - 96 comprehensive tests with Vitest + React Testing Library
+- **Unit tests** - 160 comprehensive tests with Vitest + React Testing Library
 
 ## Themes
 
@@ -194,6 +195,22 @@ See [radial-randomizer-prd.md](./radial-randomizer-prd.md) for the complete prod
 - [x] Touch-friendly buttons (44px WCAG AAA)
 - [x] Responsive typography (14px/15px/16px)
 - [x] Mobile fixes (scrollbars, text overlays)
+
+**Session 8-11: Radix UI Migration** ✅ Complete
+- [x] Radix Dialog (ExportModal, BulkImportModal)
+- [x] Radix DropdownMenu (ListSelector)
+- [x] Radix AlertDialog (ConfirmDialog, delete confirmations)
+- [x] Radix Dialog for mobile drawer (MobileSidebar)
+- [x] WCAG 2.1 AA accessibility compliance
+- [x] Automatic keyboard navigation and focus management
+
+**Session 12: Toast Notifications** ✅ Complete
+- [x] Sonner toast library integration (headless API)
+- [x] Custom SelectionToast component with theme support
+- [x] Toast stacking (max 3 visible, 5s duration)
+- [x] Responsive positioning (bottom-center, adaptive offsets)
+- [x] 21 comprehensive toast tests (160 total tests)
+- [x] Removed static selected name display
 
 **MVP Status: 100% COMPLETE - Production Ready**
 
