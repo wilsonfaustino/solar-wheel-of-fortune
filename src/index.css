@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&display=swap");
 @import "tailwindcss";
 
 @theme {
@@ -159,4 +159,66 @@ body {
 
 .scrollbar-themed::-webkit-scrollbar-thumb:hover {
   background-color: var(--color-accent-60);
+}
+
+/* Toast Notifications (Sonner) */
+[data-sonner-toaster] {
+  --normal-bg: transparent;
+  --normal-border: transparent;
+  --normal-text: inherit;
+}
+
+[data-sonner-toaster][data-theme="light"] {
+  --normal-bg: transparent;
+  --normal-border: transparent;
+  --normal-text: inherit;
+}
+
+[data-sonner-toaster][data-theme="dark"] {
+  --normal-bg: transparent;
+  --normal-border: transparent;
+  --normal-text: inherit;
+}
+
+/* Toast container positioning and stacking */
+[data-sonner-toaster] {
+  font-family: var(--font-mono);
+}
+
+[data-sonner-toast] {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Toast enter/exit animations */
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toast-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+[data-sonner-toast][data-mounted="true"] {
+  animation: toast-enter 0.3s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+}
+
+[data-sonner-toast][data-removed="true"] {
+  animation: toast-exit 0.2s ease-out forwards;
 }
