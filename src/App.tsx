@@ -1,17 +1,25 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 import { Footer } from './components/Footer';
 import { MobileHeader } from './components/MobileHeader';
-import { MobileSidebar, NameManagementSidebar } from './components/sidebar';
-import { showSelectionToast, Toaster } from './components/toast';
+import { NameManagementSidebar } from './components/sidebar';
 import { RadialWheel, type RadialWheelRef } from './components/wheel';
 import { useKeyboardShortcuts, useMediaQuery } from './hooks';
 import { useNameStore } from './stores/useNameStore';
 import type { Name } from './types/name';
 
+const MobileSidebar = lazy(() =>
+  import('./components/sidebar').then((module) => ({ default: module.MobileSidebar }))
+);
+
+const Toaster = lazy(() =>
+  import('./components/toast').then((module) => ({ default: module.Toaster }))
+);
+
 function App() {
   const wheelRef = useRef<RadialWheelRef>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [toastLoaded, setToastLoaded] = useState(false);
 
   const { isSmallScreen, isMediumScreen, isLargeScreen } = useMediaQuery();
 
@@ -35,8 +43,10 @@ function App() {
   }, [lists, activeListId]);
 
   const handleSelect = useCallback(
-    (name: Name) => {
+    async (name: Name) => {
       markSelected(name.id);
+      setToastLoaded(true);
+      const { showSelectionToast } = await import('./components/toast');
       showSelectionToast(name);
     },
     [markSelected]
@@ -56,7 +66,11 @@ function App() {
 
   return (
     <div className="flex flex-col h-screen w-screen bg-background">
-      <Toaster />
+      {toastLoaded && (
+        <Suspense fallback={null}>
+          <Toaster />
+        </Suspense>
+      )}
       {/* Mobile Header */}
       {(isSmallScreen || isMediumScreen) && <MobileHeader onToggleSidebar={handleToggleSidebar} />}
 
@@ -67,9 +81,11 @@ function App() {
 
         {/* Mobile/Tablet Sidebar Drawer */}
         {(isSmallScreen || isMediumScreen) && (
-          <MobileSidebar isOpen={sidebarOpen} onClose={handleCloseSidebar}>
-            <NameManagementSidebar isMobile />
-          </MobileSidebar>
+          <Suspense fallback={null}>
+            <MobileSidebar isOpen={sidebarOpen} onClose={handleCloseSidebar}>
+              <NameManagementSidebar isMobile />
+            </MobileSidebar>
+          </Suspense>
         )}
 
         {/* Main Wheel Area */}
