@@ -1,0 +1,18 @@
+Implement lazy loading for MobileSidebar and Toaster components according to the plan in .claude/plans/staged-beaming-token.md
+
+Key requirements:
+- Only modify src/App.tsx (no changes to component files or barrel exports)
+- Add lazy imports for MobileSidebar and Toaster components
+- Wrap lazy components in Suspense boundaries with null fallbacks
+- Make handleSelect async with dynamic import for showSelectionToast
+- Add toastLoaded state to track when toast system should load
+
+After implementation:
+1. Run type check: bun run tsc
+2. Run tests: bun test:run
+3. Build production: bun run build
+4. Verify bundle size reduction (target: 506 kB → ~450-470 kB)
+5. Manual test on desktop and mobile viewports
+
+Create atomic commit following conventional commits format:
+feat(perf): add lazy loading for MobileSidebar and Toaster components
