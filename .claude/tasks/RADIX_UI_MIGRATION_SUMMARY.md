@@ -151,11 +151,59 @@ bun add @radix-ui/react-alert-dialog
 
 ---
 
-## Total Impact
+### Session 14: RadioGroup Migration (60-70 min)
+**Branch**: `feat/radix-radiogroup-migration`
+**Completed**: December 16, 2024
+
+**Install**:
+```bash
+bun add @radix-ui/react-radio-group
+```
+
+**Migrates**:
+- ThemeSwitcher (`src/components/sidebar/ThemeSwitcher.tsx`)
+
+**Changes**:
+- Replace custom theme selector buttons with `<RadioGroup>`
+- Proper radio semantics instead of toggle buttons (`aria-pressed` → `aria-checked`)
+- Automatic arrow key navigation
+- Inline styles migrated to Tailwind classes
+
+**Removes**:
+- ~15 lines of button-based implementation
+- Manual `useCallback` hook
+- `aria-pressed` attribute (replaced with proper `aria-checked`)
+
+**Adds**:
+- Automatic keyboard navigation (arrow keys, Space/Enter)
+- Proper ARIA attributes (`role="radiogroup"`, `role="radio"`)
+- Focus management with roving tabindex
+- `data-state` attributes for checked/unchecked styling
+
+**Bundle**: +3kb gzipped (minimal - shared Radix utilities already loaded)
+
+**Test Impact**: +3 tests (163 total)
+
+**Prompt**: `.claude/tasks/prompts/session-14-radix-radiogroup-prompt.md`
+
+---
+
+## Total Impact Summary
 
 ### Bundle Size
-- **Total Addition**: +35kb gzipped
+- **Before Session 8**: Custom implementations (~5kb)
+- **After Sessions 8-11**: Radix primitives (~40kb gzipped)
+- **After Session 14**: +3kb for RadioGroup (~43kb total)
+- **Net Increase from Start**: +38kb gzipped
 - **Trade-off**: Worth it for accessibility, maintainability, UX improvements
+
+**Radix Primitives Installed**:
+1. `@radix-ui/react-dialog` (Sessions 8, 11) - Modals and mobile drawer
+2. `@radix-ui/react-dropdown-menu` (Session 9) - List selector
+3. `@radix-ui/react-alert-dialog` (Session 10) - Confirmation dialogs
+4. `@radix-ui/react-radio-group` (Session 14) - Theme selector
+
+**Coverage**: All interactive UI primitives now use Radix for consistency
 
 ### Code Reduction
 - **~200 lines removed**: Manual event handlers, click-outside detection, keyboard logic

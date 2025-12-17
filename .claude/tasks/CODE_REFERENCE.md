@@ -191,6 +191,52 @@ const [confirmState, setConfirmState] = useState<{ id: string } | null>(null);
 
 ---
 
+### RadioGroup Pattern
+**Components**: ThemeSwitcher
+**Package**: `@radix-ui/react-radio-group`
+
+**Use Case**: Mutually exclusive selection from multiple options (e.g., theme picker, settings)
+
+**Basic structure**:
+```tsx
+import * as RadioGroup from '@radix-ui/react-radio-group';
+
+<RadioGroup.Root value={currentValue} onValueChange={setValue} className="flex gap-2">
+  {options.map((option) => (
+    <RadioGroup.Item
+      key={option.value}
+      value={option.value}
+      className={cn(
+        'flex-1 px-3 py-2 transition-colors border',
+        'data-[state=checked]:border-accent data-[state=checked]:bg-accent-10',
+        'data-[state=unchecked]:border-white/20 data-[state=unchecked]:opacity-50',
+        'hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-accent/50'
+      )}
+    >
+      {option.label}
+    </RadioGroup.Item>
+  ))}
+</RadioGroup.Root>
+```
+
+**Key features**:
+- Automatic keyboard navigation (arrow keys move between options)
+- Proper ARIA attributes (`role="radiogroup"`, `role="radio"`, `aria-checked`)
+- Focus management with roving tabindex
+- `data-state` attributes for styling (`checked`/`unchecked`)
+- Space/Enter keys to select focused option
+- Tab key to enter/exit the group
+
+**Styling with data attributes**:
+- `data-[state=checked]`: Applied when radio is selected
+- `data-[state=unchecked]`: Applied when radio is not selected
+- `data-[disabled]`: Applied when radio is disabled
+
+**Reference**: Session 14 ([sessions/session-14-radix-radiogroup.md](./sessions/session-14-radix-radiogroup.md))
+**Implementation**: [src/components/sidebar/ThemeSwitcher.tsx](../../src/components/sidebar/ThemeSwitcher.tsx)
+
+---
+
 ### Dialog with Framer Motion (Drawer Pattern)
 **Components**: MobileSidebar
 **Packages**: `@radix-ui/react-dialog` + `framer-motion`
