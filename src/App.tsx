@@ -3,6 +3,7 @@ import { useShallow } from 'zustand/shallow';
 import { Footer } from './components/Footer';
 import { MobileHeader } from './components/MobileHeader';
 import { NameManagementSidebar } from './components/sidebar';
+import { showSelectionToast, Toaster } from './components/toast';
 import { RadialWheel, type RadialWheelRef } from './components/wheel';
 import { useKeyboardShortcuts, useMediaQuery } from './hooks';
 import { useNameStore } from './stores/useNameStore';
@@ -12,14 +13,9 @@ const MobileSidebar = lazy(() =>
   import('./components/sidebar').then((module) => ({ default: module.MobileSidebar }))
 );
 
-const Toaster = lazy(() =>
-  import('./components/toast').then((module) => ({ default: module.Toaster }))
-);
-
 function App() {
   const wheelRef = useRef<RadialWheelRef>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [toastLoaded, setToastLoaded] = useState(false);
 
   const { isSmallScreen, isMediumScreen, isLargeScreen } = useMediaQuery();
 
@@ -43,10 +39,8 @@ function App() {
   }, [lists, activeListId]);
 
   const handleSelect = useCallback(
-    async (name: Name) => {
+    (name: Name) => {
       markSelected(name.id);
-      setToastLoaded(true);
-      const { showSelectionToast } = await import('./components/toast');
       showSelectionToast(name);
     },
     [markSelected]
@@ -66,11 +60,7 @@ function App() {
 
   return (
     <div className="flex flex-col h-screen w-screen bg-background">
-      {toastLoaded && (
-        <Suspense fallback={null}>
-          <Toaster />
-        </Suspense>
-      )}
+      <Toaster />
       {/* Mobile Header */}
       {(isSmallScreen || isMediumScreen) && <MobileHeader onToggleSidebar={handleToggleSidebar} />}
 

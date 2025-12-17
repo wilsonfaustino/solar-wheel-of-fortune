@@ -23,19 +23,8 @@ function ThemeSwitcherComponent() {
   const themeList: Theme[] = ['cyan', 'matrix', 'sunset'];
 
   return (
-    <div
-      className="px-4 py-4"
-      style={{
-        borderBottomColor: 'rgba(255, 255, 255, 0.1)',
-        borderBottomWidth: '1px',
-      }}
-    >
-      <div
-        className="text-xs font-mono tracking-wider mb-3"
-        style={{ color: 'var(--color-text)', opacity: 0.7 }}
-      >
-        THEME
-      </div>
+    <div className="px-4 py-4 border-b border-b-white/10">
+      <div className="text-xs font-mono tracking-wider mb-3 text-text/70">THEME</div>
       <div className="flex gap-2">
         {themeList.map((theme) => (
           <button
