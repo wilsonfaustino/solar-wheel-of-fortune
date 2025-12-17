@@ -52,6 +52,10 @@ function ExportModalComponent({ records, onClose }: ExportModalProps) {
             </Dialog.Close>
           </div>
 
+          <Dialog.Description className="sr-only">
+            Export your selection history as CSV or JSON format
+          </Dialog.Description>
+
           {/* Format Selection */}
           <div className="mb-4">
             <span className="block font-mono text-xs uppercase tracking-wide mb-2 text-text/70">
