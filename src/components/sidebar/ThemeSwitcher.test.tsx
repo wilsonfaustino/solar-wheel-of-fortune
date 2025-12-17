@@ -20,11 +20,13 @@ describe('ThemeSwitcher', () => {
   it('should highlight active theme', () => {
     render(<ThemeSwitcher />);
 
-    const cyanButton = screen.getByText('Cyan Pulse').closest('button');
-    expect(cyanButton).toHaveAttribute('aria-pressed', 'true');
+    const cyanButton = screen.getByRole('radio', { name: 'Cyan Pulse' });
+    expect(cyanButton).toHaveAttribute('aria-checked', 'true');
+    expect(cyanButton).toHaveAttribute('data-state', 'checked');
 
-    const matrixButton = screen.getByText('Matrix Green').closest('button');
-    expect(matrixButton).toHaveAttribute('aria-pressed', 'false');
+    const matrixButton = screen.getByRole('radio', { name: 'Matrix Green' });
+    expect(matrixButton).toHaveAttribute('aria-checked', 'false');
+    expect(matrixButton).toHaveAttribute('data-state', 'unchecked');
   });
 
   it('should call setTheme when button clicked', async () => {
@@ -46,5 +48,41 @@ describe('ThemeSwitcher', () => {
     const secondRender = screen.getByText('Cyan Pulse');
 
     expect(firstRender).toBe(secondRender);
+  });
+
+  it('should have proper radio group semantics', () => {
+    render(<ThemeSwitcher />);
+
+    const radioGroup = screen.getByRole('radiogroup');
+    expect(radioGroup).toBeInTheDocument();
+
+    const radioButtons = screen.getAllByRole('radio');
+    expect(radioButtons).toHaveLength(3);
+  });
+
+  it('should support keyboard focus and tab navigation', async () => {
+    const user = userEvent.setup();
+    render(<ThemeSwitcher />);
+
+    // Tab to focus the radio group
+    await user.tab();
+
+    // The currently checked radio should be focused
+    const cyanButton = screen.getByRole('radio', { name: 'Cyan Pulse' });
+    expect(cyanButton).toHaveFocus();
+    expect(cyanButton).toHaveAttribute('aria-checked', 'true');
+  });
+
+  it('should support Space key to select theme', async () => {
+    const user = userEvent.setup();
+    render(<ThemeSwitcher />);
+
+    const matrixButton = screen.getByRole('radio', { name: 'Matrix Green' });
+    matrixButton.focus();
+
+    await user.keyboard(' ');
+
+    const state = useNameStore.getState();
+    expect(state.currentTheme).toBe('matrix');
   });
 });
