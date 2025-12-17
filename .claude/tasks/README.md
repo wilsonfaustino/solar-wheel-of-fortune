@@ -6,6 +6,22 @@ Quick navigation for ongoing development sessions.
 
 ## Current Session Tasks
 
+### Session 14: Radix RadioGroup Migration (Complete ✅)
+**Summary**: [sessions/session-14-radix-radiogroup.md](./sessions/session-14-radix-radiogroup.md) - Accessible theme selector with Radix RadioGroup
+**Status**: RadioGroup Migration ✅ | Tests ✅ | Build ✅ | All Radix Primitives Complete ✅
+
+**All Steps Completed**:
+- ✅ Install @radix-ui/react-radio-group dependency
+- ✅ Migrate ThemeSwitcher from buttons to RadioGroup primitive
+- ✅ Remove manual useCallback hook (replaced by onValueChange)
+- ✅ Add data-state attribute styling (checked/unchecked)
+- ✅ Add focus ring for keyboard navigation
+- ✅ Create 3 comprehensive RadioGroup tests (semantics, focus, Space key)
+- ✅ **163 tests passing** (100% - all existing + 3 new tests)
+- ✅ Type-safe (0 errors, strict mode)
+- ✅ Production build succeeds (164.04 KB gzipped)
+- ✅ 4 atomic commits created (deps, migration, tests, docs)
+
 ### Session 13: Lazy Loading Performance Optimization (Complete ✅)
 **Summary**: [sessions/session-13-lazy-loading.md](./sessions/session-13-lazy-loading.md) - Lazy loading for MobileSidebar and Toaster
 **Status**: Lazy Loading ✅ | Bundle Size ✅ | Tests ✅ | Build ✅
@@ -289,6 +305,8 @@ Example: Need to add a store action? Go to CODE_REFERENCE.md → Store section �
 | 10 | ✅ Complete | Radix AlertDialog migration (ConfirmDialog, delete confirmations) - 130 tests |
 | 11 | ✅ Complete | Radix Mobile Drawer enhancement (MobileSidebar) - 139 tests |
 | 12 | ✅ Complete | Sonner toast notifications (custom headless component, stacking) - 160 tests |
+| 13 | ✅ Complete | Lazy loading optimization (MobileSidebar, Toaster) - 159 tests |
+| 14 | ✅ Complete | Radix RadioGroup migration (ThemeSwitcher accessibility) - 163 tests |
 
 ---
 
