@@ -48,6 +48,10 @@ function MobileSidebarComponent({ isOpen, onClose, children }: MobileSidebarProp
               </Dialog.Close>
             </div>
 
+            <Dialog.Description className="sr-only">
+              Navigation menu with name management and settings
+            </Dialog.Description>
+
             {/* Drawer Content */}
             <div className="flex-1 overflow-y-auto scrollbar-themed">{children}</div>
           </motion.div>
