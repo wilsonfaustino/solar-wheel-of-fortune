@@ -469,7 +469,7 @@ export function useKeyboardShortcuts(handlers: {
 **File**: `src/utils/cn.ts`
 
 ```typescript
-import { cn } from '../../utils/cn';
+import { cn } from '@/lib/utils';
 
 // Conditional classes
 <div className={cn(

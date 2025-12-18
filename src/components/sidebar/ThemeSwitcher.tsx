@@ -1,10 +1,10 @@
 import * as RadioGroup from '@radix-ui/react-radio-group';
 import { memo } from 'react';
 import { useShallow } from 'zustand/shallow';
+import { cn } from '@/lib/utils';
 import { THEMES } from '../../constants/themes';
 import { useNameStore } from '../../stores/useNameStore';
 import type { Theme } from '../../types/theme';
-import { cn } from '../../utils/cn';
 
 function ThemeSwitcherComponent() {
   const { currentTheme, setTheme } = useNameStore(
