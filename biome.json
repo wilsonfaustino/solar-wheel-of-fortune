@@ -31,7 +31,8 @@
       },
       "complexity": {
         "recommended": true,
-        "noExcessiveCognitiveComplexity": "warn"
+        "noExcessiveCognitiveComplexity": "warn",
+        "noImportantStyles": "off"
       },
       "correctness": {
         "recommended": true,
