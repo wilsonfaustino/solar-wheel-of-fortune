@@ -1,8 +1,8 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Download, X } from 'lucide-react';
 import { memo, useCallback, useState } from 'react';
+import { cn } from '@/lib/utils';
 import type { SelectionRecord } from '../../types/name';
-import { cn } from '../../utils/cn';
 import { type ExportFormat, exportToCSV, exportToJSON } from '../../utils/export';
 import { Button } from '../ui/button';
 

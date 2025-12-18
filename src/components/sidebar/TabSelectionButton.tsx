@@ -1,5 +1,5 @@
 import { type ComponentProps, memo } from 'react';
-import { cn } from '../../utils/cn';
+import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
 
 interface TabSelectionButtonProps extends ComponentProps<'button'> {
@@ -20,7 +20,7 @@ function TabSelectionButtonComponent({
       variant="tech-ghost"
       size="tech-default"
       className={cn(
-        'flex-1 text-sm rounded-none',
+        'flex-1 text-sm',
         isActiveTab ? 'text-accent border-b-2 border-accent' : 'text-text/50 border-b-0'
       )}
       {...props}

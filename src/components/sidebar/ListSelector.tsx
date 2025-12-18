@@ -1,8 +1,8 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { ChevronDown, Edit2, Plus, Trash2 } from 'lucide-react';
 import { memo, useState } from 'react';
+import { cn } from '@/lib/utils';
 import type { NameList } from '../../types/name';
-import { cn } from '../../utils/cn';
 import { ConfirmDialog } from '../shared';
 import { Button } from '../ui/button';
 
@@ -66,7 +66,7 @@ function ListSelectorComponent({
           type="button"
           variant="tech-outline"
           size="tech-default"
-          className="w-full justify-between data-[state=open]:bg-white/5"
+          className="w-full h-auto justify-between data-[state=open]:bg-white/5"
         >
           <div className="flex-1 text-left">
             <div className="text-xs tracking-wider mb-1 font-mono text-text/50">ACTIVE LIST</div>

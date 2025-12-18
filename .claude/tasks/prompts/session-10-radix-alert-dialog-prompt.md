@@ -52,7 +52,7 @@ bun run tsc  # Should pass with 0 errors
 ```typescript
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import { memo } from 'react';
-import { cn } from '../../utils/cn';
+import { cn } from '@/lib/utils';
 
 interface ConfirmDialogProps {
   open: boolean;

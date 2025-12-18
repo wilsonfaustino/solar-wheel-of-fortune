@@ -1,7 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Plus, Upload } from 'lucide-react';
 import { memo, useCallback, useState } from 'react';
-import { cn } from '../../utils/cn';
+import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
 
 interface AddNameFormProps {

@@ -1,7 +1,7 @@
 import { Edit2, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
 import type { Name } from '../../types/name';
-import { cn } from '../../utils/cn';
 import { Button } from '../ui/button';
 
 interface NameListItemProps {

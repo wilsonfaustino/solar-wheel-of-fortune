@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
+import { cn } from '@/lib/utils';
 import { useNameStore } from '../../stores/useNameStore';
-import { cn } from '../../utils/cn';
 import { AddNameForm } from './AddNameForm';
 import { BulkActionsPanel } from './BulkActionsPanel';
 import { HistoryPanel } from './HistoryPanel';
