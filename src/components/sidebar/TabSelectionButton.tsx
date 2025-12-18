@@ -1,5 +1,6 @@
 import { type ComponentProps, memo } from 'react';
 import { cn } from '../../utils/cn';
+import { Button } from '../ui/button';
 
 interface TabSelectionButtonProps extends ComponentProps<'button'> {
   isActiveTab: boolean;
@@ -13,17 +14,19 @@ function TabSelectionButtonComponent({
   ...props
 }: TabSelectionButtonProps) {
   return (
-    <button
+    <Button
       type="button"
       onClick={onSelectTab}
+      variant="tech-ghost"
+      size="tech-default"
       className={cn(
-        'flex-1 px-4 py-3 font-mono text-sm transition-colors',
+        'flex-1 text-sm rounded-none',
         isActiveTab ? 'text-accent border-b-2 border-accent' : 'text-text/50 border-b-0'
       )}
       {...props}
     >
       {children}
-    </button>
+    </Button>
   );
 }
 
