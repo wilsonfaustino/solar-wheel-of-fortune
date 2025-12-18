@@ -354,17 +354,20 @@ const store = useStore();
 
 **Location**: `src/components/ui/button.tsx`
 
-**Description**: Centralized button component using CVA (Class Variance Authority) for variant management. Supports both standard Shadcn variants and custom tech-themed variants.
+**Description**: Centralized button component using CVA (Class Variance Authority) for variant management. All standard Shadcn variants removed - only tech-themed variants remain.
 
-**Tech Variants** (preserve cyberpunk aesthetic):
-- `tech` - Primary tech button (accent bg, border, font-mono)
-- `tech-ghost` - Transparent button with hover effects
+**Available Variants** (all include font-mono, tracking-wider):
+- `tech` - Primary tech button (accent bg/border)
+- `tech-ghost` - Transparent button with hover effects **[DEFAULT]**
 - `tech-destructive` - Destructive action (red theme)
 - `tech-toggle` - Toggle states (active/inactive via className)
 - `tech-outline` - Border-only button
 
-**Icon Sizes**:
-- `icon-sm` (size-8), `icon` (size-9), `icon-lg` (size-10)
+**Available Sizes**:
+- `sm` (h-8, px-3) - Used sparingly
+- `icon-sm` (size-8) - Icon-only buttons
+- `tech-default` (h-11, px-4 py-3) - Standard sidebar buttons **[DEFAULT]**
+- `tech-sm` (h-10, px-3 py-2) - Compact tech buttons
 
 **Usage Pattern**:
 ```typescript
@@ -390,9 +393,11 @@ import { Button } from '@/components/ui/button';
 
 **Key Features**:
 - `asChild` prop for Radix Slot composition
+- Defaults to `tech-ghost` variant and `tech-default` size if not specified
 - Automatic disabled state styling (opacity-50, pointer-events-none)
 - Focus ring management (focus-visible:ring-ring/50)
 - SVG icon sizing via CSS selector ([&_svg:not([class*='size-'])]:size-4)
+- No Shadcn standard variants (removed for cleaner, project-specific code)
 
 ---
 

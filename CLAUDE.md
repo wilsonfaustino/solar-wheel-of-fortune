@@ -131,27 +131,22 @@ bun hooks:uninstall # Remove git hooks
 
 ## Button Component Usage
 
-The application uses a centralized Button component (`src/components/ui/button.tsx`) with CVA (Class Variance Authority) for variant management.
+The application uses a centralized Button component (`src/components/ui/button.tsx`) with CVA (Class Variance Authority) for variant management. All standard Shadcn variants have been removed in favor of project-specific tech variants.
 
-### Tech Variants
+### Available Variants
 
-The following custom variants preserve the tech/cyberpunk aesthetic:
+**Variants** (all use font-mono, tracking-wider):
+- `tech` - Primary tech button (accent bg/border)
+- `tech-ghost` - Transparent tech button (hover effects) **[DEFAULT]**
+- `tech-destructive` - Destructive tech button (red theme)
+- `tech-toggle` - Toggle button (active/inactive states via className)
+- `tech-outline` - Outline tech button (border only)
 
-**Variants:**
-- `tech` - Primary tech button (font-mono, tracking-wider, accent bg/border)
-- `tech-ghost` - Transparent tech button (font-mono, tracking-wider, hover effects)
-- `tech-destructive` - Destructive tech button (font-mono, tracking-wider, red theme)
-- `tech-toggle` - Toggle button (font-mono, tracking-wider, active/inactive states via className)
-- `tech-outline` - Outline tech button (font-mono, tracking-wider, border only)
-
-**Tech Sizes:**
-- `tech-default` - h-11, px-4 py-3 (sidebar buttons)
-- `tech-sm` - h-10, px-3 py-2 (compact buttons)
-
-**Icon Sizes:**
-- `icon-sm` - size-8 (small icon-only buttons)
-- `icon` - size-9 (default icon-only buttons)
-- `icon-lg` - size-10 (large icon-only buttons)
+**Sizes:**
+- `sm` - h-8, px-3 (small standard size, used sparingly)
+- `icon-sm` - size-8 (icon-only buttons)
+- `tech-default` - h-11, px-4 py-3 (standard sidebar buttons) **[DEFAULT]**
+- `tech-sm` - h-10, px-3 py-2 (compact tech buttons)
 
 ### Usage Examples
 
@@ -202,13 +197,15 @@ The following custom variants preserve the tech/cyberpunk aesthetic:
 </Dialog.Close>
 ```
 
-### Migration Notes
+### Important Notes
 
-- CenterButton (wheel spin) intentionally NOT migrated - complex custom animations preserved
-- All sidebar buttons use Button component as of Session 15
-- Icon buttons standardized to size-8 (icon-sm), size-9 (icon), or size-10 (icon-lg)
-- Disabled states automatically handled by Button (pointer-events-none, opacity-50)
-- Focus rings handled by Button's base classes (focus-visible variants)
+- **Defaults**: If variant/size not specified, defaults to `tech-ghost` and `tech-default`
+- **No Shadcn variants**: All standard Shadcn variants (default, destructive, outline, etc.) have been removed
+- **Tech aesthetic**: All variants include `font-mono` and `tracking-wider` for consistency
+- **Icon standardization**: Icon-only buttons use `size="icon-sm"` with `className="size-4"` for icons
+- **Disabled states**: Automatically handled (pointer-events-none, opacity-50)
+- **Focus rings**: Automatic focus-visible ring management
+- **CenterButton exception**: Wheel spin button NOT migrated (preserves complex custom animations)
 
 ## Linting & Formatting (Session 4)
 
