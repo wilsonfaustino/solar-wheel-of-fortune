@@ -129,6 +129,84 @@ bun hooks:uninstall # Remove git hooks
 - Prefer `memo` for pure components that receive stable props
 - Use `cn()` for conditional className logic instead of template literals or ternaries
 
+## Button Component Usage
+
+The application uses a centralized Button component (`src/components/ui/button.tsx`) with CVA (Class Variance Authority) for variant management. All standard Shadcn variants have been removed in favor of project-specific tech variants.
+
+### Available Variants
+
+**Variants** (all use font-mono, tracking-wider):
+- `tech` - Primary tech button (accent bg/border)
+- `tech-ghost` - Transparent tech button (hover effects) **[DEFAULT]**
+- `tech-destructive` - Destructive tech button (red theme)
+- `tech-toggle` - Toggle button (active/inactive states via className)
+- `tech-outline` - Outline tech button (border only)
+
+**Sizes:**
+- `sm` - h-8, px-3 (small standard size, used sparingly)
+- `icon-sm` - size-8 (icon-only buttons)
+- `tech-default` - h-11, px-4 py-3 (standard sidebar buttons) **[DEFAULT]**
+- `tech-sm` - h-10, px-3 py-2 (compact tech buttons)
+
+### Usage Examples
+
+**Primary tech button:**
+```typescript
+<Button variant="tech" size="tech-default">
+  <Plus className="size-4" />
+  ADD
+</Button>
+```
+
+**Icon-only button:**
+```typescript
+<Button variant="tech-ghost" size="icon-sm" aria-label="Delete name">
+  <Trash2 className="size-4" />
+</Button>
+```
+
+**Destructive button:**
+```typescript
+<Button variant="tech-destructive" size="tech-sm">
+  <Trash2 className="size-4" />
+  DELETE
+</Button>
+```
+
+**Toggle button (active/inactive states):**
+```typescript
+<Button
+  variant="tech-toggle"
+  size="tech-sm"
+  className={cn(
+    isActive
+      ? 'border-accent bg-accent-20 text-accent'
+      : 'border-white/20 text-text/70'
+  )}
+>
+  OPTION
+</Button>
+```
+
+**Radix integration (Dialog.Close, DropdownMenu.Trigger):**
+```typescript
+<Dialog.Close asChild>
+  <Button variant="tech-outline" size="tech-default">
+    CANCEL
+  </Button>
+</Dialog.Close>
+```
+
+### Important Notes
+
+- **Defaults**: If variant/size not specified, defaults to `tech-ghost` and `tech-default`
+- **No Shadcn variants**: All standard Shadcn variants (default, destructive, outline, etc.) have been removed
+- **Tech aesthetic**: All variants include `font-mono` and `tracking-wider` for consistency
+- **Icon standardization**: Icon-only buttons use `size="icon-sm"` with `className="size-4"` for icons
+- **Disabled states**: Automatically handled (pointer-events-none, opacity-50)
+- **Focus rings**: Automatic focus-visible ring management
+- **CenterButton exception**: Wheel spin button NOT migrated (preserves complex custom animations)
+
 ## Linting & Formatting (Session 4)
 
 ### Biome 2

@@ -78,7 +78,7 @@ describe('ExportModal', () => {
     expect(jsonButton).toHaveClass('bg-accent-20');
     expect(jsonButton).toHaveClass('border-accent');
     expect(csvButton).not.toHaveClass('bg-accent-20');
-    expect(csvButton).toHaveClass('bg-transparent');
+    expect(csvButton).toHaveClass('border-white/20');
   });
 
   it('should display record count', () => {

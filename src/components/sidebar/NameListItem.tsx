@@ -2,6 +2,7 @@ import { Edit2, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
 import type { Name } from '../../types/name';
 import { cn } from '../../utils/cn';
+import { Button } from '../ui/button';
 
 interface NameListItemProps {
   name: Name;
@@ -74,34 +75,36 @@ function NameListItemComponent({ name, onEdit, onDelete, onToggleExclude }: Name
           </button>
 
           <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
+            <Button
               type="button"
               onClick={() => onToggleExclude(name.id)}
-              className={cn(
-                'p-2 rounded transition-colors h-10 w-10 flex items-center justify-center bg-transparent hover:bg-white/10',
-                name.isExcluded ? 'text-text opacity-30' : 'text-accent opacity-70'
-              )}
+              variant="tech-ghost"
+              size="icon-sm"
+              className={name.isExcluded ? 'opacity-30' : 'text-accent opacity-70'}
               aria-label={name.isExcluded ? 'Include name' : 'Exclude name'}
               title={name.isExcluded ? 'Include in spins' : 'Exclude from spins'}
             >
-              {name.isExcluded ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
-            </button>
-            <button
+              {name.isExcluded ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </Button>
+            <Button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="p-2 rounded transition-colors h-10 w-10 flex items-center justify-center bg-transparent text-accent opacity-70 hover:bg-white/10"
+              variant="tech-ghost"
+              size="icon-sm"
+              className="text-accent opacity-70"
               aria-label={`Edit ${name.value}`}
             >
-              <Edit2 className="size-5" />
-            </button>
-            <button
+              <Edit2 className="size-4" />
+            </Button>
+            <Button
               type="button"
               onClick={() => onDelete(name.id)}
-              className="p-2 rounded transition-colors text-red-400/70 h-10 w-10 flex items-center justify-center bg-transparent hover:bg-white/10"
+              variant="tech-destructive"
+              size="icon-sm"
               aria-label={`Delete ${name.value}`}
             >
-              <Trash2 className="size-5" />
-            </button>
+              <Trash2 className="size-4" />
+            </Button>
           </div>
         </div>
       )}

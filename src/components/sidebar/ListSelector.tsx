@@ -4,6 +4,7 @@ import { memo, useState } from 'react';
 import type { NameList } from '../../types/name';
 import { cn } from '../../utils/cn';
 import { ConfirmDialog } from '../shared';
+import { Button } from '../ui/button';
 
 interface ListSelectorProps {
   lists: NameList[];
@@ -61,9 +62,11 @@ function ListSelectorComponent({
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
-        <button
+        <Button
           type="button"
-          className="w-full px-4 py-3 transition-colors duration-200 flex items-center justify-between group border border-(--color-border-light) bg-black/60 hover:bg-white/5 data-[state=open]:bg-white/5"
+          variant="tech-outline"
+          size="tech-default"
+          className="w-full justify-between data-[state=open]:bg-white/5"
         >
           <div className="flex-1 text-left">
             <div className="text-xs tracking-wider mb-1 font-mono text-text/50">ACTIVE LIST</div>
@@ -72,12 +75,12 @@ function ListSelectorComponent({
             </div>
           </div>
           <ChevronDown className="w-5 h-5 text-accent/50 transition-transform group-data-[state=open]:rotate-180" />
-        </button>
+        </Button>
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          className="w-[var(--radix-dropdown-menu-trigger-width)] mt-2 backdrop-blur-sm z-50 max-h-80 overflow-y-auto scrollbar-themed bg-black/90 border border-border-light focus:outline-none"
+          className="w-(--radix-dropdown-menu-trigger-width) mt-2 backdrop-blur-sm z-50 max-h-80 overflow-y-auto scrollbar-themed bg-black/90 border border-border-light focus:outline-none"
           align="start"
           sideOffset={8}
         >
@@ -133,29 +136,32 @@ function ListSelectorComponent({
 
                     {list.id !== activeListId && (
                       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
+                        <Button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             setEditingId(list.id);
                           }}
-                          className="p-1 rounded text-accent/70 bg-transparent hover:bg-white/5"
+                          variant="tech-ghost"
+                          size="icon-sm"
+                          className="text-accent/70"
                           aria-label={`Edit ${list.title}`}
                         >
                           <Edit2 className="size-4" />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDeleteClick(list.id);
                           }}
-                          className="p-1 rounded text-red-400/70 bg-transparent hover:bg-white/5"
-                          aria-label={`Delete ${list.title}`}
+                          variant="tech-destructive"
+                          size="icon-sm"
                           disabled={lists.length === 1}
+                          aria-label={`Delete ${list.title}`}
                         >
                           <Trash2 className="size-4" />
-                        </button>
+                        </Button>
                       </div>
                     )}
                   </div>

@@ -1,5 +1,6 @@
 import { type ComponentProps, memo } from 'react';
 import { cn } from '../../../utils/cn';
+import { Button } from '../../ui/button';
 
 interface ActionButtonsProps extends ComponentProps<'button'> {
   hasTargetContent: boolean;
@@ -12,19 +13,20 @@ function ActionButtonsComponent({
   ...props
 }: ActionButtonsProps) {
   return (
-    <button
+    <Button
       type="button"
       disabled={!hasTargetContent}
+      variant="tech-ghost"
+      size="tech-default"
       className={cn(
-        'flex-1 px-3 py-3 h-11 transition-colors font-mono text-xs tracking-wider bg-transparent disabled:cursor-not-allowed flex items-center justify-center gap-2',
-        'border border-white/20 hover:bg-white/10 cursor-pointer transition-colors',
-        hasTargetContent ? 'text-text/70 bg-white/5' : 'text-text/30',
+        'flex-1 text-xs',
+        hasTargetContent && 'border border-white/20 bg-white/5',
         className
       )}
       {...props}
     >
       {children}
-    </button>
+    </Button>
   );
 }
 

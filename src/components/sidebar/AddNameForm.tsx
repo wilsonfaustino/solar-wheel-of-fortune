@@ -2,6 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Plus, Upload } from 'lucide-react';
 import { memo, useCallback, useState } from 'react';
 import { cn } from '../../utils/cn';
+import { Button } from '../ui/button';
 
 interface AddNameFormProps {
   onAddName: (name: string) => void;
@@ -83,24 +84,28 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
           )}
           {error && <div className="text-xs text-red-400 font-mono mt-1">{error}</div>}
         </div>
-        <button
+        <Button
           type="submit"
-          className="px-4 py-3 h-11 font-mono text-sm text-accent border border-border-light bg-accent-10 tracking-wider transition-colors flex items-center justify-center"
+          variant="tech"
+          size="tech-default"
+          className="text-sm"
           aria-label="Add name"
         >
-          <Plus className="w-5 h-5" />
-        </button>
+          <Plus className="size-4" />
+        </Button>
       </form>
 
       {/* Bulk Import Link */}
-      <button
+      <Button
         type="button"
         onClick={() => setShowBulkImport(true)}
-        className="mt-3 text-xs text-accent/70 font-mono tracking-wider flex items-center gap-1"
+        variant="tech-ghost"
+        size="sm"
+        className="mt-3 text-xs"
       >
-        <Upload className="w-3 h-3" />
+        <Upload className="size-3" />
         BULK IMPORT
-      </button>
+      </Button>
 
       {/* Bulk Import Modal */}
       {showBulkImport && (
@@ -125,20 +130,25 @@ function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
                 className="w-full h-64 px-3 py-2 font-mono text-sm text-text border border-border-light bg-black/50 shadow-none focus:shadow-xs focus:shadow-accent focus:outline-none placeholder:text-white/30 resize-none"
               />
               <div className="flex gap-2 mt-4">
-                <button
+                <Button
                   type="button"
                   onClick={handleBulkImport}
-                  className="flex-1 px-4 py-3 h-11 font-mono text-sm text-accent border border-border-light bg-accent-10 tracking-wider transition-colors"
+                  disabled={bulkText.trim().length === 0}
+                  variant="tech"
+                  size="tech-default"
+                  className="flex-1 text-sm"
                 >
                   IMPORT
-                </button>
+                </Button>
                 <Dialog.Close asChild>
-                  <button
+                  <Button
                     type="button"
-                    className="px-4 py-3 h-11 font-mono text-sm text-text/70 border border-border-light tracking-wider transition-colors"
+                    variant="tech-outline"
+                    size="tech-default"
+                    className="text-sm"
                   >
                     CANCEL
-                  </button>
+                  </Button>
                 </Dialog.Close>
               </div>
             </Dialog.Content>
