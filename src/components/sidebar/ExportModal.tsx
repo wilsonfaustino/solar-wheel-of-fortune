@@ -4,6 +4,7 @@ import { memo, useCallback, useState } from 'react';
 import type { SelectionRecord } from '../../types/name';
 import { cn } from '../../utils/cn';
 import { type ExportFormat, exportToCSV, exportToJSON } from '../../utils/export';
+import { Button } from '../ui/button';
 
 interface ExportModalProps {
   records: SelectionRecord[];
@@ -42,13 +43,15 @@ function ExportModalComponent({ records, onClose }: ExportModalProps) {
               EXPORT HISTORY
             </Dialog.Title>
             <Dialog.Close asChild>
-              <button
+              <Button
                 type="button"
-                className="transition-colors text-accent/50 bg-transparent hover:text-accent"
+                variant="tech-ghost"
+                size="icon-sm"
+                className="text-accent/50 hover:text-accent"
                 aria-label="Close modal"
               >
                 <X className="size-5" />
-              </button>
+              </Button>
             </Dialog.Close>
           </div>
 
@@ -62,30 +65,34 @@ function ExportModalComponent({ records, onClose }: ExportModalProps) {
               Format
             </span>
             <div className="flex gap-2">
-              <button
+              <Button
                 type="button"
                 onClick={() => setFormat('csv')}
+                variant="tech-toggle"
+                size="tech-sm"
                 className={cn(
-                  'flex-1 px-3 py-2 font-mono text-sm tracking-wider transition-colors border',
+                  'flex-1 text-sm',
                   format === 'csv'
                     ? 'border-accent bg-accent-20 text-accent'
-                    : 'bg-transparent border-white/20 text-text/70 hover:border-white/40 hover:text-text'
+                    : 'border-white/20 text-text/70 hover:border-white/40 hover:text-text'
                 )}
               >
                 CSV
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => setFormat('json')}
+                variant="tech-toggle"
+                size="tech-sm"
                 className={cn(
-                  'flex-1 px-3 py-2 font-mono text-sm tracking-wider transition-colors border',
+                  'flex-1 text-sm',
                   format === 'json'
                     ? 'border-accent bg-accent-20 text-accent'
-                    : 'bg-transparent border-white/20 text-text/70 hover:border-white/40 hover:text-text'
+                    : 'border-white/20 text-text/70 hover:border-white/40 hover:text-text'
                 )}
               >
                 JSON
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -115,24 +122,25 @@ function ExportModalComponent({ records, onClose }: ExportModalProps) {
 
           {/* Action Buttons */}
           <div className="flex gap-2">
-            <button
+            <Button
               type="button"
               onClick={handleExport}
-              className={cn(
-                'flex-1 px-4 py-2 transition-colors font-mono text-sm tracking-wider flex items-center justify-center gap-2',
-                'bg-accent-10 border border-border-light text-accent hover:bg-accent-20'
-              )}
+              variant="tech"
+              size="tech-sm"
+              className="flex-1 text-sm"
             >
-              <Download className="w-4 h-4" />
+              <Download className="size-4" />
               DOWNLOAD
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 transition-colors font-mono text-sm tracking-wider bg-transparent border border-white/20 text-text/70 hover:bg-white/5"
+              variant="tech-outline"
+              size="tech-sm"
+              className="text-sm"
             >
               CANCEL
-            </button>
+            </Button>
           </div>
         </Dialog.Content>
       </Dialog.Portal>
