@@ -2,6 +2,7 @@ import { Download, Trash2 } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useNameStore } from '../../stores/useNameStore';
 import type { SelectionRecord } from '../../types/name';
+import { Button } from '../ui/button';
 import { ExportModal } from './ExportModal';
 import { HistoryItem } from './HistoryItem';
 
@@ -73,24 +74,28 @@ function HistoryPanelComponent() {
           </div>
 
           <div className="px-4 py-3 flex gap-2 border-t border-t-(--color-border-light)">
-            <button
+            <Button
               type="button"
               onClick={handleOpenExport}
-              className="flex-1 px-4 py-2 transition-colors font-mono text-sm flex items-center justify-center gap-2 border border-(--color-border-light) text-(--color-accent) bg-transparent hover:bg-accent-20"
+              variant="tech-outline"
+              size="tech-sm"
+              className="flex-1 text-sm text-accent hover:bg-accent-20"
               aria-label="Export selection history"
             >
               <Download className="size-4" />
               Export
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={handleClearHistory}
-              className="flex-1 px-4 py-2 transition-colors font-mono text-sm flex items-center justify-center gap-2 text-red-400 border border-destructive/30 bg-transparent hover:bg-destructive/20"
+              variant="tech-destructive"
+              size="tech-sm"
+              className="flex-1 text-sm"
               aria-label="Clear all history"
             >
               <Trash2 className="size-4" />
               Clear
-            </button>
+            </Button>
           </div>
         </>
       )}

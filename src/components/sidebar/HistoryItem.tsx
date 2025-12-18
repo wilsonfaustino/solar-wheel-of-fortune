@@ -2,6 +2,7 @@ import { Trash2 } from 'lucide-react';
 import { memo } from 'react';
 import type { SelectionRecord } from '../../types/name';
 import { formatRelativeTime } from '../../utils/formatRelativeTime';
+import { Button } from '../ui/button';
 
 interface HistoryItemProps {
   record: SelectionRecord;
@@ -20,14 +21,16 @@ function HistoryItemComponent({ record, onDelete }: HistoryItemProps) {
         </div>
       </div>
 
-      <button
+      <Button
         type="button"
         onClick={() => onDelete(record.id)}
-        className="ml-2 p-1.5 rounded transition-colors text-red-400/70 shrink-0 bg-transparent hover:bg-white/10"
+        variant="tech-destructive"
+        size="icon-sm"
+        className="ml-2 shrink-0"
         aria-label={`Delete ${record.nameValue} from history`}
       >
         <Trash2 className="size-4" />
-      </button>
+      </Button>
     </div>
   );
 }
