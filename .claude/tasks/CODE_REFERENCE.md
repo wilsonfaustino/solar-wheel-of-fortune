@@ -350,6 +350,52 @@ const store = useStore();
 
 ## Component Patterns
 
+### Button Component
+
+**Location**: `src/components/ui/button.tsx`
+
+**Description**: Centralized button component using CVA (Class Variance Authority) for variant management. Supports both standard Shadcn variants and custom tech-themed variants.
+
+**Tech Variants** (preserve cyberpunk aesthetic):
+- `tech` - Primary tech button (accent bg, border, font-mono)
+- `tech-ghost` - Transparent button with hover effects
+- `tech-destructive` - Destructive action (red theme)
+- `tech-toggle` - Toggle states (active/inactive via className)
+- `tech-outline` - Border-only button
+
+**Icon Sizes**:
+- `icon-sm` (size-8), `icon` (size-9), `icon-lg` (size-10)
+
+**Usage Pattern**:
+```typescript
+import { Button } from '@/components/ui/button';
+
+// Primary button
+<Button variant="tech" size="tech-default">
+  ACTION
+</Button>
+
+// Icon-only button
+<Button variant="tech-ghost" size="icon-sm" aria-label="Delete">
+  <Trash2 className="size-4" />
+</Button>
+
+// With Radix integration
+<Dialog.Close asChild>
+  <Button variant="tech-outline" size="tech-default">
+    CANCEL
+  </Button>
+</Dialog.Close>
+```
+
+**Key Features**:
+- `asChild` prop for Radix Slot composition
+- Automatic disabled state styling (opacity-50, pointer-events-none)
+- Focus ring management (focus-visible:ring-ring/50)
+- SVG icon sizing via CSS selector ([&_svg:not([class*='size-'])]:size-4)
+
+---
+
 ### Memoized Component with Props
 **Pattern**: All sidebar components
 

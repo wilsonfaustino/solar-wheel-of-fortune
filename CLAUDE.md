@@ -129,6 +129,87 @@ bun hooks:uninstall # Remove git hooks
 - Prefer `memo` for pure components that receive stable props
 - Use `cn()` for conditional className logic instead of template literals or ternaries
 
+## Button Component Usage
+
+The application uses a centralized Button component (`src/components/ui/button.tsx`) with CVA (Class Variance Authority) for variant management.
+
+### Tech Variants
+
+The following custom variants preserve the tech/cyberpunk aesthetic:
+
+**Variants:**
+- `tech` - Primary tech button (font-mono, tracking-wider, accent bg/border)
+- `tech-ghost` - Transparent tech button (font-mono, tracking-wider, hover effects)
+- `tech-destructive` - Destructive tech button (font-mono, tracking-wider, red theme)
+- `tech-toggle` - Toggle button (font-mono, tracking-wider, active/inactive states via className)
+- `tech-outline` - Outline tech button (font-mono, tracking-wider, border only)
+
+**Tech Sizes:**
+- `tech-default` - h-11, px-4 py-3 (sidebar buttons)
+- `tech-sm` - h-10, px-3 py-2 (compact buttons)
+
+**Icon Sizes:**
+- `icon-sm` - size-8 (small icon-only buttons)
+- `icon` - size-9 (default icon-only buttons)
+- `icon-lg` - size-10 (large icon-only buttons)
+
+### Usage Examples
+
+**Primary tech button:**
+```typescript
+<Button variant="tech" size="tech-default">
+  <Plus className="size-4" />
+  ADD
+</Button>
+```
+
+**Icon-only button:**
+```typescript
+<Button variant="tech-ghost" size="icon-sm" aria-label="Delete name">
+  <Trash2 className="size-4" />
+</Button>
+```
+
+**Destructive button:**
+```typescript
+<Button variant="tech-destructive" size="tech-sm">
+  <Trash2 className="size-4" />
+  DELETE
+</Button>
+```
+
+**Toggle button (active/inactive states):**
+```typescript
+<Button
+  variant="tech-toggle"
+  size="tech-sm"
+  className={cn(
+    isActive
+      ? 'border-accent bg-accent-20 text-accent'
+      : 'border-white/20 text-text/70'
+  )}
+>
+  OPTION
+</Button>
+```
+
+**Radix integration (Dialog.Close, DropdownMenu.Trigger):**
+```typescript
+<Dialog.Close asChild>
+  <Button variant="tech-outline" size="tech-default">
+    CANCEL
+  </Button>
+</Dialog.Close>
+```
+
+### Migration Notes
+
+- CenterButton (wheel spin) intentionally NOT migrated - complex custom animations preserved
+- All sidebar buttons use Button component as of Session 15
+- Icon buttons standardized to size-8 (icon-sm), size-9 (icon), or size-10 (icon-lg)
+- Disabled states automatically handled by Button (pointer-events-none, opacity-50)
+- Focus rings handled by Button's base classes (focus-visible variants)
+
 ## Linting & Formatting (Session 4)
 
 ### Biome 2
