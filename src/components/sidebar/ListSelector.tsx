@@ -80,7 +80,7 @@ function ListSelectorComponent({
 
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          className="w-[var(--radix-dropdown-menu-trigger-width)] mt-2 backdrop-blur-sm z-50 max-h-80 overflow-y-auto scrollbar-themed bg-black/90 border border-border-light focus:outline-none"
+          className="w-(--radix-dropdown-menu-trigger-width) mt-2 backdrop-blur-sm z-50 max-h-80 overflow-y-auto scrollbar-themed bg-black/90 border border-border-light focus:outline-none"
           align="start"
           sideOffset={8}
         >
