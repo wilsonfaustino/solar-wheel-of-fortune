@@ -8,9 +8,7 @@
       "mcp__ide__getDiagnostics",
       "Bash(bun test:run:*)"
     ],
-    "deny": [
-      "Bash(sleep)"
-    ],
+    "deny": ["Bash(sleep)"],
     "ask": []
   }
 }

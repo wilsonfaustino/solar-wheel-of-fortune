@@ -82,9 +82,11 @@ bun check      # Biome check (lint + format + organize imports)
 bun ci         # Biome CI mode (no writes, fails on issues)
 
 # Testing
-bun test       # Run tests in watch mode
-bun test:ui    # Run tests with UI
-bun test:run   # Run tests once (CI mode)
+bun test              # Run tests in watch mode
+bun test:ui           # Run tests with UI
+bun test:run          # Run tests once (CI mode)
+bun test:coverage     # Generate coverage reports (LCOV + HTML)
+bun test:coverage:ui  # Coverage with Vitest UI
 
 # Git Hooks
 bun hooks:install   # Install git hooks (runs automatically on install)
@@ -95,6 +97,116 @@ bun hooks:uninstall # Remove git hooks
 - **pre-commit**: Runs Biome check on staged files, auto-stages fixes
 - **pre-push**: Runs full type-check and test suite
 - **commit-msg**: Validates conventional commits format
+
+## CI/CD Pipeline
+
+### GitHub Actions Workflow
+
+**Workflow**: [.github/workflows/ci.yml](.github/workflows/ci.yml)
+**Triggers**: Pull requests to `main`, pushes to `main`
+
+**Quality Gates** (5 jobs):
+1. **Lint (Biome)** - `bun run ci` (fails on issues)
+2. **Type Check (TypeScript)** - `bun run tsc -b` (strict mode)
+3. **Test & Coverage (Vitest)** - `bun test:coverage` (163 tests, 45% threshold)
+4. **Build (Vite)** - `bun run build` (production bundle)
+5. **SonarQube Analysis** - Code quality + quality gate
+
+**Job Dependencies**:
+- Lint, type-check, test run in parallel
+- Build waits for lint + type-check
+- SonarQube waits for test coverage
+
+**Estimated CI Time**: 3-5 minutes per run
+
+### Test Coverage
+
+**Commands**:
+```bash
+bun test:coverage     # Generate coverage reports (LCOV + HTML)
+bun test:coverage:ui  # Coverage with Vitest UI
+```
+
+**Output**:
+- `coverage/lcov.info` - SonarQube format (gitignored)
+- `coverage/index.html` - HTML report for local review (gitignored)
+
+**Thresholds**: 45% minimum for lines/functions/statements, 30% branches (baseline)
+
+**Coverage Provider**: v8 (modern, fast, accurate)
+
+### SonarQube Integration
+
+**Configuration**: [sonar-project.properties](sonar-project.properties) (root directory)
+**Dashboard**: https://sonarcloud.io/project/overview?id=wilsonfaustino_solar-wheel-of-fortune
+
+**Quality Gates**:
+- Code coverage ≥ 80% (SonarQube default)
+- No new bugs, vulnerabilities, code smells
+- Security hotspots reviewed
+- Duplicated lines ≤ 3%
+
+**Token**: Stored in GitHub Secrets as `SONAR_TOKEN`
+
+### Branch Protection Rules
+
+**Main Branch Rules**:
+- ✅ Require 1 approval before merge
+- ✅ Require all 5 status checks to pass
+- ✅ Require branch to be up to date
+- ✅ Require conversation resolution
+- ❌ No bypassing settings (applies to admins)
+
+**PR Workflow**:
+1. Create feature branch from `main`
+2. Push commits (triggers CI on push)
+3. Create PR (triggers full CI pipeline)
+4. Wait for all 5 checks to pass
+5. Request review from teammate
+6. Resolve all conversations
+7. Merge when approved + green checks
+
+### Local Testing Before Push
+
+Run these commands locally to catch issues before CI:
+
+```bash
+bun run ci          # Biome lint (CI mode)
+bun run tsc -b      # Type check
+bun test:run        # All tests once
+bun test:coverage   # Tests with coverage
+bun run build       # Production build
+```
+
+**Note**: Local git hooks already run subset of these checks (pre-commit, pre-push)
+
+### Troubleshooting CI Failures
+
+**Lint Failures**:
+```bash
+bun lint:fix    # Auto-fix Biome issues
+bun format      # Format code
+bun check       # All-in-one check
+```
+
+**Type Errors**:
+```bash
+bun run tsc -b  # See exact errors
+```
+
+**Test Failures**:
+```bash
+bun test        # Run tests in watch mode
+bun test:ui     # Debug with Vitest UI
+```
+
+**Coverage Below Threshold**:
+- Add tests for uncovered code paths
+- Or temporarily lower threshold in `vitest.config.ts`
+
+**Build Failures**:
+- Usually caused by type errors or missing dependencies
+- Check `dist/` directory after successful build
 
 ### Key Implementation Details
 
