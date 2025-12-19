@@ -6,15 +6,14 @@ export function Toaster() {
   return (
     <SonnerToaster
       position="bottom-center"
-      expand={true}
-      richColors={false}
+      expand={false}
+      richColors={true}
       closeButton={false}
-      duration={5000}
+      duration={25000}
       visibleToasts={3}
-      gap={8}
+      gap={14}
       offset={isSmallScreen ? 100 : 150}
       toastOptions={{
-        unstyled: true,
         classNames: {
           toast: 'toast-container',
           title: 'toast-title',

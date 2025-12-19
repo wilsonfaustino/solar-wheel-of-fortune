@@ -16,7 +16,7 @@ export function SelectionToast({ name, timestamp, onDismiss }: SelectionToastPro
   });
 
   return (
-    <div className="w-120 sm:max-w-sm p-3 sm:p-4 bg-black border border-border-light font-mono shadow-lg lg:translate-x-40">
+    <div className="w-120 sm:max-w-sm p-3 sm:p-4 bg-black border border-border-light font-mono shadow-lg lg:translate-x-[38%]">
       {/* Header */}
       <div className="flex items-start justify-between gap-3 sm:gap-4 mb-2">
         <div className="flex-1 min-w-0">
