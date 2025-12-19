@@ -60,7 +60,6 @@ function App() {
 
   return (
     <div className="flex flex-col h-screen w-screen bg-background">
-      <Toaster />
       {/* Mobile Header */}
       {(isSmallScreen || isMediumScreen) && <MobileHeader onToggleSidebar={handleToggleSidebar} />}
 
@@ -80,6 +79,7 @@ function App() {
 
         {/* Main Wheel Area */}
         <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative">
+          <Toaster />
           <div className="relative w-full sm:max-w-2xl lg:max-w-4xl h-full flex items-center justify-center">
             <RadialWheel ref={wheelRef} names={names} onSelect={handleSelect} />
 
