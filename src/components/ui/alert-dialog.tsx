@@ -72,7 +72,7 @@ interface ActionProps extends ComponentProps<typeof AlertDialogPrimitive.Action>
   variant?: 'danger' | 'warning' | 'info';
 }
 
-function Action({ className, confirmLabel, onConfirm, variant, ...props }: ActionProps) {
+function Action({ className, confirmLabel, onConfirm, variant, ...props }: Readonly<ActionProps>) {
   return (
     <AlertDialogPrimitive.Action asChild {...props} data-slot="alert-dialog-action">
       <button
@@ -97,7 +97,7 @@ interface CancelProps extends ComponentProps<typeof AlertDialogPrimitive.Cancel>
   cancelLabel?: string;
 }
 
-function Cancel({ cancelLabel, className, ...props }: CancelProps) {
+function Cancel({ cancelLabel, className, ...props }: Readonly<CancelProps>) {
   return (
     <AlertDialogPrimitive.Cancel asChild {...props} data-slot="alert-dialog-cancel">
       <button
@@ -125,7 +125,7 @@ function Footer({
   cancelLabel,
   className,
   ...props
-}: FooterProps) {
+}: Readonly<FooterProps>) {
   return (
     <div className={cn('flex gap-2', className)} {...props}>
       <Action onConfirm={onConfirm} confirmLabel={confirmLabel} variant={variant} />

@@ -18,7 +18,7 @@ function UncontrolledConfirmDialogComponent({
   cancelLabel = 'Cancel',
   onConfirm,
   variant = 'danger',
-}: ConfirmDialogProps) {
+}: Readonly<ConfirmDialogProps>) {
   return (
     <AlertDialog.Root>
       <AlertDialog.Trigger asChild>{children}</AlertDialog.Trigger>
