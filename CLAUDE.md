@@ -222,9 +222,10 @@ bun test:ui     # Debug with Vitest UI
 - Derived data (filtered names) should use `useMemo` to avoid infinite loops
 - Store actions: addName, deleteName, updateName, markSelected, setActiveList, createList, deleteList, updateListTitle, toggleNameExclusion, clearSelections, resetList, bulkAddNames
 
-**Keyboard Shortcuts** (Session 3)
-- Space: Spin the wheel (via `useKeyboardShortcuts` hook)
+**Keyboard Shortcuts** (Session 3, Session 15)
+- Space: Spin the wheel (via `useKeyboardShortcuts` hook, suppressed when typing in input/textarea fields)
 - Escape: Close bulk import modal and list selector dropdown
+- Input field detection: Automatically prevents shortcuts during text entry to allow typing compound names
 
 **Styling**
 - Tailwind v4 uses CSS-based config via `@theme` directive in `index.css`

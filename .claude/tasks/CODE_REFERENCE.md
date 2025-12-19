@@ -427,39 +427,66 @@ export const Component = memo(ComponentName);
 
 ---
 
-### Keyboard Shortcuts Hook
+### Keyboard Shortcuts Hook with Input Field Suppression
 **File**: `src/hooks/useKeyboardShortcuts.ts`
+**Sessions**: Session 3, Session 15
+
+**Pattern**: Global keyboard listeners should check event target to avoid conflicts with text input.
 
 ```typescript
 import { useEffect } from 'react';
 
-export function useKeyboardShortcuts(handlers: {
-  onSpace?: () => void;
-  onEscape?: () => void;
-}) {
+interface KeyboardShortcutsOptions {
+  onSpinTrigger?: () => void;
+  onEscapePress?: () => void;
+}
+
+export function useKeyboardShortcuts({ onSpinTrigger, onEscapePress }: KeyboardShortcutsOptions) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Ignore if typing in input/textarea
-      if (event.target instanceof HTMLInputElement ||
-          event.target instanceof HTMLTextAreaElement) {
-        return;
-      }
+      const target = event.target as HTMLElement;
 
-      if (event.key === ' ' && handlers.onSpace) {
+      // Check if user is typing in an input field (input, textarea, contentEditable)
+      const isInputField =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target.isContentEditable;
+
+      // Space: Spin the wheel (but NOT when typing in input fields)
+      if (event.code === 'Space' && !isInputField) {
         event.preventDefault();
-        handlers.onSpace();
+        onSpinTrigger?.();
       }
 
-      if (event.key === 'Escape' && handlers.onEscape) {
-        handlers.onEscape();
+      // Escape: Close modals/dropdowns (works everywhere)
+      if (event.key === 'Escape') {
+        onEscapePress?.();
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [handlers]);
+    globalThis.addEventListener('keydown', handleKeyDown);
+    return () => globalThis.removeEventListener('keydown', handleKeyDown);
+  }, [onSpinTrigger, onEscapePress]);
 }
 ```
+
+**Why**:
+- Prevents global shortcuts from blocking text entry in forms (users can type compound names like "Ana Luiza")
+- Uses `event.code === 'Space'` instead of `event.key === ' '` for keyboard layout independence
+- Includes `contentEditable` check for future-proofing (rich text editors)
+- Escape key works everywhere (including inputs) to close modals/dropdowns
+
+**Usage**:
+```typescript
+// In App.tsx
+const wheelRef = useRef<RadialWheelRef>(null);
+
+useKeyboardShortcuts({
+  onSpinTrigger: () => wheelRef.current?.spin(),
+});
+```
+
+**Test Coverage**: 13 tests covering Space key behavior, input field suppression, Escape key, and edge cases
 
 ---
 
