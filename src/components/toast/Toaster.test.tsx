@@ -63,14 +63,14 @@ describe('Toaster', () => {
     expect(getByTestId('toaster')).toHaveAttribute('data-visible-toasts', '3');
   });
 
-  it('configures toast duration to 5000ms', () => {
+  it('configures toast duration to 25000ms', () => {
     const { getByTestId } = render(<Toaster />);
-    expect(getByTestId('toaster')).toHaveAttribute('data-duration', '5000');
+    expect(getByTestId('toaster')).toHaveAttribute('data-duration', '25000');
   });
 
   it('configures gap between toasts', () => {
     const { getByTestId } = render(<Toaster />);
-    expect(getByTestId('toaster')).toHaveAttribute('data-gap', '8');
+    expect(getByTestId('toaster')).toHaveAttribute('data-gap', '14');
   });
 
   it('uses different offset on mobile vs desktop', async () => {
