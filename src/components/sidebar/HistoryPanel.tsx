@@ -2,6 +2,7 @@ import { Download, Trash2 } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useNameStore } from '../../stores/useNameStore';
 import type { SelectionRecord } from '../../types/name';
+import { UncontrolledConfirmDialog } from '../shared';
 import { Button } from '../ui/button';
 import { ExportModal } from './ExportModal';
 import { HistoryItem } from './HistoryItem';
@@ -31,12 +32,6 @@ function HistoryPanelComponent() {
     },
     [deleteHistoryItem]
   );
-
-  const handleClearHistory = useCallback(() => {
-    if (confirm('Clear all selection history? This cannot be undone.')) {
-      clearHistory();
-    }
-  }, [clearHistory]);
 
   const handleOpenExport = useCallback(() => {
     setShowExportModal(true);
@@ -85,17 +80,24 @@ function HistoryPanelComponent() {
               <Download className="size-4" />
               Export
             </Button>
-            <Button
-              type="button"
-              onClick={handleClearHistory}
-              variant="tech-destructive"
-              size="tech-sm"
-              className="flex-1 text-sm"
-              aria-label="Clear all history"
+            <UncontrolledConfirmDialog
+              title="Clear All History?"
+              description="This will permanently delete all selection history. This action cannot be undone."
+              confirmLabel="Clear All"
+              onConfirm={clearHistory}
+              variant="danger"
             >
-              <Trash2 className="size-4" />
-              Clear
-            </Button>
+              <Button
+                type="button"
+                variant="tech-destructive"
+                size="tech-sm"
+                className="flex-1 text-sm"
+                aria-label="Clear all history"
+              >
+                <Trash2 className="size-4" />
+                Clear
+              </Button>
+            </UncontrolledConfirmDialog>
           </div>
         </>
       )}

@@ -70,7 +70,7 @@ describe('HistoryPanel', () => {
     expect(screen.getByText('ALICE')).toBeInTheDocument();
   });
 
-  it('should clear all history when clear button clicked', async () => {
+  it('should show confirmation dialog when clear button clicked', async () => {
     const store = useNameStore.getState();
     store.recordSelection('ALICE', 'name-1');
     store.recordSelection('BOB', 'name-2');
@@ -80,12 +80,28 @@ describe('HistoryPanel', () => {
     const user = userEvent.setup();
     const clearButton = screen.getByRole('button', { name: /clear all history/i });
 
-    vi.stubGlobal(
-      'confirm',
-      vi.fn(() => true)
-    );
+    await user.click(clearButton);
+
+    expect(screen.getByText('Clear All History?')).toBeInTheDocument();
+    expect(
+      screen.getByText(/this will permanently delete all selection history/i)
+    ).toBeInTheDocument();
+  });
+
+  it('should clear all history when confirmation is accepted', async () => {
+    const store = useNameStore.getState();
+    store.recordSelection('ALICE', 'name-1');
+    store.recordSelection('BOB', 'name-2');
+
+    render(<HistoryPanel />);
+
+    const user = userEvent.setup();
+    const clearButton = screen.getByRole('button', { name: /clear all history/i });
 
     await user.click(clearButton);
+
+    const confirmButton = screen.getByRole('button', { name: /clear all/i });
+    await user.click(confirmButton);
 
     expect(screen.getByText(/spin the wheel to record selections/i)).toBeInTheDocument();
   });
@@ -100,12 +116,10 @@ describe('HistoryPanel', () => {
     const user = userEvent.setup();
     const clearButton = screen.getByRole('button', { name: /clear all history/i });
 
-    vi.stubGlobal(
-      'confirm',
-      vi.fn(() => false)
-    );
-
     await user.click(clearButton);
+
+    const cancelButton = screen.getByRole('button', { name: /cancel/i });
+    await user.click(cancelButton);
 
     expect(screen.getByText('ALICE')).toBeInTheDocument();
     expect(screen.getByText('BOB')).toBeInTheDocument();
