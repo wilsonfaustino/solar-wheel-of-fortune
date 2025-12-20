@@ -9,7 +9,7 @@ export class ThemePage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    this.settingsTab = page.getByRole('tab', { name: /settings/i });
+    this.settingsTab = page.getByRole('button', { name: /settings tab/i });
     // RadioGroup buttons with theme labels
     this.cyanThemeButton = page.getByRole('radio', { name: /cyan pulse/i });
     this.matrixThemeButton = page.getByRole('radio', { name: /matrix green/i });
