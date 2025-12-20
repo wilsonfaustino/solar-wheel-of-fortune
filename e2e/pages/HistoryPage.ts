@@ -11,14 +11,14 @@ export class HistoryPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    this.historyTab = page.getByRole('tab', { name: /history/i });
+    this.historyTab = page.getByRole('button', { name: /history tab/i });
     this.historyItems = page
       .locator('.group')
       .filter({ has: page.getByRole('button', { name: /delete/i }) });
     this.clearHistoryButton = page.getByRole('button', { name: /clear all/i });
     this.exportButton = page.getByRole('button', { name: /export/i });
-    this.statsText = page.locator('text=Total:').or(page.locator('text=Unique:'));
-    this.noHistoryMessage = page.getByText(/no history yet/i);
+    this.statsText = page.getByText(/total.*unique/i);
+    this.noHistoryMessage = page.getByText(/spin the wheel to record selections/i);
   }
 
   async switchToHistoryTab() {
@@ -38,7 +38,7 @@ export class HistoryPage extends BasePage {
   async clearAllHistory() {
     await this.clearHistoryButton.click();
     // Confirm in dialog
-    const confirmButton = this.page.getByRole('button', { name: /confirm/i });
+    const confirmButton = this.page.getByRole('button', { name: /clear all/i });
     await confirmButton.click();
   }
 
