@@ -586,6 +586,46 @@ export function ActionButtons({ buttons }: ActionButtonsProps) {
 
 ## Testing Patterns
 
+### E2E Testing (Playwright)
+
+**Location**: `e2e/` directory
+
+**Page Object Model Architecture**:
+- **BasePage** (`e2e/pages/BasePage.ts`) - Common functionality for all pages
+  - Methods: `goto()`, `clearLocalStorage()`, `waitForToast(text)`, `pressEscape()`, `pressSpace()`
+- **WheelPage** (`e2e/pages/WheelPage.ts`) - Wheel spin interactions
+  - Methods: `spin()`, `spinViaKeyboard()`, `getSelectedName()`, `verifyNamesDisplayed(count)`
+- **SidebarPage** (`e2e/pages/SidebarPage.ts`) - Name/list management
+  - Methods: `addName(name)`, `bulkImport(names[])`, `deleteName(name)`, `editName(old, new)`
+
+**Fixture Pattern**:
+```typescript
+import { test, expect } from '../fixtures/localStorage.fixture';
+
+test('test name', async ({ wheelPage, sidebarPage }) => {
+  // Auto-initialized page objects
+  // localStorage cleared before each test
+});
+```
+
+**Locator Strategy**:
+- Prefer role-based selectors: `page.getByRole('button', { name: /add/i })`
+- Use filters for specificity: `page.getByRole('listitem').filter({ hasText: 'Alice' })`
+- Avoid data-testid unless role-based selectors fail
+- Sonner toasts: Use `.toast-container` class selector
+
+**Animation Handling**:
+- Wheel spin takes 5s (spring animation) + 1s buffer
+- Use `page.waitForTimeout(6000)` in WheelPage methods
+- Check disabled state during spin: `expect(button).toBeDisabled()`
+
+**Test Files**:
+- Numbered prefixes (01-, 02-) for logical execution order
+- Kebab-case naming: `01-wheel-spin.spec.ts`
+- One file per feature workflow
+
+---
+
 ### Store Tests with Vitest
 **File**: `src/stores/useNameStore.test.ts`
 
