@@ -1,4 +1,4 @@
-import { expect, type Locator } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class WheelPage extends BasePage {
@@ -6,13 +6,13 @@ export class WheelPage extends BasePage {
   readonly wheelContainer: Locator;
   readonly nameLabels: Locator;
 
-  constructor(page) {
+  constructor(page: Page) {
     super(page);
     this.centerButton = page.getByRole('button', {
-      name: /click to randomize/i,
+      name: /randomize selection/i,
     });
     this.wheelContainer = page.locator('svg').filter({ hasText: 'Wheel of Fortune' });
-    this.nameLabels = page.locator('text[data-index]');
+    this.nameLabels = page.locator('g[data-index]');
   }
 
   async spin() {
@@ -32,7 +32,8 @@ export class WheelPage extends BasePage {
   }
 
   async getSelectedName(): Promise<string | null> {
-    const toast = this.page.getByRole('status').first();
+    const toast = this.page.locator('.toast-container').first();
+    await toast.waitFor({ timeout: 10000 });
     const text = await toast.textContent();
     return text;
   }

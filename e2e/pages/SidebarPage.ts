@@ -1,4 +1,4 @@
-import type { Locator } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class SidebarPage extends BasePage {
@@ -8,7 +8,7 @@ export class SidebarPage extends BasePage {
   readonly listSelector: Locator;
   readonly nameItems: Locator;
 
-  constructor(page) {
+  constructor(page: Page) {
     super(page);
     this.addNameInput = page.getByPlaceholder(/enter name/i);
     this.addButton = page.getByRole('button', { name: /^add$/i });
