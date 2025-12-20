@@ -24,3 +24,9 @@ coverage
 *.sln
 *.sw?
 lefthook-local.yml
+
+# Playwright
+playwright-report/
+playwright-results.xml
+test-results/
+.playwright/
