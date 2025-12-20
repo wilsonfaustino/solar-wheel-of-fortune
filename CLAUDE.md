@@ -105,19 +105,21 @@ bun hooks:uninstall # Remove git hooks
 **Workflow**: [.github/workflows/ci.yml](.github/workflows/ci.yml)
 **Triggers**: Pull requests to `main`, pushes to `main`
 
-**Quality Gates** (5 jobs):
+**Quality Gates** (6 jobs):
 1. **Lint (Biome)** - `bun run ci` (fails on issues)
 2. **Type Check (TypeScript)** - `bun run tsc -b` (strict mode)
-3. **Test & Coverage (Vitest)** - `bun test:coverage` (163 tests, 45% threshold)
+3. **Test & Coverage (Vitest)** - `bun test:coverage` (190 tests, 45% threshold)
 4. **Build (Vite)** - `bun run build` (production bundle)
-5. **SonarQube Analysis** - Code quality + quality gate
+5. **E2E Tests (Playwright)** - `bun run test:e2e` (6 tests, Chromium only)
+6. **SonarQube Analysis** - Code quality + quality gate
 
 **Job Dependencies**:
 - Lint, type-check, test run in parallel
 - Build waits for lint + type-check
-- SonarQube waits for test coverage
+- E2E waits for lint + type-check
+- SonarQube waits for test coverage + E2E
 
-**Estimated CI Time**: 3-5 minutes per run
+**Estimated CI Time**: 4-6 minutes per run
 
 ### Test Coverage
 
@@ -740,15 +742,74 @@ bun test:run  # Run tests once
 - Component tests for sidebar and wheel components
 - Integration tests for user workflows
 
+## E2E Testing (Playwright)
+
+### Overview
+- **Framework**: Playwright 1.57+ with TypeScript
+- **Architecture**: Page Object Model (POM)
+- **Browser**: Chromium only (fastest CI execution)
+- **Test Directory**: `/e2e/` (separate from Vitest unit tests)
+- **Test Count**: 6 tests (Phase 1), 22 tests (Phase 2 target)
+- **CI Integration**: 6th quality gate (runs after lint + typecheck)
+
+### Running E2E Tests
+
+```bash
+bun run test:e2e          # Run all tests (headless)
+bun run test:e2e:ui       # Run with Playwright UI (best for writing tests)
+bun run test:e2e:headed   # Run with browser visible
+bun run test:e2e:debug    # Debug with Playwright Inspector
+bun run test:e2e:report   # View last test report
+bun run test:e2e:codegen  # Generate test code via browser interaction
+```
+
+### Test Organization
+
+**Page Objects** (`e2e/pages/`):
+- BasePage.ts - Common functionality (navigation, shortcuts)
+- WheelPage.ts - Wheel spin interactions
+- SidebarPage.ts - Name/list management
+
+**Test Specs** (`e2e/specs/`):
+- 01-wheel-spin.spec.ts - Spin animation, toast notifications (4 tests)
+- 02-name-management.spec.ts - Add, bulk import (2 tests)
+
+### Writing E2E Tests
+
+Use fixtures for automatic localStorage cleanup:
+```typescript
+import { test, expect } from '../fixtures/localStorage.fixture';
+
+test('should add name', async ({ sidebarPage }) => {
+  await sidebarPage.addName('Alice');
+  const count = await sidebarPage.getNameCount();
+  expect(count).toBe(13);
+});
+```
+
+### Debugging E2E Tests
+
+1. **Run with UI mode**: `bun run test:e2e:ui`
+2. **Check trace viewer**: Open `test-results/*/trace.zip`
+3. **Increase timeouts**: Modify `waitForTimeout` in page objects
+4. **Use pause**: Add `await page.pause()` for live debugging
+
+### VSCode Integration
+
+Install Playwright extension: `ms-playwright.playwright`
+- Run/debug tests from sidebar
+- Pick locators with browser tool
+- View trace files inline
+
 ## Tech Debt
 
 - [x] Add unit tests (Vitest + React Testing Library) - COMPLETED Session 3
+- [x] Add E2E tests (Playwright) - COMPLETED Session 17
 - [ ] Add component/integration tests - future priority
 - [ ] Migrate from `framer-motion` to `motion` package (rebranded, same codebase)
   - Replace: `import { motion } from "framer-motion"` with `import { motion } from "motion/react"`
   - Consider using `motion/mini` for smaller bundle (2.5kb)
   - See: https://motion.dev/docs/react-upgrade-guide
-- [ ] Add E2E tests (Playwright or Cypress) - lower priority
 
 ## Known Issues & Fixes
 
