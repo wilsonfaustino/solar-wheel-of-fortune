@@ -11,10 +11,13 @@ export class SidebarPage extends BasePage {
   constructor(page: Page) {
     super(page);
     this.addNameInput = page.getByPlaceholder(/enter name/i);
-    this.addButton = page.getByRole('button', { name: /^add$/i });
+    this.addButton = page.getByRole('button', { name: /add name/i });
     this.bulkImportButton = page.getByRole('button', { name: /bulk import/i });
     this.listSelector = page.getByRole('button', { name: /default list/i }).first();
-    this.nameItems = page.getByRole('listitem');
+    // Name items are divs containing edit/delete buttons
+    this.nameItems = page
+      .locator('.group')
+      .filter({ has: page.getByRole('button', { name: /edit/i }) });
   }
 
   async addName(name: string) {
@@ -31,13 +34,13 @@ export class SidebarPage extends BasePage {
   }
 
   async deleteName(name: string) {
-    const item = this.page.getByRole('listitem').filter({ hasText: name });
+    const item = this.nameItems.filter({ hasText: name });
     const deleteButton = item.getByRole('button', { name: /delete/i });
     await deleteButton.click();
   }
 
   async editName(oldName: string, newName: string) {
-    const item = this.page.getByRole('listitem').filter({ hasText: oldName });
+    const item = this.nameItems.filter({ hasText: oldName });
     const editButton = item.getByRole('button', { name: /edit/i });
     await editButton.click();
     const input = item.getByRole('textbox');
@@ -46,7 +49,7 @@ export class SidebarPage extends BasePage {
   }
 
   async excludeName(name: string) {
-    const item = this.page.getByRole('listitem').filter({ hasText: name });
+    const item = this.nameItems.filter({ hasText: name });
     const excludeButton = item.getByRole('button', { name: /exclude/i });
     await excludeButton.click();
   }
