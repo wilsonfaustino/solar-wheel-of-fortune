@@ -10,13 +10,13 @@ export class MobilePage extends BasePage {
   constructor(page: Page) {
     super(page);
     // Hamburger menu button (only visible on mobile)
-    this.menuButton = page.getByRole('button', { name: /menu/i });
+    this.menuButton = page.getByRole('button', { name: /toggle sidebar menu/i });
     // Drawer dialog
-    this.drawer = page.getByRole('dialog', { name: /menu/i });
+    this.drawer = page.getByRole('dialog');
     // Close button inside drawer
-    this.drawerCloseButton = this.drawer.getByRole('button', { name: /close/i });
-    // Overlay backdrop
-    this.drawerOverlay = page.locator('[data-radix-dialog-overlay]');
+    this.drawerCloseButton = this.drawer.getByRole('button', { name: /close sidebar/i });
+    // Overlay backdrop - Use specific class combination for the overlay
+    this.drawerOverlay = page.locator('.fixed.inset-0.z-30.bg-black\\/70.backdrop-blur-sm');
   }
 
   async setMobileViewport() {
