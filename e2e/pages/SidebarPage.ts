@@ -13,7 +13,8 @@ export class SidebarPage extends BasePage {
     this.addNameInput = page.getByPlaceholder(/enter name/i);
     this.addButton = page.getByRole('button', { name: /add name/i });
     this.bulkImportButton = page.getByRole('button', { name: /bulk import/i });
-    this.listSelector = page.getByRole('button', { name: /default list/i }).first();
+    // List selector button contains "ACTIVE LIST" text
+    this.listSelector = page.locator('button:has-text("ACTIVE LIST")').first();
     // Name items are divs containing edit/delete buttons
     this.nameItems = page
       .locator('.group')
@@ -61,23 +62,39 @@ export class SidebarPage extends BasePage {
   // List management methods
   async createList(name: string) {
     await this.listSelector.click();
-    const createButton = this.page.getByRole('button', { name: /create new list/i });
-    await createButton.click();
-    // Enter name in prompt-like input
-    const input = this.page.getByRole('textbox', { name: /list name/i });
-    await input.fill(name);
-    await input.press('Enter');
+
+    // Set up prompt dialog handler before clicking
+    this.page.once('dialog', async (dialog) => {
+      await dialog.accept(name);
+    });
+
+    // Click "CREATE NEW LIST" menu item
+    const createItem = this.page.getByText(/create new list/i);
+    await createItem.click();
+
+    // Wait for dropdown to close after list creation
+    await this.page.waitForTimeout(500);
   }
 
   async switchToList(listName: string) {
+    // If dropdown is stuck open, close it first with Escape
+    await this.pressEscape();
+    await this.page.waitForTimeout(200);
+
     await this.listSelector.click();
     const listItem = this.page.getByRole('menuitem').filter({ hasText: listName });
     await listItem.click();
   }
 
   async deleteList(listName: string) {
+    // If dropdown is stuck open, close it first with Escape
+    await this.pressEscape();
+    await this.page.waitForTimeout(200);
+
     await this.listSelector.click();
     const listItem = this.page.locator('.group').filter({ hasText: listName });
+    // Hover over item to reveal delete button
+    await listItem.hover();
     const deleteButton = listItem.getByRole('button', { name: /delete/i });
     await deleteButton.click();
     // Confirm deletion
@@ -86,8 +103,14 @@ export class SidebarPage extends BasePage {
   }
 
   async renameList(oldName: string, newName: string) {
+    // If dropdown is stuck open, close it first with Escape
+    await this.pressEscape();
+    await this.page.waitForTimeout(200);
+
     await this.listSelector.click();
     const listItem = this.page.locator('.group').filter({ hasText: oldName });
+    // Hover over item to reveal edit button
+    await listItem.hover();
     const editButton = listItem.getByRole('button', { name: /edit/i });
     await editButton.click();
     // Edit inline input
