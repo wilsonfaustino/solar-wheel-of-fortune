@@ -57,4 +57,68 @@ export class SidebarPage extends BasePage {
   async getNameCount(): Promise<number> {
     return await this.nameItems.count();
   }
+
+  // List management methods
+  async createList(name: string) {
+    await this.listSelector.click();
+    const createButton = this.page.getByRole('button', { name: /create new list/i });
+    await createButton.click();
+    // Enter name in prompt-like input
+    const input = this.page.getByRole('textbox', { name: /list name/i });
+    await input.fill(name);
+    await input.press('Enter');
+  }
+
+  async switchToList(listName: string) {
+    await this.listSelector.click();
+    const listItem = this.page.getByRole('menuitem').filter({ hasText: listName });
+    await listItem.click();
+  }
+
+  async deleteList(listName: string) {
+    await this.listSelector.click();
+    const listItem = this.page.locator('.group').filter({ hasText: listName });
+    const deleteButton = listItem.getByRole('button', { name: /delete/i });
+    await deleteButton.click();
+    // Confirm deletion
+    const confirmButton = this.page.getByRole('button', { name: /confirm/i });
+    await confirmButton.click();
+  }
+
+  async renameList(oldName: string, newName: string) {
+    await this.listSelector.click();
+    const listItem = this.page.locator('.group').filter({ hasText: oldName });
+    const editButton = listItem.getByRole('button', { name: /edit/i });
+    await editButton.click();
+    // Edit inline input
+    const input = listItem.getByRole('textbox');
+    await input.fill(newName);
+    await input.press('Enter');
+  }
+
+  async getCurrentListName(): Promise<string | null> {
+    return await this.listSelector.textContent();
+  }
+
+  // Export modal methods
+  async selectExportFormat(format: 'csv' | 'json') {
+    const radioButton = this.page.getByRole('radio', {
+      name: new RegExp(format, 'i'),
+    });
+    await radioButton.click();
+  }
+
+  async setExportFilename(filename: string) {
+    const filenameInput = this.page.getByPlaceholder(/filename/i);
+    await filenameInput.fill(filename);
+  }
+
+  async clickExportDownload() {
+    const downloadButton = this.page.getByRole('button', { name: /download/i });
+    await downloadButton.click();
+  }
+
+  async closeExportModal() {
+    await this.pressEscape();
+  }
 }
