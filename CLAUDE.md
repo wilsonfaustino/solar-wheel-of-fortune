@@ -749,7 +749,7 @@ bun test:run  # Run tests once
 - **Architecture**: Page Object Model (POM)
 - **Browser**: Chromium only (fastest CI execution)
 - **Test Directory**: `/e2e/` (separate from Vitest unit tests)
-- **Test Count**: 6 tests (Phase 1), 22 tests (Phase 2 target)
+- **Test Count**: 21 tests passing, 4 skipped (Phase 2 partial)
 - **CI Integration**: 6th quality gate (runs after lint + typecheck)
 
 ### Running E2E Tests
@@ -768,11 +768,21 @@ bun run test:e2e:codegen  # Generate test code via browser interaction
 **Page Objects** (`e2e/pages/`):
 - BasePage.ts - Common functionality (navigation, shortcuts)
 - WheelPage.ts - Wheel spin interactions
-- SidebarPage.ts - Name/list management
+- SidebarPage.ts - Name/list management, export modal
+- HistoryPage.ts - History tab interactions
+- ThemePage.ts - Theme switcher controls
+- MobilePage.ts - Mobile drawer and header
 
 **Test Specs** (`e2e/specs/`):
 - 01-wheel-spin.spec.ts - Spin animation, toast notifications (4 tests)
 - 02-name-management.spec.ts - Add, bulk import (2 tests)
+- 03-list-management.spec.ts - List CRUD operations (1 passing, 3 skipped)
+- 04-selection-history.spec.ts - History tracking and management (4 tests)
+- 05-export.spec.ts - CSV/JSON export downloads (3 tests)
+- 06-theme-switching.spec.ts - Theme persistence and visual changes (2 tests)
+- 07-mobile-sidebar.spec.ts - Responsive drawer behavior (2 tests)
+- 08-name-exclusion-editing.spec.ts - Exclusion and UI interactions (2 tests)
+- 09-keyboard-shortcuts.spec.ts - Edge cases for Space/Escape (2 tests)
 
 ### Writing E2E Tests
 
