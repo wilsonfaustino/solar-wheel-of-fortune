@@ -15,15 +15,23 @@ test.describe('Selection History', () => {
     expect(count).toBe(3);
   });
 
-  test('should delete individual history item', async ({ wheelPage, historyPage }) => {
+  test('should delete individual history item', async ({ wheelPage, historyPage, page }) => {
     await wheelPage.spin();
     await wheelPage.spin();
 
     await historyPage.switchToHistoryTab();
+
+    // Wait for history items to load
+    await page.waitForTimeout(500);
+
     const initialCount = await historyPage.getHistoryCount();
     expect(initialCount).toBe(2);
 
     await historyPage.deleteHistoryItem(0);
+
+    // Wait for deletion to complete
+    await page.waitForTimeout(300);
+
     const finalCount = await historyPage.getHistoryCount();
     expect(finalCount).toBe(1);
   });
