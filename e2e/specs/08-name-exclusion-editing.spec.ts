@@ -1,7 +1,11 @@
 import { expect, test } from '../fixtures/localStorage.fixture';
 
 test.describe('Name Exclusion and Editing', () => {
-  test('should show edit and exclude buttons on hover', async ({ page }) => {
+  test('should show edit and exclude buttons on hover', async ({ sidebarPage, page }) => {
+    // Wait for name list to load
+    const nameCount = await sidebarPage.getNameCount();
+    expect(nameCount).toBeGreaterThan(0);
+
     // Find the name item containing ALEX
     const nameItem = page.locator('.group').filter({ hasText: 'ALEX' });
 
