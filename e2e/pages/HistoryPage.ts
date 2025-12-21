@@ -1,4 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class HistoryPage extends BasePage {
@@ -27,6 +28,12 @@ export class HistoryPage extends BasePage {
 
   async getHistoryCount(): Promise<number> {
     return await this.historyItems.count();
+  }
+
+  async waitForHistoryItems(expectedCount: number): Promise<void> {
+    await expect(this.historyItems).toHaveCount(expectedCount, {
+      timeout: 5000, // Max wait time, but returns immediately when condition met
+    });
   }
 
   async deleteHistoryItem(index: number) {
