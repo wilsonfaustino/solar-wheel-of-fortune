@@ -6,7 +6,9 @@
       "Bash(bun add:*)",
       "Bash(bun run tsc:*)",
       "mcp__ide__getDiagnostics",
-      "Bash(bun test:run:*)"
+      "Bash(bun test:run:*)",
+      "Bash(bun run test:e2e:*)",
+      "Bash(bun run test:e2e:ui:*)"
     ],
     "deny": ["Bash(sleep)"],
     "ask": []
