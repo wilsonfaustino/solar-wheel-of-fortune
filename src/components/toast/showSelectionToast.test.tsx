@@ -34,12 +34,16 @@ describe('showSelectionToast', () => {
     );
   });
 
-  it('generates unique toast IDs for the same name', async () => {
+  it('generates unique toast IDs for the same name', () => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
 
+    // Set initial time
+    vi.setSystemTime(new Date('2025-12-15T10:00:00.000Z'));
     showSelectionToast(mockName);
-    // Wait 1ms to ensure different timestamps
-    await new Promise((resolve) => setTimeout(resolve, 1));
+
+    // Advance time by 1ms
+    vi.advanceTimersByTime(1);
     showSelectionToast(mockName);
 
     expect(toast.custom).toHaveBeenCalledTimes(2);
@@ -48,6 +52,8 @@ describe('showSelectionToast', () => {
     const secondCall = (toast.custom as ReturnType<typeof vi.fn>).mock.calls[1][1];
 
     expect(firstCall.id).not.toBe(secondCall.id);
+
+    vi.useRealTimers();
   });
 
   it('uses name ID in the toast ID', () => {
