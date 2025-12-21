@@ -42,10 +42,18 @@ test.describe('Selection History', () => {
     await wheelPage.spin();
 
     await historyPage.switchToHistoryTab();
+
+    // Wait for history items to render (Playwright auto-retries)
+    await historyPage.waitForHistoryItems(3);
+
     const initialCount = await historyPage.getHistoryCount();
     expect(initialCount).toBe(3);
 
     await historyPage.clearAllHistory();
+
+    // Wait for all items to be removed (Playwright auto-retries)
+    await historyPage.waitForHistoryItems(0);
+
     const noHistoryVisible = await historyPage.isNoHistoryMessageVisible();
     expect(noHistoryVisible).toBe(true);
   });
