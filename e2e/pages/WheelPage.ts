@@ -17,8 +17,16 @@ export class WheelPage extends BasePage {
 
   async spin() {
     await this.centerButton.click();
-    // Wait for 5s spring animation + 1s buffer
-    await this.page.waitForTimeout(6000);
+
+    // Wait for spin animation to complete (button re-enabled)
+    await expect(this.centerButton).toBeEnabled({ timeout: 10000 });
+
+    // CRITICAL: Additional 2s buffer for motion.div overlay to fully settle
+    // The button becomes enabled when onAnimationComplete fires, but the overlay
+    // (motion.div with absolute inset-0) can still have imperceptible micro-movements
+    // that cause Playwright to think it's intercepting pointer events
+    // Testing: 1s buffer = still flaky, 2s buffer = reliable
+    await this.page.waitForTimeout(2000);
   }
 
   async spinViaKeyboard() {
