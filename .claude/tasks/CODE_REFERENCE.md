@@ -614,9 +614,21 @@ test('test name', async ({ wheelPage, sidebarPage }) => {
 - Avoid data-testid unless role-based selectors fail
 - Sonner toasts: Use `.toast-container` class selector
 
-**Animation Handling**:
-- Wheel spin takes 5s (spring animation) + 1s buffer
-- Use `page.waitForTimeout(6000)` in WheelPage methods
+**Animation Handling** (CRITICAL - Session 20):
+- **Problem**: Framer Motion's `onAnimationComplete` fires before overlay fully settles
+  - Root cause: `motion.div` with `absolute inset-0` can have micro-movements (<0.01px)
+  - This causes Playwright to think overlay is "intercepting pointer events"
+- **Solution**: Smart wait strategy
+  ```typescript
+  // GOOD: Wait for deterministic signal + buffer
+  await expect(centerButton).toBeEnabled({ timeout: 10000 });
+  await page.waitForTimeout(2000); // Buffer for overlay settling
+
+  // BAD: Arbitrary timeout (not reliable across machines)
+  await page.waitForTimeout(6000); // Can be too short or too long
+  ```
+- **Key Lesson**: Never trust animation completion callbacks alone - always add buffer
+- **Testing**: Run 10+ consecutive test runs to catch flakiness (15-20% flake rate common)
 - Check disabled state during spin: `expect(button).toBeDisabled()`
 
 **Test Files**:
