@@ -6,6 +6,22 @@ Quick navigation for ongoing development sessions.
 
 ## Current Session Tasks
 
+### Session 20: Fix Flaky E2E Tests (Complete ✅)
+**Summary**: [sessions/session-20-fix-flaky-e2e-tests.md](./sessions/session-20-fix-flaky-e2e-tests.md) - Smart wait strategies for reliable E2E tests
+**Status**: Flakiness Fixed ✅ | Smart Waits ✅ | Tests ✅ | 0% Flake Rate ✅
+
+**All Steps Completed**:
+- ✅ Investigate wheel overlay structure (motion.div with absolute inset-0)
+- ✅ Identify root cause: Framer Motion's onAnimationComplete fires before overlay settles
+- ✅ Implement smart wait strategy: Button enabled + 2s buffer
+- ✅ Add waitForHistoryItems() helper with auto-retry
+- ✅ Remove arbitrary timeouts (500ms + 300ms replaced with smart waits)
+- ✅ Fix hover visibility test with getNameCount() wait
+- ✅ **Stress test: 10/10 consecutive runs passed (0% flake rate)**
+- ✅ **23 tests passing, 3 skipped** (was 21 passing, 4 skipped)
+- ✅ Update CODE_REFERENCE.md with E2E best practices
+- ✅ 5 atomic commits created
+
 ### Session 14: Radix RadioGroup Migration (Complete ✅)
 **Summary**: [sessions/session-14-radix-radiogroup.md](./sessions/session-14-radix-radiogroup.md) - Accessible theme selector with Radix RadioGroup
 **Status**: RadioGroup Migration ✅ | Tests ✅ | Build ✅ | All Radix Primitives Complete ✅

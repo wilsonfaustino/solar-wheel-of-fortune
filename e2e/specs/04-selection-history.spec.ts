@@ -15,22 +15,22 @@ test.describe('Selection History', () => {
     expect(count).toBe(3);
   });
 
-  test('should delete individual history item', async ({ wheelPage, historyPage, page }) => {
+  test('should delete individual history item', async ({ wheelPage, historyPage }) => {
     await wheelPage.spin();
     await wheelPage.spin();
 
     await historyPage.switchToHistoryTab();
 
-    // Wait for history items to load
-    await page.waitForTimeout(500);
+    // Wait for history items to render (Playwright auto-retries)
+    await historyPage.waitForHistoryItems(2);
 
     const initialCount = await historyPage.getHistoryCount();
     expect(initialCount).toBe(2);
 
     await historyPage.deleteHistoryItem(0);
 
-    // Wait for deletion to complete
-    await page.waitForTimeout(300);
+    // Wait for count to change (Playwright auto-retries)
+    await historyPage.waitForHistoryItems(1);
 
     const finalCount = await historyPage.getHistoryCount();
     expect(finalCount).toBe(1);
@@ -42,10 +42,18 @@ test.describe('Selection History', () => {
     await wheelPage.spin();
 
     await historyPage.switchToHistoryTab();
+
+    // Wait for history items to render (Playwright auto-retries)
+    await historyPage.waitForHistoryItems(3);
+
     const initialCount = await historyPage.getHistoryCount();
     expect(initialCount).toBe(3);
 
     await historyPage.clearAllHistory();
+
+    // Wait for all items to be removed (Playwright auto-retries)
+    await historyPage.waitForHistoryItems(0);
+
     const noHistoryVisible = await historyPage.isNoHistoryMessageVisible();
     expect(noHistoryVisible).toBe(true);
   });
