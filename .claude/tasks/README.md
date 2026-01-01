@@ -323,6 +323,9 @@ Example: Need to add a store action? Go to CODE_REFERENCE.md → Store section �
 | 12 | ✅ Complete | Sonner toast notifications (custom headless component, stacking) - 160 tests |
 | 13 | ✅ Complete | Lazy loading optimization (MobileSidebar, Toaster) - 159 tests |
 | 14 | ✅ Complete | Radix RadioGroup migration (ThemeSwitcher accessibility) - 163 tests |
+| 15-19 | ✅ Complete | E2E testing setup, history tests, mobile tests, theme tests, keyboard shortcuts tests |
+| 20 | ✅ Complete | E2E test fixes (smart wait strategies, 0% flake rate) - 190 tests |
+| 21 | ✅ Complete | Test coverage analysis (49.78%, threshold update, SVG testing trade-offs) - 190 tests |
 
 ---
 
