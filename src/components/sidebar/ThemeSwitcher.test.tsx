@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { mockInitialState } from '@/test/test-data';
 import { useNameStore } from '../../stores/useNameStore';
-import { mockInitialState } from '../../stores/useNameStore.mock';
 import { ThemeSwitcher } from './ThemeSwitcher';
 
 describe('ThemeSwitcher', () => {

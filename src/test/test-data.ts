@@ -177,3 +177,42 @@ Eve`;
 export const bulkImportCSVSpecialChars = `"Smith, John"
 "O'Brien, Mary"
 "Jane ""The Best"" Doe"`;
+
+/**
+ * Mock initial state for store tests
+ */
+export const mockInitialState = {
+  lists: [
+    {
+      id: 'test-list-1',
+      title: 'Test List',
+      names: [
+        {
+          id: 'test-name-1',
+          value: 'ALICE',
+          weight: 1.0,
+          createdAt: now,
+          lastSelectedAt: null,
+          selectionCount: 0,
+          isExcluded: false,
+          categoryId: null,
+        },
+        {
+          id: 'test-name-2',
+          value: 'BOB',
+          weight: 1.0,
+          createdAt: now,
+          lastSelectedAt: null,
+          selectionCount: 0,
+          isExcluded: false,
+          categoryId: null,
+        },
+      ],
+      createdAt: now,
+      updatedAt: now,
+    },
+  ],
+  activeListId: 'test-list-1',
+  history: [],
+  currentTheme: 'cyan' as const,
+};

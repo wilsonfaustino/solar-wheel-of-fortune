@@ -1,5 +1,5 @@
+import { mockInitialState } from '@/test/test-data';
 import { selectHistoryStats, useNameStore } from './useNameStore';
-import { mockInitialState } from './useNameStore.mock';
 
 describe('useNameStore', () => {
   beforeEach(() => {
