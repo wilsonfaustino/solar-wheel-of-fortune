@@ -2,61 +2,21 @@ import type { Name, NameList, SelectionRecord } from '@/types/name';
 
 const now = new Date('2025-01-01T00:00:00Z');
 
+const namesOnly = ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve'];
+
 /**
  * Sample names for testing
  */
-export const sampleNames: Name[] = [
-  {
-    id: '1',
-    value: 'Alice',
-    weight: 1,
-    createdAt: now,
-    lastSelectedAt: null,
-    selectionCount: 0,
-    isExcluded: false,
-    categoryId: null,
-  },
-  {
-    id: '2',
-    value: 'Bob',
-    weight: 1,
-    createdAt: now,
-    lastSelectedAt: null,
-    selectionCount: 0,
-    isExcluded: false,
-    categoryId: null,
-  },
-  {
-    id: '3',
-    value: 'Charlie',
-    weight: 1,
-    createdAt: now,
-    lastSelectedAt: null,
-    selectionCount: 0,
-    isExcluded: false,
-    categoryId: null,
-  },
-  {
-    id: '4',
-    value: 'Diana',
-    weight: 1,
-    createdAt: now,
-    lastSelectedAt: null,
-    selectionCount: 0,
-    isExcluded: false,
-    categoryId: null,
-  },
-  {
-    id: '5',
-    value: 'Eve',
-    weight: 1,
-    createdAt: now,
-    lastSelectedAt: null,
-    selectionCount: 0,
-    isExcluded: false,
-    categoryId: null,
-  },
-];
+export const sampleNames: Name[] = namesOnly.map((name, index) => ({
+  id: (index + 1).toString(),
+  value: name,
+  weight: 1,
+  createdAt: now,
+  lastSelectedAt: null,
+  selectionCount: 0,
+  isExcluded: false,
+  categoryId: null,
+}));
 
 /**
  * Sample name with selection history
