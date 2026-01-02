@@ -638,32 +638,91 @@ test('test name', async ({ wheelPage, sidebarPage }) => {
 
 ---
 
-### Store Tests with Vitest
+### Store Unit Tests with Vitest
 **File**: `src/stores/useNameStore.test.ts`
 
 ```typescript
 import { describe, it, expect, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
 import { useNameStore } from './useNameStore';
+import { mockInitialState } from './useNameStore.mock';
 
 describe('useNameStore', () => {
   beforeEach(() => {
-    localStorage.clear();
-    useNameStore.setState({ /* reset state */ });
+    useNameStore.setState(mockInitialState);
   });
 
-  it('should add item', () => {
-    const { result } = renderHook(() => useNameStore());
+  it('should add name to active list', () => {
+    const addName = useNameStore.getState().addName;
+    addName('Charlie');
 
-    act(() => {
-      result.current.addItem({ id: '1', name: 'Test' });
-    });
-
-    expect(result.current.items).toHaveLength(1);
-    expect(result.current.items[0].name).toBe('Test');
+    const state = useNameStore.getState();
+    const activeList = state.lists.find((l) => l.id === state.activeListId);
+    expect(activeList?.names).toHaveLength(3);
+    expect(activeList?.names[2].value).toBe('CHARLIE');
   });
 });
 ```
+
+---
+
+### Integration Tests with Vitest
+**Purpose**: Test multi-step workflows and state synchronization across store actions
+
+**File**: `src/stores/useNameStore.integration.test.ts`
+
+**Test Utilities** (`src/test/integration-helpers.ts`):
+- `renderWithStore(ui)` - Render component with real Zustand store
+- `waitForStoreUpdate(selector, expectedValue, timeout)` - Wait for async store updates
+- `clearPersistedState()` - Reset store to clean slate between tests
+- `mockLocalStorage()` - Mock localStorage for persistence tests
+
+**Test Data** (`src/test/test-data.ts`):
+- `sampleNames` - 5 pre-configured Name objects for tests
+- `defaultNameList` - Default NameList with sample names
+- `sampleSelectionHistory` - Pre-configured SelectionRecord array
+- `bulkImportCSV` - CSV-formatted test data for bulk import
+
+**Integration Test Structure**:
+```typescript
+import { beforeEach, describe, expect, it } from 'vitest';
+import { clearPersistedState } from '@/test/integration-helpers';
+import { defaultNameList } from '@/test/test-data';
+import { useNameStore } from './useNameStore';
+
+describe('Integration Tests', () => {
+  beforeEach(() => {
+    clearPersistedState(); // Clean slate for each test
+  });
+
+  it('should perform multi-step workflow with store sync', () => {
+    const { createList, addName, setActiveList } = useNameStore.getState();
+
+    // Step 1: Create lists
+    createList('Team A');
+    createList('Team B');
+
+    // Step 2: Switch to Team A and add names
+    const teamAId = useNameStore.getState().lists.find((l) => l.title === 'Team A')?.id;
+    setActiveList(teamAId!);
+    addName('Alice');
+    addName('Bob');
+
+    // Step 3: Verify state isolation
+    const state = useNameStore.getState();
+    const teamA = state.lists.find((l) => l.title === 'Team A');
+    expect(teamA?.names).toHaveLength(2);
+    expect(teamA?.names[0].value).toBe('ALICE');
+  });
+});
+```
+
+**Best Practices**:
+- Use `clearPersistedState()` in `beforeEach`/`afterEach` hooks
+- Test complete workflows (not isolated actions)
+- Verify both store state AND business logic
+- Use `useNameStore.setState()` for initial test data setup
+- Use `useNameStore.getState()` for assertions (not hooks)
+- Group related assertions in describe blocks by workflow
 
 ---
 
