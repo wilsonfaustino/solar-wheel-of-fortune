@@ -37,9 +37,20 @@ export async function waitForStoreUpdate(
  * Prevents test pollution from localStorage
  */
 export function clearPersistedState(): void {
-  localStorage.clear();
-  useNameStore.persist.clearStorage();
-  useNameStore.setState(useNameStore.getInitialState());
+  const initialList = {
+    id: crypto.randomUUID(),
+    title: 'Default List',
+    names: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  useNameStore.setState({
+    lists: [initialList],
+    activeListId: initialList.id,
+    history: [],
+    currentTheme: 'cyan',
+  });
 }
 
 /**
