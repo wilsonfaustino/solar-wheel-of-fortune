@@ -136,11 +136,11 @@ export const mockInitialState = {
       id: 'test-list-1',
       title: 'Test List',
       names: [
-        ...sampleNames.slice(0, 2).map((name) => ({
+        sampleNames.slice(0, 2).map((name) => ({
           ...name,
           id: `test-name-${name.id}`,
         })),
-      ],
+      ].flat(),
       createdAt: now,
       updatedAt: now,
     },
