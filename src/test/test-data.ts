@@ -62,28 +62,17 @@ export const sampleNames: Name[] = [
  * Sample name with selection history
  */
 export const selectedName: Name = {
-  id: '1',
-  value: 'Alice',
-  weight: 1,
-  createdAt: now,
+  ...(sampleNames.at(0) as Name),
   lastSelectedAt: new Date('2025-01-01T10:00:00Z'),
   selectionCount: 1,
-  isExcluded: false,
-  categoryId: null,
 };
 
 /**
  * Sample excluded name
  */
 export const excludedName: Name = {
-  id: '2',
-  value: 'Bob',
-  weight: 1,
-  createdAt: now,
-  lastSelectedAt: null,
-  selectionCount: 0,
+  ...(sampleNames.at(1) as Name),
   isExcluded: true,
-  categoryId: null,
 };
 
 /**

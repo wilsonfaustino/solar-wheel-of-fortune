@@ -1,18 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { sampleNames } from '@/test/test-data';
 import type { Name } from '../../types/name';
 import { SelectionToast } from './SelectionToast';
 
 describe('SelectionToast', () => {
   const mockName: Name = {
-    id: '1',
-    value: 'Alice',
-    weight: 1,
+    ...(sampleNames.at(0) as Name),
     createdAt: new Date('2025-12-15T10:00:00'),
-    lastSelectedAt: null,
-    selectionCount: 0,
-    isExcluded: false,
-    categoryId: null,
   };
 
   const mockTimestamp = new Date('2025-12-15T10:30:45');
