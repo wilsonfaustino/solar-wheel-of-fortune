@@ -6,6 +6,21 @@ Quick navigation for ongoing development sessions.
 
 ## Current Session Tasks
 
+### Session 22: Integration Tests for User Workflows (Complete ✅)
+**Summary**: [sessions/session-22-integration-tests.md](./sessions/session-22-integration-tests.md) - Store workflow integration tests
+**Status**: Integration Tests ✅ | Test Infrastructure ✅ | Tests ✅ | Build ✅
+
+**All Steps Completed**:
+- ✅ Create integration test helpers (renderWithStore, waitForStoreUpdate, clearPersistedState)
+- ✅ Create centralized test data fixtures (sampleNames, defaultNameList, mockInitialState)
+- ✅ Add 8 store integration tests (multi-list, exclusion, history, bulk operations, theme, complete workflow)
+- ✅ Consolidate duplicate test data (deleted useNameStore.mock.ts, 38 lines saved)
+- ✅ Update CODE_REFERENCE.md with integration test patterns
+- ✅ **198 tests passing** (8 new integration tests)
+- ✅ Type-safe (0 errors, strict mode)
+- ✅ Production build succeeds
+- ✅ 9 atomic commits created (3 core + 1 docs + 5 refactoring)
+
 ### Session 20: Fix Flaky E2E Tests (Complete ✅)
 **Summary**: [sessions/session-20-fix-flaky-e2e-tests.md](./sessions/session-20-fix-flaky-e2e-tests.md) - Smart wait strategies for reliable E2E tests
 **Status**: Flakiness Fixed ✅ | Smart Waits ✅ | Tests ✅ | 0% Flake Rate ✅
