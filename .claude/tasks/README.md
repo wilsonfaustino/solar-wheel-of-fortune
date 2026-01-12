@@ -6,6 +6,22 @@ Quick navigation for ongoing development sessions.
 
 ## Current Session Tasks
 
+### Session 23: UI Integration Tests for NameManagementSidebar (Complete ✅)
+**Summary**: [sessions/session-23-ui-integration-tests.md](./sessions/session-23-ui-integration-tests.md) - Component workflow integration tests
+**Status**: Integration Tests ✅ | Workflows ✅ | Tests ✅ | Build ✅
+
+**All Steps Completed**:
+- ✅ Create NameManagementSidebar integration test file
+- ✅ Test name management flow (add name → store update → display refresh)
+- ✅ Test list management flow (switch list → store update → name display)
+- ✅ Test bulk import flow (modal → paste → import → Escape → verify)
+- ✅ Skip exclusion toggle test (placeholder for Phase 2 after Session 22 merge)
+- ✅ Add data-testid to NameListItem for test stability
+- ✅ **201 tests passing, 1 skipped** (4 new integration tests)
+- ✅ Type-safe (0 errors, strict mode)
+- ✅ Production build succeeds
+- ✅ 1 atomic commit created
+
 ### Session 22: Integration Tests for User Workflows (Complete ✅)
 **Summary**: [sessions/session-22-integration-tests.md](./sessions/session-22-integration-tests.md) - Store workflow integration tests
 **Status**: Integration Tests ✅ | Test Infrastructure ✅ | Tests ✅ | Build ✅
@@ -341,6 +357,8 @@ Example: Need to add a store action? Go to CODE_REFERENCE.md → Store section �
 | 15-19 | ✅ Complete | E2E testing setup, history tests, mobile tests, theme tests, keyboard shortcuts tests |
 | 20 | ✅ Complete | E2E test fixes (smart wait strategies, 0% flake rate) - 190 tests |
 | 21 | ✅ Complete | Test coverage analysis (49.78%, threshold update, SVG testing trade-offs) - 190 tests |
+| 22 | ✅ Complete | Integration test infrastructure (renderWithStore, fixtures, 8 store tests) - 198 tests |
+| 23 | ✅ Complete | UI integration tests (NameManagementSidebar workflows) - 201 tests |
 
 ---
 
@@ -420,4 +438,4 @@ If you need full context, check:
 
 ---
 
-Last updated: Task Directory Reorganization Complete (Dec 14, 2025) - All 26 task files consolidated into 12 organized files across 4 directories (sessions, features, prompts, root). MVP 100% COMPLETE with comprehensive documentation ready for team collaboration!
+Last updated: Session 23 Complete (January 12, 2026) - UI integration tests for NameManagementSidebar. 201 tests passing (4 new component workflow tests). Integration test coverage now includes both store workflows (Session 22) and UI component workflows (Session 23).
