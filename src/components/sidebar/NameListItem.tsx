@@ -38,6 +38,7 @@ function NameListItemComponent({ name, onEdit, onDelete, onToggleExclude }: Name
 
   return (
     <div
+      data-testid={`name-item-${name.id}`}
       className={cn(
         'px-4 py-3 last:border-b-0 transition-colors group bg-transparent border-b border-b-white/5 hover:bg-white/5',
         name.isExcluded ? 'opacity-50' : 'opacity-100'
