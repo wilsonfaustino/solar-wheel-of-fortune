@@ -346,6 +346,47 @@ const { items, addItem } = useStore(
 const store = useStore();
 ```
 
+### Auto-Exclusion Pattern
+
+**Feature**: Names automatically excluded 2 seconds after selection
+
+**Implementation** (App.tsx):
+```typescript
+const handleSelect = useCallback(
+  (name: Name) => {
+    markSelected(name.id);
+    showSelectionToast(name);
+
+    // Auto-exclude after 2 seconds (only if not last name)
+    setTimeout(() => {
+      const state = useNameStore.getState();
+      const activeList = state.lists.find((list) => list.id === state.activeListId);
+      if (!activeList) return;
+
+      const activeNames = activeList.names.filter((n) => !n.isExcluded);
+
+      // Only auto-exclude if more than 1 active name remains
+      if (activeNames.length > 1) {
+        toggleNameExclusion(name.id);
+      }
+    }, 2000);
+  },
+  [markSelected, toggleNameExclusion]
+);
+```
+
+**Edge Cases Handled**:
+- Last name scenario: If only 1 active name remains, auto-exclusion skipped
+- Multiple rapid spins: Each selection queues independent 2s timer
+- Manual exclusion during timer: Double-toggle occurs (acceptable behavior)
+
+**Testing**:
+- Unit tests use Vitest fake timers (`vi.useFakeTimers()`, `vi.advanceTimersByTime()`)
+- E2E tests use real timers (`page.waitForTimeout(2500)`)
+- See: [src/App.test.tsx](../../src/App.test.tsx), [e2e/specs/10-auto-exclude-selection.spec.ts](../../e2e/specs/10-auto-exclude-selection.spec.ts)
+
+**Reference**: Session 24 ([sessions/session-24-auto-exclude.md](./sessions/session-24-auto-exclude.md))
+
 ---
 
 ## Component Patterns
