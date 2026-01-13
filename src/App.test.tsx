@@ -50,17 +50,45 @@ describe('App - Auto-Exclusion Logic', () => {
 
     // Reset store to default state
     const state = useNameStore.getState();
+    const now = new Date();
     state.lists = [
       {
         id: 'default',
         title: 'Default List',
         names: [
-          { id: 'name-1', value: 'Alice', isExcluded: false, selectionCount: 0 },
-          { id: 'name-2', value: 'Bob', isExcluded: false, selectionCount: 0 },
-          { id: 'name-3', value: 'Charlie', isExcluded: false, selectionCount: 0 },
+          {
+            id: 'name-1',
+            value: 'Alice',
+            isExcluded: false,
+            selectionCount: 0,
+            weight: 1,
+            createdAt: now,
+            lastSelectedAt: null,
+            categoryId: null,
+          },
+          {
+            id: 'name-2',
+            value: 'Bob',
+            isExcluded: false,
+            selectionCount: 0,
+            weight: 1,
+            createdAt: now,
+            lastSelectedAt: null,
+            categoryId: null,
+          },
+          {
+            id: 'name-3',
+            value: 'Charlie',
+            isExcluded: false,
+            selectionCount: 0,
+            weight: 1,
+            createdAt: now,
+            lastSelectedAt: null,
+            categoryId: null,
+          },
         ],
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: now,
+        updatedAt: now,
       },
     ];
     state.activeListId = 'default';
@@ -118,17 +146,45 @@ describe('App - Auto-Exclusion Logic', () => {
   test('should NOT auto-exclude last remaining name', async () => {
     // Set up state with only 1 active name
     const state = useNameStore.getState();
+    const now = new Date();
     state.lists = [
       {
         id: 'default',
         title: 'Default List',
         names: [
-          { id: 'name-1', value: 'Alice', isExcluded: false, selectionCount: 0 },
-          { id: 'name-2', value: 'Bob', isExcluded: true, selectionCount: 0 },
-          { id: 'name-3', value: 'Charlie', isExcluded: true, selectionCount: 0 },
+          {
+            id: 'name-1',
+            value: 'Alice',
+            isExcluded: false,
+            selectionCount: 0,
+            weight: 1,
+            createdAt: now,
+            lastSelectedAt: null,
+            categoryId: null,
+          },
+          {
+            id: 'name-2',
+            value: 'Bob',
+            isExcluded: true,
+            selectionCount: 0,
+            weight: 1,
+            createdAt: now,
+            lastSelectedAt: null,
+            categoryId: null,
+          },
+          {
+            id: 'name-3',
+            value: 'Charlie',
+            isExcluded: true,
+            selectionCount: 0,
+            weight: 1,
+            createdAt: now,
+            lastSelectedAt: null,
+            categoryId: null,
+          },
         ],
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: now,
+        updatedAt: now,
       },
     ];
 
