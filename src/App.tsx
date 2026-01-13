@@ -27,6 +27,7 @@ function App() {
     }))
   );
   const markSelected = useNameStore((state) => state.markSelected);
+  const toggleNameExclusion = useNameStore((state) => state.toggleNameExclusion);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', currentTheme);
@@ -42,8 +43,22 @@ function App() {
     (name: Name) => {
       markSelected(name.id);
       showSelectionToast(name);
+
+      // Auto-exclude after 2 seconds (only if not the last name)
+      setTimeout(() => {
+        const state = useNameStore.getState();
+        const activeList = state.lists.find((list) => list.id === state.activeListId);
+        if (!activeList) return;
+
+        const activeNames = activeList.names.filter((n) => !n.isExcluded);
+
+        // Only auto-exclude if more than 1 active name remains
+        if (activeNames.length > 1) {
+          toggleNameExclusion(name.id);
+        }
+      }, 2000);
     },
-    [markSelected]
+    [markSelected, toggleNameExclusion]
   );
 
   const handleToggleSidebar = useCallback(() => {
