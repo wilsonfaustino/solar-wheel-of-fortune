@@ -7,6 +7,7 @@ import { showSelectionToast, Toaster } from './components/toast';
 import { RadialWheel, type RadialWheelRef } from './components/wheel';
 import { useKeyboardShortcuts, useMediaQuery } from './hooks';
 import { useNameStore } from './stores/useNameStore';
+import { useSettingsStore } from './stores/useSettingsStore';
 import type { Name } from './types/name';
 
 const MobileSidebar = lazy(() =>
@@ -29,6 +30,13 @@ function App() {
   const markSelected = useNameStore((state) => state.markSelected);
   const toggleNameExclusion = useNameStore((state) => state.toggleNameExclusion);
 
+  const { autoExcludeEnabled, clearSelectionAfterExclude } = useSettingsStore(
+    useShallow((state) => ({
+      autoExcludeEnabled: state.autoExcludeEnabled,
+      clearSelectionAfterExclude: state.clearSelectionAfterExclude,
+    }))
+  );
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', currentTheme);
   }, [currentTheme]);
@@ -44,21 +52,28 @@ function App() {
       markSelected(name.id);
       showSelectionToast(name);
 
-      // Auto-exclude after 2 seconds (only if not the last name)
-      setTimeout(() => {
-        const state = useNameStore.getState();
-        const activeList = state.lists.find((list) => list.id === state.activeListId);
-        if (!activeList) return;
+      // Auto-exclude after 2 seconds (only if setting is enabled and not the last name)
+      if (autoExcludeEnabled) {
+        setTimeout(() => {
+          const state = useNameStore.getState();
+          const activeList = state.lists.find((list) => list.id === state.activeListId);
+          if (!activeList) return;
 
-        const activeNames = activeList.names.filter((n) => !n.isExcluded);
+          const activeNames = activeList.names.filter((n) => !n.isExcluded);
 
-        // Only auto-exclude if more than 1 active name remains
-        if (activeNames.length > 1) {
-          toggleNameExclusion(name.id);
-        }
-      }, 2000);
+          // Only auto-exclude if more than 1 active name remains
+          if (activeNames.length > 1) {
+            toggleNameExclusion(name.id);
+
+            // Clear selection if setting is enabled
+            if (clearSelectionAfterExclude) {
+              wheelRef.current?.clearSelection();
+            }
+          }
+        }, 2000);
+      }
     },
-    [markSelected, toggleNameExclusion]
+    [markSelected, toggleNameExclusion, autoExcludeEnabled, clearSelectionAfterExclude]
   );
 
   const handleToggleSidebar = useCallback(() => {
