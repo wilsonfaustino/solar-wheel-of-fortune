@@ -1,17 +1,19 @@
-# Session 24: Auto-Exclude Selected Names
+# Session 24: Auto-Exclude Selected Names + Settings Configuration
 
-**Date**: January 12, 2026
+**Date**: January 12-13, 2026
 **Status**: Completed
 **Branch**: `feat/auto-exclude-selected-names`
 **PR**: TBD
-**Duration**: ~60 minutes
-**Test Count**: 210 tests (206 unit + 27 E2E, +9 new: 5 unit + 4 E2E)
+**Duration**: ~2.5 hours (60 min Phase 1-4 + 90 min Phase 5)
+**Test Count**: 226 tests (216 unit + 27 E2E, +16 new: 10 unit + 4 E2E + 2 settings tests)
 
 ## Overview
 
 Session 24 implemented automatic name exclusion to streamline the selection workflow. When a name is selected via wheel spin, it now automatically excludes itself from the pool 2 seconds after the toast notification appears. This eliminates the need for manual exclusion during events, improving user experience and workflow efficiency.
 
 The implementation includes robust edge case handling (last name protection), comprehensive unit tests using Vitest fake timers, and real-world E2E validation with Playwright. This feature is non-breaking and purely additive, preserving all existing selection behavior while enhancing automation.
+
+**Phase 5 Extension**: Based on user feedback, both auto-exclusion and clear-selection behaviors were made configurable via a Settings panel. Users can now toggle auto-exclusion ON/OFF and optionally enable clearing the visual selection after exclusion. This adds user control while maintaining sensible defaults (auto-exclude ON, clear-selection OFF).
 
 ## What Was Done
 
@@ -96,14 +98,102 @@ setTimeout(() => {
 
 **Impact**: Complete knowledge transfer for future sessions and team members
 
+### Phase 5: Settings Configuration (Extension)
+
+**Goal**: Make auto-exclusion and clear-selection configurable via Settings panel
+
+Based on user feedback requesting toggleable settings, this phase adds:
+1. A new `useSettingsStore` for persisting user preferences
+2. A `SettingsPanel` component with toggle switches
+3. A `clearSelection` method on RadialWheelRef
+4. Integration with App.tsx to respect settings
+
+**Files Created**:
+
+1. **src/stores/useSettingsStore.ts** - Zustand store with persist middleware
+   ```typescript
+   interface SettingsState {
+     autoExcludeEnabled: boolean;      // default: true
+     clearSelectionAfterExclude: boolean;  // default: false
+     setAutoExclude: (enabled: boolean) => void;
+     setClearSelectionAfterExclude: (enabled: boolean) => void;
+   }
+   ```
+
+2. **src/stores/useSettingsStore.test.ts** - 8 unit tests for settings store
+   - Initial state tests (2)
+   - setAutoExclude tests (2)
+   - setClearSelectionAfterExclude tests (2)
+   - Settings independence tests (2)
+
+3. **src/components/ui/switch.tsx** - shadcn Switch component with tech styling
+   - Installed via `bunx --bun shadcn@latest add switch`
+   - Customized with accent colors and border styles
+
+4. **src/components/sidebar/SettingsPanel.tsx** - Toggle switches UI
+   - "WHEEL BEHAVIOR" section header
+   - Auto-exclude toggle with description
+   - Clear selection toggle (only visible when auto-exclude ON)
+   - Uses shadcn Switch component
+
+**Files Modified**:
+
+1. **src/components/wheel/RadialWheel.tsx**
+   - Extended `RadialWheelRef` interface with `clearSelection: () => void`
+   - Added `clearSelection` method to `useImperativeHandle`
+
+2. **src/App.tsx**
+   - Added `useSettingsStore` import and selectors
+   - Wrapped auto-exclusion logic in `if (autoExcludeEnabled)` conditional
+   - Added `clearSelection` call when `clearSelectionAfterExclude` is true
+   - Updated dependency array for `handleSelect` callback
+
+3. **src/App.test.tsx**
+   - Added `useSettingsStore` import
+   - Added settings store reset in `beforeEach`
+   - Added 2 new tests:
+     - "should NOT auto-exclude when autoExcludeEnabled is false"
+     - "should respect clearSelectionAfterExclude setting"
+
+4. **src/components/sidebar/NameManagementSidebar.tsx**
+   - Added `SettingsPanel` import
+   - Added `<SettingsPanel />` below `<ThemeSwitcher />` in Settings tab
+
+5. **src/components/sidebar/index.ts**
+   - Added `SettingsPanel` export
+
+**UI Layout**:
+```
+Settings Tab
+├── THEME
+│   └── [CYAN] [MATRIX] [SUNSET]  (RadioGroup)
+└── WHEEL BEHAVIOR
+    ├── [====o] Auto-exclude after selection
+    │         Automatically exclude selected names from future spins
+    └── [o====] Clear selection after exclusion  (only visible when above is ON)
+              Remove visual highlighting after name is excluded
+```
+
+**Impact**: Users can now control auto-exclusion behavior based on their use case (educators vs event hosts)
+
 ## Files Modified
 
-### Implementation
-- [src/App.tsx](../../src/App.tsx) - Added auto-exclusion timer (20 lines modified/added)
-
-### Tests
+### New Files (Phase 1-4)
 - [src/App.test.tsx](../../src/App.test.tsx) - 5 unit tests (203 lines)
-- [e2e/specs/10-auto-exclude-selection.spec.ts](../../e2e/specs/10-auto-exclude-selection.spec.ts) - 4 E2E tests (100 lines)
+- [e2e/specs/10-auto-exclude-selection.spec.ts](../../e2e/specs/10-auto-exclude-selection.spec.ts) - 4 E2E tests (103 lines)
+
+### New Files (Phase 5)
+- [src/stores/useSettingsStore.ts](../../src/stores/useSettingsStore.ts) - Settings store (~25 lines)
+- [src/stores/useSettingsStore.test.ts](../../src/stores/useSettingsStore.test.ts) - 8 unit tests (~90 lines)
+- [src/components/ui/switch.tsx](../../src/components/ui/switch.tsx) - shadcn Switch (~35 lines)
+- [src/components/sidebar/SettingsPanel.tsx](../../src/components/sidebar/SettingsPanel.tsx) - Toggle switches UI (~65 lines)
+
+### Modified Files
+- [src/App.tsx](../../src/App.tsx) - Auto-exclusion timer + settings integration (+32 lines)
+- [src/App.test.tsx](../../src/App.test.tsx) - Added 2 settings tests (+53 lines, total 316 lines)
+- [src/components/wheel/RadialWheel.tsx](../../src/components/wheel/RadialWheel.tsx) - Added clearSelection to ref (+2 lines)
+- [src/components/sidebar/NameManagementSidebar.tsx](../../src/components/sidebar/NameManagementSidebar.tsx) - Added SettingsPanel (+2 lines)
+- [src/components/sidebar/index.ts](../../src/components/sidebar/index.ts) - Export SettingsPanel (+1 line)
 
 ### Documentation
 - [CLAUDE.md](../../CLAUDE.md) - Session 24 summary
@@ -112,23 +202,55 @@ setTimeout(() => {
 
 ## Commits
 
-**Commit 1**: `feat(app): add auto-exclusion timer to handleSelect`
+### Phase 1-4 Commits (Completed)
+
+**Commit 1**: `feat(app): add auto-exclusion timer to handleSelect` (1396c81)
 - Modified App.tsx with setTimeout logic
 - Added edge case check for last name
 - Included 5 unit tests with Vitest fake timers
 - ~223 lines (20 implementation + 203 tests)
 
-**Commit 2**: `test(e2e): add auto-exclusion E2E tests`
+**Commit 2**: `test(e2e): add auto-exclusion E2E tests` (f31979f)
 - Created 10-auto-exclude-selection.spec.ts
 - 4 tests for browser verification
 - Tests sequential exclusions and last name edge case
 - ~100 lines
 
-**Commit 3**: `docs(session): document Session 24 auto-exclusion feature` (pending)
+**Commit 3**: `docs(session): document Session 24 auto-exclusion feature` (ad5361b)
 - Update CLAUDE.md with Session 24 summary
 - Add auto-exclusion pattern to CODE_REFERENCE.md
 - Complete session documentation
 - ~150 lines
+
+### Phase 5 Commits (Pending)
+
+**Commit 4**: `feat(ui): add shadcn Switch component`
+- Install @radix-ui/react-switch dependency
+- Create switch.tsx with tech styling
+- ~35 lines
+
+**Commit 5**: `feat(store): add useSettingsStore for wheel behavior settings`
+- Create useSettingsStore.ts with persist middleware
+- Add 8 unit tests for settings actions
+- ~115 lines
+
+**Commit 6**: `feat(wheel): add clearSelection to RadialWheelRef`
+- Extend RadialWheelRef interface
+- Add clearSelection method to useImperativeHandle
+- ~2 lines
+
+**Commit 7**: `feat(sidebar): add SettingsPanel with toggle switches`
+- Create SettingsPanel.tsx component
+- Add to NameManagementSidebar Settings tab
+- Export from sidebar index
+- ~70 lines
+
+**Commit 8**: `feat(app): integrate settings store with auto-exclusion logic`
+- Add useSettingsStore selectors
+- Wrap auto-exclusion in conditional
+- Add clearSelection call when enabled
+- Update App.test.tsx with settings tests
+- ~65 lines
 
 ## Verification
 
@@ -142,7 +264,7 @@ bun run tsc -b
 ```bash
 bun test:run
 ```
-✅ 206 tests passing (201 existing + 5 new)
+✅ 216 tests passing (201 existing + 15 new: 7 App tests + 8 settings store tests)
 
 **E2E Tests**:
 ```bash
@@ -154,7 +276,7 @@ bun run test:e2e
 ```bash
 bun run build
 ```
-✅ Production build succeeded
+✅ Production build succeeded (520.63 kB, gzip: 166.47 kB)
 
 ## Key Learnings
 
@@ -178,27 +300,47 @@ bun run build
 - Uses existing `toggleNameExclusion` action (no new store logic)
 - Wheel re-renders automatically via `selectActiveNames` selector
 
+### 5. Settings Store Pattern (Phase 5)
+- Zustand `persist` middleware handles localStorage automatically
+- Separate settings store keeps concerns isolated from name store
+- `useShallow` prevents unnecessary re-renders when reading multiple values
+- Conditional UI (showing clear-selection only when auto-exclude is ON) improves UX
+
+### 6. shadcn/ui Integration
+- `bunx --bun shadcn@latest add switch` installs component + dependencies
+- Radix Switch primitives provide accessibility out of the box
+- Tech styling customization via Tailwind `data-[state=checked/unchecked]` classes
+- Consistent with existing button.tsx and alert-dialog.tsx patterns
+
 ## Bundle Impact
 
-**No bundle size change** - Implementation uses existing store action and native `setTimeout`.
+**Phase 1-4**: No bundle size change - Implementation uses existing store action and native `setTimeout`.
+
+**Phase 5**: +2.5 kB (estimated) - Added @radix-ui/react-switch dependency and settings store. Minimal impact as Radix utilities are already loaded from existing components.
 
 ## Next Steps
 
-### Future Enhancements (Out of Scope for Session 24)
-- [ ] Configurable auto-exclusion delay (user preference setting)
-- [ ] Toggle to enable/disable auto-exclusion per list
+### Completed in Phase 5
+- [x] Toggle to enable/disable auto-exclusion (Settings panel)
+- [x] Clear selection option after exclusion
+
+### Future Enhancements (Out of Scope)
+- [ ] Configurable auto-exclusion delay (slider: 1-10 seconds)
+- [ ] Per-list settings (currently global)
 - [ ] Visual countdown indicator on toast (3, 2, 1...)
 - [ ] Undo button on toast to prevent auto-exclusion
+- [ ] E2E tests for settings toggles
 
 ### Session 25 Candidates
-- [ ] Settings panel for user preferences (auto-exclusion toggle, delay slider)
 - [ ] CSV import enhancement (preview before import)
 - [ ] Accessibility audit (WCAG 2.1 AA compliance)
 - [ ] Performance optimization (React.memo audit, bundle size analysis)
+- [ ] Mobile touch gestures for wheel spin
 
 ## Related Files
 
-- **Plan**: [.claude/plans/quirky-bubbling-steele.md](../.claude/plans/quirky-bubbling-steele.md)
+- **Phase 1-4 Plan**: [.claude/plans/quirky-bubbling-steele.md](../../plans/quirky-bubbling-steele.md)
+- **Phase 5 Plan**: [.claude/plans/tender-drifting-glacier.md](../../plans/tender-drifting-glacier.md)
 - **Prompt**: [.claude/tasks/prompts/session-24-auto-exclude-prompt.md](../prompts/session-24-auto-exclude-prompt.md)
 - **Previous Session**: [Session 23 - UI Integration Tests](session-23-ui-integration-tests.md)
 
@@ -213,3 +355,14 @@ bun run build
 **Double-Toggle Edge Case**: Accepted as valid behavior. If user manually excludes during 2-second window, `toggleNameExclusion` toggles twice (exclude → include). Rare edge case, minimal impact, simple implementation prioritized.
 
 **CI Pipeline**: All 6 quality gates passing (lint, typecheck, test, build, E2E, SonarQube).
+
+### Phase 5 Notes
+
+**Settings Store Decision**: Created separate `useSettingsStore` rather than extending `useNameStore` to:
+- Keep wheel behavior settings isolated from name data
+- Allow independent persistence with different storage keys
+- Simplify store structure and testing
+
+**Conditional Clear Selection**: The "Clear selection after exclusion" toggle is only visible when "Auto-exclude after selection" is enabled. This prevents confusing UX where users could enable clear-selection without auto-exclude (which would have no effect).
+
+**Default Values**: Auto-exclude defaults to ON (preserving backward compatibility with Phase 1-4 behavior), while clear-selection defaults to OFF (most users want to see which name was selected).

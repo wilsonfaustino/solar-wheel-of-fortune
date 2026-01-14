@@ -348,30 +348,52 @@ const store = useStore();
 
 ### Auto-Exclusion Pattern
 
-**Feature**: Names automatically excluded 2 seconds after selection
+**Feature**: Names automatically excluded 2 seconds after selection (configurable via Settings)
+
+**Settings Store** (src/stores/useSettingsStore.ts):
+```typescript
+interface SettingsState {
+  autoExcludeEnabled: boolean;      // default: true
+  clearSelectionAfterExclude: boolean;  // default: false
+  setAutoExclude: (enabled: boolean) => void;
+  setClearSelectionAfterExclude: (enabled: boolean) => void;
+}
+```
 
 **Implementation** (App.tsx):
 ```typescript
+const { autoExcludeEnabled, clearSelectionAfterExclude } = useSettingsStore(
+  useShallow((state) => ({
+    autoExcludeEnabled: state.autoExcludeEnabled,
+    clearSelectionAfterExclude: state.clearSelectionAfterExclude,
+  }))
+);
+
 const handleSelect = useCallback(
   (name: Name) => {
     markSelected(name.id);
     showSelectionToast(name);
 
-    // Auto-exclude after 2 seconds (only if not last name)
-    setTimeout(() => {
-      const state = useNameStore.getState();
-      const activeList = state.lists.find((list) => list.id === state.activeListId);
-      if (!activeList) return;
+    // Auto-exclude after 2 seconds (only if setting is enabled and not last name)
+    if (autoExcludeEnabled) {
+      setTimeout(() => {
+        const state = useNameStore.getState();
+        const activeList = state.lists.find((list) => list.id === state.activeListId);
+        if (!activeList) return;
 
-      const activeNames = activeList.names.filter((n) => !n.isExcluded);
+        const activeNames = activeList.names.filter((n) => !n.isExcluded);
 
-      // Only auto-exclude if more than 1 active name remains
-      if (activeNames.length > 1) {
-        toggleNameExclusion(name.id);
-      }
-    }, 2000);
+        if (activeNames.length > 1) {
+          toggleNameExclusion(name.id);
+
+          if (clearSelectionAfterExclude) {
+            wheelRef.current?.clearSelection();
+          }
+        }
+      }, 2000);
+    }
   },
-  [markSelected, toggleNameExclusion]
+  [markSelected, toggleNameExclusion, autoExcludeEnabled, clearSelectionAfterExclude]
 );
 ```
 
@@ -379,10 +401,12 @@ const handleSelect = useCallback(
 - Last name scenario: If only 1 active name remains, auto-exclusion skipped
 - Multiple rapid spins: Each selection queues independent 2s timer
 - Manual exclusion during timer: Double-toggle occurs (acceptable behavior)
+- Settings disabled: No timer scheduled when autoExcludeEnabled is false
 
 **Testing**:
 - Unit tests use Vitest fake timers (`vi.useFakeTimers()`, `vi.advanceTimersByTime()`)
 - E2E tests use real timers (`page.waitForTimeout(2500)`)
+- Settings store tests: 8 tests in [src/stores/useSettingsStore.test.ts](../../src/stores/useSettingsStore.test.ts)
 - See: [src/App.test.tsx](../../src/App.test.tsx), [e2e/specs/10-auto-exclude-selection.spec.ts](../../e2e/specs/10-auto-exclude-selection.spec.ts)
 
 **Reference**: Session 24 ([sessions/session-24-auto-exclude.md](./sessions/session-24-auto-exclude.md))
