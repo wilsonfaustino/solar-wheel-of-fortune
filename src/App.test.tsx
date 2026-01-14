@@ -2,6 +2,8 @@ import { act, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import App from './App';
 import { useNameStore } from './stores/useNameStore';
+import { useSettingsStore } from './stores/useSettingsStore';
+import type { Name } from './types/name';
 
 // Mock components to isolate App logic
 vi.mock('./components/sidebar', () => ({
@@ -10,11 +12,12 @@ vi.mock('./components/sidebar', () => ({
 }));
 
 vi.mock('./components/wheel', () => ({
-  RadialWheel: ({ onSelect }: { onSelect: (name: any) => void }) => (
+  RadialWheel: ({ onSelect }: { onSelect: (name: Name) => void }) => (
     <button
+      type="button"
       data-testid="wheel"
       onClick={() =>
-        onSelect({ id: 'name-1', value: 'Alice', isExcluded: false, selectionCount: 0 })
+        onSelect({ id: 'name-1', value: 'Alice', isExcluded: false, selectionCount: 0 } as Name)
       }
     >
       Spin
@@ -92,6 +95,11 @@ describe('App - Auto-Exclusion Logic', () => {
       },
     ];
     state.activeListId = 'default';
+
+    // Reset settings store to defaults
+    const settingsState = useSettingsStore.getState();
+    settingsState.autoExcludeEnabled = true;
+    settingsState.clearSelectionAfterExclude = false;
   });
 
   afterEach(() => {
@@ -259,5 +267,52 @@ describe('App - Auto-Exclusion Logic', () => {
     const state = useNameStore.getState();
     const name = state.lists[0].names.find((n) => n.id === 'name-1');
     expect(name?.selectionCount).toBe(1);
+  });
+
+  test('should NOT auto-exclude when autoExcludeEnabled is false', async () => {
+    // Disable auto-exclude setting
+    useSettingsStore.getState().autoExcludeEnabled = false;
+
+    render(<App />);
+
+    const wheelButton = screen.getByTestId('wheel');
+    await act(async () => {
+      wheelButton.click();
+    });
+
+    // Fast-forward 2 seconds
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+
+    // Verify name NOT excluded (setting is disabled)
+    const state = useNameStore.getState();
+    const name = state.lists[0].names.find((n) => n.id === 'name-1');
+    expect(name?.isExcluded).toBe(false);
+
+    // But selection should still be marked
+    expect(name?.selectionCount).toBe(1);
+  });
+
+  test('should respect clearSelectionAfterExclude setting', async () => {
+    // Enable clear selection setting
+    useSettingsStore.getState().clearSelectionAfterExclude = true;
+
+    render(<App />);
+
+    const wheelButton = screen.getByTestId('wheel');
+    await act(async () => {
+      wheelButton.click();
+    });
+
+    // Fast-forward 2 seconds
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+
+    // Verify name is excluded
+    const state = useNameStore.getState();
+    const name = state.lists[0].names.find((n) => n.id === 'name-1');
+    expect(name?.isExcluded).toBe(true);
   });
 });
