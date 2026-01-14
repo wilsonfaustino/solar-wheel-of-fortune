@@ -7,6 +7,7 @@ import { BulkActionsPanel } from './BulkActionsPanel';
 import { HistoryPanel } from './HistoryPanel';
 import { ListSelector } from './ListSelector';
 import { NameListDisplay } from './NameListDisplay';
+import { SettingsPanel } from './SettingsPanel';
 import { TabSelectionButton } from './TabSelectionButton';
 import { ThemeSwitcher } from './ThemeSwitcher';
 
@@ -147,6 +148,7 @@ function NameManagementSidebarComponent({
       {activeTab === 'settings' && (
         <div className="flex flex-col flex-1 min-h-0">
           <ThemeSwitcher />
+          <SettingsPanel />
         </div>
       )}
     </div>
