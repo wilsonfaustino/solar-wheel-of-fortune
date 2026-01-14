@@ -888,6 +888,25 @@ Install Playwright extension: `ms-playwright.playwright`
 
 **Commits**: 9 atomic commits (1 infrastructure + 8 component migrations)
 
+### Session 24: Auto-Exclude Selected Names (Completed)
+- [x] Add auto-exclusion timer to App.tsx handleSelect (2 second delay)
+- [x] Add edge case check for last remaining name
+- [x] Create 5 unit tests for auto-exclusion logic (Vitest fake timers)
+- [x] Create 4 E2E tests for browser verification
+- [x] Verify all tests pass (210 total: 206 unit + 27 E2E)
+
+**Commits**:
+- feat(app): add auto-exclusion timer to handleSelect
+- test(e2e): add auto-exclusion E2E tests
+- docs(session): document Session 24 auto-exclusion feature
+
+**Key Implementation**:
+- Auto-exclusion occurs 2 seconds after toast appears
+- Edge case: Last name never auto-excluded (wheel requires ≥1 name)
+- Timer uses `setTimeout` in handleSelect callback
+- Store check via `useNameStore.getState()` inside timer
+- No breaking changes to existing selection flow
+
 ### Session 5: Selection History & Export (Planned)
 - [ ] Create selection history store (extend useNameStore)
 - [ ] Create history panel component
