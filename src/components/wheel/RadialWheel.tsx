@@ -15,6 +15,7 @@ interface RadialWheelProps {
 
 export interface RadialWheelRef {
   spin: () => void;
+  clearSelection: () => void;
 }
 
 export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
@@ -52,6 +53,7 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
       ref,
       () => ({
         spin: handleSpin,
+        clearSelection: () => setSelectedIndex(null),
       }),
       [handleSpin]
     );
