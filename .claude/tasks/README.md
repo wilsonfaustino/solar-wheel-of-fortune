@@ -6,6 +6,25 @@ Quick navigation for ongoing development sessions.
 
 ## Current Session Tasks
 
+### Session 24: Auto-Exclude Selected Names + Settings Configuration (Complete ✅)
+**Summary**: [sessions/session-24-auto-exclude.md](./sessions/session-24-auto-exclude.md) - Auto-exclusion with configurable settings
+**Status**: Auto-Exclusion ✅ | Settings Panel ✅ | Tests ✅ | Build ✅
+
+**All Steps Completed**:
+- ✅ Add auto-exclusion timer to handleSelect (2 second delay)
+- ✅ Implement edge case protection (last name never excluded)
+- ✅ Create 5 unit tests with Vitest fake timers
+- ✅ Create 4 E2E tests for browser verification
+- ✅ Create useSettingsStore for wheel behavior preferences
+- ✅ Add shadcn Switch component with tech styling
+- ✅ Create SettingsPanel with toggle switches (auto-exclude, clear selection)
+- ✅ Extend RadialWheelRef with clearSelection method
+- ✅ Integrate settings store with App.tsx logic
+- ✅ Add 2 settings-related App.tsx tests
+- ✅ **226 tests passing** (216 unit + 27 E2E, +26 new tests)
+- ✅ Type-safe (0 errors, strict mode)
+- ✅ Production build succeeds (520.63 kB)
+
 ### Session 23: UI Integration Tests for NameManagementSidebar (Complete ✅)
 **Summary**: [sessions/session-23-ui-integration-tests.md](./sessions/session-23-ui-integration-tests.md) - Component workflow integration tests
 **Status**: Integration Tests ✅ | Workflows ✅ | Tests ✅ | Build ✅
@@ -359,6 +378,7 @@ Example: Need to add a store action? Go to CODE_REFERENCE.md → Store section �
 | 21 | ✅ Complete | Test coverage analysis (49.78%, threshold update, SVG testing trade-offs) - 190 tests |
 | 22 | ✅ Complete | Integration test infrastructure (renderWithStore, fixtures, 8 store tests) - 198 tests |
 | 23 | ✅ Complete | UI integration tests (NameManagementSidebar workflows) - 201 tests |
+| 24 | ✅ Complete | Auto-exclude selected names + settings configuration - 226 tests (216 unit + 27 E2E) |
 
 ---
 
@@ -438,4 +458,4 @@ If you need full context, check:
 
 ---
 
-Last updated: Session 23 Complete (January 12, 2026) - UI integration tests for NameManagementSidebar. 201 tests passing (4 new component workflow tests). Integration test coverage now includes both store workflows (Session 22) and UI component workflows (Session 23).
+Last updated: Session 24 Complete (January 17, 2026) - Auto-exclude selected names with configurable settings panel. 226 tests passing (216 unit + 27 E2E). Added useSettingsStore, SettingsPanel component, and auto-exclusion logic with 2-second delay. Users can now toggle auto-exclusion ON/OFF and optionally clear visual selection after exclusion.
