@@ -900,6 +900,23 @@ Install Playwright extension: `ms-playwright.playwright`
 - test(e2e): add auto-exclusion E2E tests
 - docs(session): document Session 24 auto-exclusion feature
 
+### Session 25: SettingsPanel E2E Tests (Completed)
+- [x] Create SettingsPage page object with toggle and verification methods
+- [x] Add 4 comprehensive E2E tests for SettingsPanel feature
+- [x] Test auto-exclusion toggle and behavior verification
+- [x] Test clear-selection toggle and visual verification
+- [x] Test settings persistence across page reloads
+- [x] Test conditional visibility of clear-selection toggle
+- [x] Update fixtures and exports for SettingsPage
+- [x] Verify 0% flake rate for new tests (3 consecutive runs)
+- [x] Total test count: 265 tests (234 unit + 31 E2E)
+
+**Commits**:
+- test(e2e): add SettingsPage page object
+- test(e2e): add comprehensive SettingsPanel E2E tests
+- test(e2e): add SettingsPage to fixtures and exports
+- docs(tasks): document Session 25 SettingsPanel E2E tests
+
 **Key Implementation**:
 - Auto-exclusion occurs 2 seconds after toast appears
 - Edge case: Last name never auto-excluded (wheel requires ≥1 name)
