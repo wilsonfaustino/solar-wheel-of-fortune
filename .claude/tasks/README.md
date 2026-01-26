@@ -379,6 +379,7 @@ Example: Need to add a store action? Go to CODE_REFERENCE.md → Store section �
 | 22 | ✅ Complete | Integration test infrastructure (renderWithStore, fixtures, 8 store tests) - 198 tests |
 | 23 | ✅ Complete | UI integration tests (NameManagementSidebar workflows) - 201 tests |
 | 24 | ✅ Complete | Auto-exclude selected names + settings configuration - 226 tests (216 unit + 27 E2E) |
+| 25 | ✅ Complete | SettingsPanel E2E tests (4 tests, closes Session 24 gap) - 265 tests (234 unit + 31 E2E) |
 
 ---
 
@@ -458,4 +459,4 @@ If you need full context, check:
 
 ---
 
-Last updated: Session 24 Complete (January 17, 2026) - Auto-exclude selected names with configurable settings panel. 226 tests passing (216 unit + 27 E2E). Added useSettingsStore, SettingsPanel component, and auto-exclusion logic with 2-second delay. Users can now toggle auto-exclusion ON/OFF and optionally clear visual selection after exclusion.
+Last updated: Session 25 Complete (January 25, 2026) - E2E tests for SettingsPanel. 265 tests passing (234 unit + 31 E2E). Closes testing gap from Session 24 auto-exclusion feature. 0% flake rate maintained for new tests.
