@@ -1,3 +1,5 @@
+import { cn } from '@/lib/utils';
+
 interface GlitchTextProps {
   children: string;
   className?: string;
@@ -5,7 +7,7 @@ interface GlitchTextProps {
 
 export const GlitchText = ({ children, className = '' }: GlitchTextProps) => {
   return (
-    <span className={`relative inline-block ${className}`}>
+    <span className={cn('relative inline-block', className)}>
       <span className="relative z-10">{children}</span>
       <span
         aria-hidden="true"

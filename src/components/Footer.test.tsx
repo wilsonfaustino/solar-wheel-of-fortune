@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useNameStore } from '@/stores/useNameStore';
 import { mockInitialState } from '@/test/test-data';
-import { useNameStore } from '../stores/useNameStore';
 import { Footer } from './Footer';
 
 describe('Footer', () => {
