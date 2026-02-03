@@ -18,7 +18,7 @@ export const Footer = () => {
           rel="noopener noreferrer"
           className="hover:text-(--color-accent) transition-colors"
         >
-          {isMatrixTheme ? <GlitchText speed={0.5}>{authorName}</GlitchText> : authorName}
+          {isMatrixTheme ? <GlitchText>{authorName}</GlitchText> : authorName}
         </a>
       </div>
 
