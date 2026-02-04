@@ -316,3 +316,81 @@ describe('App - Auto-Exclusion Logic', () => {
     expect(name?.isExcluded).toBe(true);
   });
 });
+
+describe('App - Instruction Text Glitch Effect', () => {
+  beforeEach(() => {
+    // Reset store to default (cyan theme)
+    const state = useNameStore.getState();
+    const now = new Date();
+    state.lists = [
+      {
+        id: 'default',
+        title: 'Default List',
+        names: [
+          {
+            id: 'name-1',
+            value: 'Alice',
+            isExcluded: false,
+            selectionCount: 0,
+            weight: 1,
+            createdAt: now,
+            lastSelectedAt: null,
+            categoryId: null,
+          },
+        ],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+    state.activeListId = 'default';
+    state.currentTheme = 'cyan';
+  });
+
+  test('renders instruction text normally with cyan theme', () => {
+    render(<App />);
+
+    // With cyan theme (default), should have 1 plain text element
+    const instructionElements = screen.queryAllByText('CLICK CENTER TO RANDOMIZE');
+    expect(instructionElements.length).toBe(1);
+    // No aria-hidden elements for non-matrix theme
+    const hiddenElements = instructionElements.filter(
+      (el) => el.getAttribute('aria-hidden') === 'true'
+    );
+    expect(hiddenElements.length).toBe(0);
+  });
+
+  test('renders instruction text normally with sunset theme', () => {
+    useNameStore.setState({
+      ...useNameStore.getState(),
+      currentTheme: 'sunset',
+    });
+
+    render(<App />);
+
+    // With sunset theme, should have 1 plain text element
+    const instructionElements = screen.queryAllByText('CLICK CENTER TO RANDOMIZE');
+    expect(instructionElements.length).toBe(1);
+  });
+
+  test('applies glitch effect with matrix theme', () => {
+    useNameStore.setState({
+      ...useNameStore.getState(),
+      currentTheme: 'matrix',
+    });
+
+    render(<App />);
+
+    // With GlitchText, there should be 3 spans: main + 2 glitch layers
+    const instructionElements = screen.queryAllByText('CLICK CENTER TO RANDOMIZE');
+    expect(instructionElements.length).toBe(3);
+
+    // Check for aria-hidden glitch layers (2 out of 3 should be aria-hidden)
+    const hiddenElements = instructionElements.filter(
+      (el) => el.getAttribute('aria-hidden') === 'true'
+    );
+    expect(hiddenElements.length).toBe(2);
+
+    // The first (visible) element should not be aria-hidden
+    expect(instructionElements[0].getAttribute('aria-hidden')).toBeNull();
+  });
+});

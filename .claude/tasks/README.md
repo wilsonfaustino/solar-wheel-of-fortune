@@ -6,6 +6,19 @@ Quick navigation for ongoing development sessions.
 
 ## Current Session Tasks
 
+### Session 27: Matrix Theme Instruction Text Glitch Effect (Complete ✅)
+**Summary**: [sessions/session-27-matrix-instruction-glitch.md](./sessions/session-27-matrix-instruction-glitch.md) - Matrix-only glitch for wheel instruction text
+**Status**: Glitch Rendering ✅ | Tests ✅ | Build ✅
+
+**All Steps Completed**:
+- ✅ Reuse `GlitchText` for instruction overlay (Matrix theme only)
+- ✅ Preserve existing positioning and typography
+- ✅ Add 3 App tests for glitch vs non-glitch themes
+- ✅ **243 tests passing** (240 existing + 3 new)
+- ✅ Type-safe (0 errors, strict mode)
+- ✅ Production build succeeds
+- ✅ 1 atomic commit on branch `feat/matrix-instruction-glitch`
+
 ### Session 26: Matrix Theme Footer Glitch Effect (Complete ✅)
 **Summary**: [sessions/session-26-matrix-footer-glitch.md](./sessions/session-26-matrix-footer-glitch.md) - CSS glitch animation for author name in Matrix theme
 **Status**: Glitch Animation ✅ | Tailwind v4 ✅ | Tests ✅ | Build ✅

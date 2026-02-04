@@ -4,11 +4,14 @@ import { Footer } from './components/Footer';
 import { MobileHeader } from './components/MobileHeader';
 import { NameManagementSidebar } from './components/sidebar';
 import { showSelectionToast, Toaster } from './components/toast';
+import { GlitchText } from './components/ui/GlitchText';
 import { RadialWheel, type RadialWheelRef } from './components/wheel';
 import { useKeyboardShortcuts, useMediaQuery } from './hooks';
 import { useNameStore } from './stores/useNameStore';
 import { useSettingsStore } from './stores/useSettingsStore';
 import type { Name } from './types/name';
+
+const instructionText = 'CLICK CENTER TO RANDOMIZE';
 
 const MobileSidebar = lazy(() =>
   import('./components/sidebar').then((module) => ({ default: module.MobileSidebar }))
@@ -29,6 +32,8 @@ function App() {
   );
   const markSelected = useNameStore((state) => state.markSelected);
   const toggleNameExclusion = useNameStore((state) => state.toggleNameExclusion);
+
+  const isMatrixTheme = currentTheme === 'matrix';
 
   const { autoExcludeEnabled, clearSelectionAfterExclude } = useSettingsStore(
     useShallow((state) => ({
@@ -114,7 +119,7 @@ function App() {
             <RadialWheel ref={wheelRef} names={names} onSelect={handleSelect} />
 
             <div className="absolute top-2 sm:top-4 lg:top-8 left-1/2 -translate-x-1/2 text-xs tracking-wider font-mono text-text/40">
-              CLICK CENTER TO RANDOMIZE
+              {isMatrixTheme ? <GlitchText>{instructionText}</GlitchText> : instructionText}
             </div>
           </div>
           <Footer />
