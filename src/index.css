@@ -305,3 +305,17 @@ body {
 [data-sonner-toast][data-removed="true"] {
   animation: toast-exit 0.2s ease-out forwards;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-glow,
+  .animate-ping-custom,
+  .animate-glitch-1,
+  .animate-glitch-2 {
+    animation: none;
+  }
+
+  [data-sonner-toast][data-mounted="true"],
+  [data-sonner-toast][data-removed="true"] {
+    animation: none;
+  }
+}
