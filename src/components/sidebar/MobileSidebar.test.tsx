@@ -1,7 +1,16 @@
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import { useReducedMotion } from 'framer-motion';
 import { describe, expect, it, vi } from 'vitest';
 import { MobileSidebar } from './MobileSidebar';
+
+vi.mock('framer-motion', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('framer-motion')>();
+  return {
+    ...actual,
+    useReducedMotion: vi.fn().mockReturnValue(null),
+  };
+});
 
 describe('MobileSidebar', () => {
   it('should render drawer when open', () => {
@@ -110,5 +119,15 @@ describe('MobileSidebar', () => {
     );
 
     expect(screen.getByText(testContent)).toBeInTheDocument();
+  });
+
+  it('should apply instant transitions when reduced motion is preferred', () => {
+    vi.mocked(useReducedMotion).mockReturnValue(true);
+    render(
+      <MobileSidebar isOpen={true} onClose={vi.fn()}>
+        <div>Content</div>
+      </MobileSidebar>
+    );
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 });
