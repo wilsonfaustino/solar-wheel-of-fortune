@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { forwardRef, useCallback, useImperativeHandle, useMemo, useState } from 'react';
 import { ANIMATION_CONFIG, WHEEL_CONFIG } from '../../constants/defaults';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
@@ -26,6 +26,7 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
     const [pendingSelectionIndex, setPendingSelectionIndex] = useState<number | null>(null);
     const recordSelection = useNameStore((state) => state.recordSelection);
     const { isSmallScreen, isMediumScreen } = useMediaQuery();
+    const shouldReduceMotion = useReducedMotion();
 
     const responsiveStyles = useMemo(() => {
       if (isSmallScreen) {
@@ -66,13 +67,17 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
         <motion.div
           className="absolute inset-0 flex items-center justify-center"
           animate={{ rotate: rotation }}
-          transition={{
-            type: 'spring',
-            damping: ANIMATION_CONFIG.spring.damping,
-            stiffness: ANIMATION_CONFIG.spring.stiffness,
-            mass: ANIMATION_CONFIG.spring.mass,
-            velocity: ANIMATION_CONFIG.spring.velocity,
-          }}
+          transition={
+            shouldReduceMotion
+              ? { duration: 0 }
+              : {
+                  type: 'spring',
+                  damping: ANIMATION_CONFIG.spring.damping,
+                  stiffness: ANIMATION_CONFIG.spring.stiffness,
+                  mass: ANIMATION_CONFIG.spring.mass,
+                  velocity: ANIMATION_CONFIG.spring.velocity,
+                }
+          }
           onAnimationComplete={() => {
             if (pendingSelectionIndex !== null) {
               const selectedName = names[pendingSelectionIndex];
