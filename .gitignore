@@ -30,3 +30,7 @@ playwright-report/
 playwright-results.xml
 test-results/
 .playwright/
+
+# AI Tool Configuration
+.agents/
+.serena/
