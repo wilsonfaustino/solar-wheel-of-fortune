@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { WHEEL_CONFIG } from '../../constants/defaults';
+import { LABEL_CONFIG, WHEEL_CONFIG } from '../../constants/defaults';
 import { RadialLine } from './RadialLine';
 
 interface NameLabelProps {
@@ -26,10 +26,10 @@ function NameLabelComponent({ name, index, totalNames, isSelected }: NameLabelPr
         x="0"
         y="-5"
         className="font-mono"
-        fontSize={isSelected ? '24' : '13'}
+        fontSize={isSelected ? LABEL_CONFIG.selectedFontSize : LABEL_CONFIG.defaultFontSize}
         fontWeight={isSelected ? '600' : '300'}
         fill={isSelected ? 'var(--color-accent)' : 'var(--color-text)'}
-        opacity={isSelected ? 1 : 0.85}
+        opacity={isSelected ? 1 : LABEL_CONFIG.defaultOpacity}
         letterSpacing="2"
         style={{
           transition: 'all 0.3s ease',
