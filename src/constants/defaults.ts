@@ -23,6 +23,12 @@ export const WHEEL_CONFIG = {
   spinDuration: 3000,
 } as const;
 
+export const LABEL_CONFIG = {
+  selectedFontSize: 24,
+  defaultFontSize: 13,
+  defaultOpacity: 0.85,
+} as const;
+
 export const ANIMATION_CONFIG = {
   spinEasing: 'cubic-bezier(0.17, 0.67, 0.3, 0.98)',
   spring: {

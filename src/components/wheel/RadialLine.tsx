@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { WHEEL_CONFIG } from '../../constants/defaults';
 
 interface RadialLineProps {
   isSelected: boolean;
@@ -9,7 +10,7 @@ function RadialLineComponent({ isSelected }: RadialLineProps) {
     <line
       x1="0"
       y1="0"
-      x2="120"
+      x2={WHEEL_CONFIG.lineLength}
       y2="0"
       stroke="var(--color-text)"
       strokeWidth="0.5"
