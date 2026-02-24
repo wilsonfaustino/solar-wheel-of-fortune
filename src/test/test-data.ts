@@ -19,23 +19,6 @@ export const sampleNames: Name[] = namesOnly.map((name, index) => ({
 }));
 
 /**
- * Sample name with selection history
- */
-export const selectedName: Name = {
-  ...(sampleNames.at(0) as Name),
-  lastSelectedAt: new Date('2025-01-01T10:00:00Z'),
-  selectionCount: 1,
-};
-
-/**
- * Sample excluded name
- */
-export const excludedName: Name = {
-  ...(sampleNames.at(1) as Name),
-  isExcluded: true,
-};
-
-/**
  * Default name list for testing
  */
 export const defaultNameList: NameList = {
@@ -110,22 +93,6 @@ export const sampleSelectionHistory: SelectionRecord[] = [
     spinDuration: 4000,
   },
 ];
-
-/**
- * CSV-formatted names for bulk import tests
- */
-export const bulkImportCSV = `Alice
-Bob
-Charlie
-Diana
-Eve`;
-
-/**
- * CSV with special characters (commas, quotes)
- */
-export const bulkImportCSVSpecialChars = `"Smith, John"
-"O'Brien, Mary"
-"Jane ""The Best"" Doe"`;
 
 /**
  * Mock initial state for store tests
