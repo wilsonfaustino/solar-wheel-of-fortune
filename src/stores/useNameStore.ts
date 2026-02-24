@@ -270,17 +270,6 @@ export const useNameStore = create<NameStore>()(
   )
 );
 
-// Selectors - use these outside the store
-export const selectActiveList = (state: NameStore): NameList | undefined => {
-  return state.lists.find((list) => list.id === state.activeListId);
-};
-
-export const selectActiveNames = (state: NameStore): Name[] => {
-  const activeList = state.lists.find((list) => list.id === state.activeListId);
-  if (!activeList) return [];
-  return activeList.names.filter((name) => !name.isExcluded);
-};
-
 export const selectHistoryStats = (
   state: NameStore
 ): { total: number; unique: number; lastSelection: Date | null } => {
