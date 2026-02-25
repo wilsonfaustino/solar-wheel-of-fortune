@@ -389,7 +389,7 @@ describe('useNameStore', () => {
       const nameId = state.lists[0].names[0].id;
       const nameValue = state.lists[0].names[0].value;
 
-      state.recordSelection(nameValue, nameId);
+      state.recordSelection(nameValue, nameId, 'wheel');
 
       const updatedState = useNameStore.getState();
       expect(updatedState.history).toHaveLength(1);
@@ -408,8 +408,8 @@ describe('useNameStore', () => {
       const name1 = state.lists[0].names[0];
       const name2 = state.lists[0].names[1];
 
-      state.recordSelection(name1.value, name1.id);
-      state.recordSelection(name2.value, name2.id);
+      state.recordSelection(name1.value, name1.id, 'wheel');
+      state.recordSelection(name2.value, name2.id, 'wheel');
 
       const updatedState = useNameStore.getState();
       expect(updatedState.history).toHaveLength(2);
@@ -424,7 +424,7 @@ describe('useNameStore', () => {
       // Add 150 selections
       for (let i = 0; i < 150; i++) {
         const name = names[i % names.length];
-        state.recordSelection(name.value, name.id);
+        state.recordSelection(name.value, name.id, 'wheel');
       }
 
       const updatedState = useNameStore.getState();
@@ -437,8 +437,8 @@ describe('useNameStore', () => {
       const state = useNameStore.getState();
       const name = state.lists[0].names[0];
 
-      state.recordSelection(name.value, name.id);
-      state.recordSelection(name.value, name.id);
+      state.recordSelection(name.value, name.id, 'wheel');
+      state.recordSelection(name.value, name.id, 'wheel');
 
       const updatedState = useNameStore.getState();
       expect(updatedState.history[0].id).not.toBe(updatedState.history[1].id);
@@ -448,8 +448,8 @@ describe('useNameStore', () => {
       const state = useNameStore.getState();
       const name = state.lists[0].names[0];
 
-      state.recordSelection(name.value, name.id);
-      state.recordSelection(name.value, name.id);
+      state.recordSelection(name.value, name.id, 'wheel');
+      state.recordSelection(name.value, name.id, 'wheel');
       expect(useNameStore.getState().history).toHaveLength(2);
 
       state.clearHistory();
@@ -462,9 +462,9 @@ describe('useNameStore', () => {
       const name1 = state.lists[0].names[0];
       const name2 = state.lists[0].names[1];
 
-      state.recordSelection(name1.value, name1.id);
-      state.recordSelection(name2.value, name2.id);
-      state.recordSelection(name1.value, name1.id);
+      state.recordSelection(name1.value, name1.id, 'wheel');
+      state.recordSelection(name2.value, name2.id, 'wheel');
+      state.recordSelection(name1.value, name1.id, 'wheel');
 
       const recordIdToDelete = useNameStore.getState().history[1].id;
       state.deleteHistoryItem(recordIdToDelete);
@@ -480,7 +480,7 @@ describe('useNameStore', () => {
 
       const state = useNameStore.getState();
       const name = state.lists[0].names[0];
-      state.recordSelection(name.value, name.id);
+      state.recordSelection(name.value, name.id, 'wheel');
 
       const stored = localStorage.getItem('radial-randomizer-v1-state');
       expect(stored).toBeDefined();
@@ -493,9 +493,9 @@ describe('useNameStore', () => {
       const name1 = state.lists[0].names[0];
       const name2 = state.lists[0].names[1];
 
-      state.recordSelection(name1.value, name1.id);
-      state.recordSelection(name2.value, name2.id);
-      state.recordSelection(name1.value, name1.id);
+      state.recordSelection(name1.value, name1.id, 'wheel');
+      state.recordSelection(name2.value, name2.id, 'wheel');
+      state.recordSelection(name1.value, name1.id, 'wheel');
 
       const stats = selectHistoryStats(useNameStore.getState());
       expect(stats.total).toBe(3);
@@ -510,6 +510,64 @@ describe('useNameStore', () => {
       expect(stats.total).toBe(0);
       expect(stats.unique).toBe(0);
       expect(stats.lastSelection).toBeNull();
+    });
+  });
+
+  describe('volunteerName', () => {
+    it('should increment selectionCount and set lastSelectedAt', () => {
+      const state = useNameStore.getState();
+      const nameId = state.lists[0].names[0].id;
+
+      state.volunteerName(nameId);
+
+      const updatedState = useNameStore.getState();
+      const name = updatedState.lists[0].names.find((n) => n.id === nameId);
+      expect(name?.selectionCount).toBe(1);
+      expect(name?.lastSelectedAt).not.toBeNull();
+    });
+
+    it('should set isExcluded to true immediately', () => {
+      const state = useNameStore.getState();
+      const nameId = state.lists[0].names[0].id;
+
+      state.volunteerName(nameId);
+
+      const updatedState = useNameStore.getState();
+      const name = updatedState.lists[0].names.find((n) => n.id === nameId);
+      expect(name?.isExcluded).toBe(true);
+    });
+
+    it('should record history with selectionMethod volunteer', () => {
+      const state = useNameStore.getState();
+      const nameId = state.lists[0].names[0].id;
+      const nameValue = state.lists[0].names[0].value;
+
+      state.volunteerName(nameId);
+
+      const updatedState = useNameStore.getState();
+      expect(updatedState.history).toHaveLength(1);
+      expect(updatedState.history[0].nameId).toBe(nameId);
+      expect(updatedState.history[0].nameValue).toBe(nameValue);
+      expect(updatedState.history[0].selectionMethod).toBe('volunteer');
+    });
+
+    it('should be a no-op for a missing name', () => {
+      useNameStore.getState().volunteerName('non-existent-id');
+
+      const updatedState = useNameStore.getState();
+      expect(updatedState.history).toHaveLength(0);
+    });
+
+    it('should be a no-op for an already-excluded name', () => {
+      const state = useNameStore.getState();
+      const nameId = state.lists[0].names[0].id;
+      state.toggleNameExclusion(nameId);
+
+      state.volunteerName(nameId);
+
+      const updatedState = useNameStore.getState();
+      expect(updatedState.history).toHaveLength(0);
+      expect(updatedState.lists[0].names.find((n) => n.id === nameId)?.selectionCount).toBe(0);
     });
   });
 
