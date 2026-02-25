@@ -18,6 +18,8 @@ export interface NameList {
   updatedAt: Date;
 }
 
+export type SelectionMethod = 'wheel' | 'volunteer';
+
 export interface SelectionRecord {
   id: string;
   nameId: string;
@@ -26,4 +28,5 @@ export interface SelectionRecord {
   timestamp: Date;
   sessionId: string;
   spinDuration: number;
+  selectionMethod?: SelectionMethod;
 }

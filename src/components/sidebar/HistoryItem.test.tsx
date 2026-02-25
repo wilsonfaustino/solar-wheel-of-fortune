@@ -53,4 +53,26 @@ describe('HistoryItem', () => {
     });
     expect(deleteButton).toBeInTheDocument();
   });
+
+  it('should show VOLUNTEER tag for volunteer picks', () => {
+    const onDelete = vi.fn();
+    const volunteerRecord: SelectionRecord = {
+      ...mockRecord,
+      selectionMethod: 'volunteer',
+    };
+    render(<HistoryItem record={volunteerRecord} onDelete={onDelete} />);
+
+    expect(screen.getByText('VOLUNTEER')).toBeInTheDocument();
+  });
+
+  it('should not show VOLUNTEER tag for wheel picks', () => {
+    const onDelete = vi.fn();
+    const wheelRecord: SelectionRecord = {
+      ...mockRecord,
+      selectionMethod: 'wheel',
+    };
+    render(<HistoryItem record={wheelRecord} onDelete={onDelete} />);
+
+    expect(screen.queryByText('VOLUNTEER')).not.toBeInTheDocument();
+  });
 });

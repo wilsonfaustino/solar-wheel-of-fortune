@@ -22,8 +22,8 @@ describe('HistoryPanel', () => {
 
   it('should display history records', () => {
     const store = useNameStore.getState();
-    store.recordSelection('ALICE', 'name-1');
-    store.recordSelection('BOB', 'name-2');
+    store.recordSelection('ALICE', 'name-1', 'wheel');
+    store.recordSelection('BOB', 'name-2', 'wheel');
 
     render(<HistoryPanel />);
 
@@ -33,8 +33,8 @@ describe('HistoryPanel', () => {
 
   it('should display total and unique count', () => {
     const store = useNameStore.getState();
-    store.recordSelection('ALICE', 'name-1');
-    store.recordSelection('BOB', 'name-2');
+    store.recordSelection('ALICE', 'name-1', 'wheel');
+    store.recordSelection('BOB', 'name-2', 'wheel');
 
     render(<HistoryPanel />);
 
@@ -43,8 +43,8 @@ describe('HistoryPanel', () => {
 
   it('should display history in reverse order (newest first)', () => {
     const store = useNameStore.getState();
-    store.recordSelection('ALICE', 'name-1');
-    store.recordSelection('BOB', 'name-2');
+    store.recordSelection('ALICE', 'name-1', 'wheel');
+    store.recordSelection('BOB', 'name-2', 'wheel');
 
     render(<HistoryPanel />);
 
@@ -54,8 +54,8 @@ describe('HistoryPanel', () => {
 
   it('should delete a history item when delete button clicked', async () => {
     const store = useNameStore.getState();
-    store.recordSelection('ALICE', 'name-1');
-    store.recordSelection('BOB', 'name-2');
+    store.recordSelection('ALICE', 'name-1', 'wheel');
+    store.recordSelection('BOB', 'name-2', 'wheel');
 
     const { rerender } = render(<HistoryPanel />);
 
@@ -72,8 +72,8 @@ describe('HistoryPanel', () => {
 
   it('should show confirmation dialog when clear button clicked', async () => {
     const store = useNameStore.getState();
-    store.recordSelection('ALICE', 'name-1');
-    store.recordSelection('BOB', 'name-2');
+    store.recordSelection('ALICE', 'name-1', 'wheel');
+    store.recordSelection('BOB', 'name-2', 'wheel');
 
     render(<HistoryPanel />);
 
@@ -90,8 +90,8 @@ describe('HistoryPanel', () => {
 
   it('should clear all history when confirmation is accepted', async () => {
     const store = useNameStore.getState();
-    store.recordSelection('ALICE', 'name-1');
-    store.recordSelection('BOB', 'name-2');
+    store.recordSelection('ALICE', 'name-1', 'wheel');
+    store.recordSelection('BOB', 'name-2', 'wheel');
 
     render(<HistoryPanel />);
 
@@ -108,8 +108,8 @@ describe('HistoryPanel', () => {
 
   it('should not clear history if user cancels confirmation', async () => {
     const store = useNameStore.getState();
-    store.recordSelection('ALICE', 'name-1');
-    store.recordSelection('BOB', 'name-2');
+    store.recordSelection('ALICE', 'name-1', 'wheel');
+    store.recordSelection('BOB', 'name-2', 'wheel');
 
     render(<HistoryPanel />);
 

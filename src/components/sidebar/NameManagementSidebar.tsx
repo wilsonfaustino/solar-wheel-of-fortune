@@ -42,6 +42,7 @@ function NameManagementSidebarComponent({
   const clearSelections = useNameStore((state) => state.clearSelections);
   const resetList = useNameStore((state) => state.resetList);
   const bulkAddNames = useNameStore((state) => state.bulkAddNames);
+  const volunteerName = useNameStore((state) => state.volunteerName);
 
   // Get active list
   const activeList = useMemo(
@@ -125,6 +126,7 @@ function NameManagementSidebarComponent({
             onEdit={handleEditName}
             onDelete={deleteName}
             onToggleExclude={toggleNameExclusion}
+            onVolunteer={volunteerName}
           />
 
           {/* Bulk Actions */}

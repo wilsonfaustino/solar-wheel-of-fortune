@@ -102,9 +102,9 @@ describe('useNameStore Integration Tests', () => {
       const bob = defaultNameList.names[1];
       const charlie = defaultNameList.names[2];
 
-      recordSelection(alice.value, alice.id);
-      recordSelection(bob.value, bob.id);
-      recordSelection(charlie.value, charlie.id);
+      recordSelection(alice.value, alice.id, 'wheel');
+      recordSelection(bob.value, bob.id, 'wheel');
+      recordSelection(charlie.value, charlie.id, 'wheel');
 
       const state = useNameStore.getState();
       expect(state.history).toHaveLength(3);
@@ -114,7 +114,7 @@ describe('useNameStore Integration Tests', () => {
 
       for (let i = 0; i < 47; i++) {
         const name = defaultNameList.names[i % 5];
-        recordSelection(name.value, name.id);
+        recordSelection(name.value, name.id, 'wheel');
       }
 
       const finalState = useNameStore.getState();
@@ -167,8 +167,8 @@ describe('useNameStore Integration Tests', () => {
       const frank = activeList?.names.find((n) => n.value === 'FRANK');
       const grace = activeList?.names.find((n) => n.value === 'GRACE');
 
-      recordSelection(frank!.value, frank!.id);
-      recordSelection(grace!.value, grace!.id);
+      recordSelection(frank!.value, frank!.id, 'wheel');
+      recordSelection(grace!.value, grace!.id, 'wheel');
 
       state = useNameStore.getState();
       expect(state.history).toHaveLength(2);
@@ -219,7 +219,7 @@ describe('useNameStore Integration Tests', () => {
         ?.names.find((n) => n.value === 'ALICE');
 
       if (alice) {
-        recordSelection(alice.value, alice.id);
+        recordSelection(alice.value, alice.id, 'wheel');
       }
 
       const finalState = useNameStore.getState();
