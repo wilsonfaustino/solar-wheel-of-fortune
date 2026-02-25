@@ -55,6 +55,15 @@ export class SidebarPage extends BasePage {
     await excludeButton.click();
   }
 
+  async clickVolunteer(name: string) {
+    const item = this.nameItems.filter({ hasText: name });
+    await item.hover();
+    const volunteerButton = item.getByRole('button', {
+      name: new RegExp(`volunteer ${name}`, 'i'),
+    });
+    await volunteerButton.click();
+  }
+
   async getNameCount(): Promise<number> {
     return await this.nameItems.count();
   }
