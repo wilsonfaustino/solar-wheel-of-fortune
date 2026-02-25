@@ -1,4 +1,4 @@
-import { Edit2, Eye, EyeOff, Trash2 } from 'lucide-react';
+import { Edit2, Eye, EyeOff, Hand, Trash2 } from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { Name } from '../../types/name';
@@ -9,9 +9,16 @@ interface NameListItemProps {
   onEdit: (nameId: string, newValue: string) => void;
   onDelete: (nameId: string) => void;
   onToggleExclude: (nameId: string) => void;
+  onVolunteer: (nameId: string) => void;
 }
 
-function NameListItemComponent({ name, onEdit, onDelete, onToggleExclude }: NameListItemProps) {
+function NameListItemComponent({
+  name,
+  onEdit,
+  onDelete,
+  onToggleExclude,
+  onVolunteer,
+}: NameListItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(name.value);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -76,6 +83,19 @@ function NameListItemComponent({ name, onEdit, onDelete, onToggleExclude }: Name
           </button>
 
           <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            {!name.isExcluded && (
+              <Button
+                type="button"
+                onClick={() => onVolunteer(name.id)}
+                variant="tech-ghost"
+                size="icon-sm"
+                className="text-accent opacity-70"
+                aria-label={`Volunteer ${name.value}`}
+                title="Mark as volunteer (skip wheel)"
+              >
+                <Hand className="size-4" />
+              </Button>
+            )}
             <Button
               type="button"
               onClick={() => onToggleExclude(name.id)}

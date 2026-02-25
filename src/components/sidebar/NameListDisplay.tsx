@@ -7,6 +7,7 @@ interface NameListDisplayProps {
   onEdit: (nameId: string, newValue: string) => void;
   onDelete: (nameId: string) => void;
   onToggleExclude: (nameId: string) => void;
+  onVolunteer: (nameId: string) => void;
 }
 
 function NameListDisplayComponent({
@@ -14,6 +15,7 @@ function NameListDisplayComponent({
   onEdit,
   onDelete,
   onToggleExclude,
+  onVolunteer,
 }: NameListDisplayProps) {
   const activeNames = names.filter((n) => !n.isExcluded);
   const excludedNames = names.filter((n) => n.isExcluded);
@@ -47,6 +49,7 @@ function NameListDisplayComponent({
           onEdit={onEdit}
           onDelete={onDelete}
           onToggleExclude={onToggleExclude}
+          onVolunteer={onVolunteer}
         />
       ))}
 
@@ -63,6 +66,7 @@ function NameListDisplayComponent({
               onEdit={onEdit}
               onDelete={onDelete}
               onToggleExclude={onToggleExclude}
+              onVolunteer={onVolunteer}
             />
           ))}
         </>
