@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { DEFAULT_NAMES } from '../constants/defaults';
 import { DEFAULT_THEME } from '../constants/themes';
-import type { Name, NameList, SelectionRecord } from '../types/name';
+import type { Name, NameList, SelectionMethod, SelectionRecord } from '../types/name';
 import type { Theme } from '../types/theme';
 
 function generateId(): string {
@@ -55,7 +55,8 @@ interface NameActions {
   clearSelections: () => void;
   resetList: () => void;
   bulkAddNames: (names: string[]) => void;
-  recordSelection: (nameValue: string, nameId: string) => void;
+  recordSelection: (nameValue: string, nameId: string, selectionMethod: SelectionMethod) => void;
+  volunteerName: (nameId: string) => void;
   clearHistory: () => void;
   deleteHistoryItem: (id: string) => void;
   setTheme: (theme: Theme) => void;
@@ -221,7 +222,7 @@ export const useNameStore = create<NameStore>()(
         });
       },
 
-      recordSelection: (nameValue: string, nameId: string) => {
+      recordSelection: (nameValue: string, nameId: string, selectionMethod: SelectionMethod) => {
         set((draft) => {
           const record: SelectionRecord = {
             id: generateId(),
@@ -231,9 +232,40 @@ export const useNameStore = create<NameStore>()(
             timestamp: new Date(),
             sessionId: '',
             spinDuration: 0,
+            selectionMethod,
           };
           draft.history.push(record);
           // Keep only last 100 records (FIFO)
+          if (draft.history.length > 100) {
+            draft.history = draft.history.slice(-100);
+          }
+        });
+      },
+
+      volunteerName: (nameId: string) => {
+        set((draft) => {
+          const activeList = draft.lists.find((list) => list.id === draft.activeListId);
+          if (!activeList) return;
+
+          const name = activeList.names.find((n) => n.id === nameId);
+          if (!name || name.isExcluded) return;
+
+          name.selectionCount += 1;
+          name.lastSelectedAt = new Date();
+          name.isExcluded = true;
+          activeList.updatedAt = new Date();
+
+          const record: SelectionRecord = {
+            id: generateId(),
+            nameId,
+            nameValue: name.value,
+            listId: draft.activeListId || '',
+            timestamp: new Date(),
+            sessionId: '',
+            spinDuration: 0,
+            selectionMethod: 'volunteer',
+          };
+          draft.history.push(record);
           if (draft.history.length > 100) {
             draft.history = draft.history.slice(-100);
           }

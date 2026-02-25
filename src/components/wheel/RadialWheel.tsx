@@ -84,7 +84,7 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
               setIsSpinning(false);
               setSelectedIndex(pendingSelectionIndex);
               onSelect(selectedName);
-              recordSelection(selectedName.value, selectedName.id);
+              recordSelection(selectedName.value, selectedName.id, 'wheel');
               setPendingSelectionIndex(null);
             }
           }}
