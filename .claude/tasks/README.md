@@ -410,6 +410,10 @@ Example: Need to add a store action? Go to CODE_REFERENCE.md → Store section �
 | 23 | ✅ Complete | UI integration tests (NameManagementSidebar workflows) - 201 tests |
 | 24 | ✅ Complete | Auto-exclude selected names + settings configuration - 226 tests (216 unit + 27 E2E) |
 | 25 | ✅ Complete | SettingsPanel E2E tests (4 tests, closes Session 24 gap) - 265 tests (234 unit + 31 E2E) |
+| 26 | ✅ Complete | Matrix theme footer glitch effect (GlitchText component) - 240 unit tests |
+| 27 | ✅ Complete | Matrix theme instruction text glitch (reuse GlitchText) - 243 unit tests |
+| 28 | ✅ Complete | CI E2E path filtering (skip E2E on doc-only PRs) - 250 unit tests |
+| 29 | ✅ Complete | Volunteer pick (Hand button, volunteerName action, history tag) - 255 unit tests |
 
 ---
 
@@ -489,4 +493,4 @@ If you need full context, check:
 
 ---
 
-Last updated: Session 25 Complete (January 25, 2026) - E2E tests for SettingsPanel. 265 tests passing (234 unit + 31 E2E). Closes testing gap from Session 24 auto-exclusion feature. 0% flake rate maintained for new tests.
+Last updated: Session 29 Complete (February 24, 2026) - Volunteer pick feature. 255 unit tests passing (+5 new volunteerName tests). Hand icon button on active names, volunteerName store action, VOLUNTEER tag in history. 6 atomic commits on branch feat/volunteer-pick.
