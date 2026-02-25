@@ -67,6 +67,6 @@ test.describe('Volunteer Pick', () => {
     await expect(page.getByText('STARVOLUNTEER')).toBeVisible();
 
     // Should show the VOLUNTEER label
-    await expect(page.getByText('VOLUNTEER')).toBeVisible();
+    await expect(page.getByText('VOLUNTEER', { exact: true })).toBeVisible();
   });
 });
