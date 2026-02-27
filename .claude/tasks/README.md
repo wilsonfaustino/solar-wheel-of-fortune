@@ -6,6 +6,18 @@ Quick navigation for ongoing development sessions.
 
 ## Current Session Tasks
 
+### Session 30: Mobile Wheel Clipping Fix (Complete ✅)
+**Summary**: [sessions/session-30-mobile-wheel-clipping.md](./sessions/session-30-mobile-wheel-clipping.md) - SVG viewBox + Tailwind responsive classes replace fixed inline size
+**Status**: Bug Fixed ✅ | Tests ✅ | PR #50 Merged ✅
+
+**All Steps Completed**:
+- ✅ Diagnosed SVG overflowing viewport by 55px on each side on mobile
+- ✅ Replaced `responsiveStyles` useMemo + `useMediaQuery` with Tailwind `sm:max-w-[500px] lg:max-w-[900px]`
+- ✅ Added `viewBox="0 0 500 500"` + `w-full h-full` to SVG, removed fixed inline dimensions
+- ✅ **260 tests passing** (unchanged)
+- ✅ Type-safe (0 errors, strict mode)
+- ✅ 1 atomic commit on branch `fix/mobile-wheel-clipping`
+
 ### Session 27: Matrix Theme Instruction Text Glitch Effect (Complete ✅)
 **Summary**: [sessions/session-27-matrix-instruction-glitch.md](./sessions/session-27-matrix-instruction-glitch.md) - Matrix-only glitch for wheel instruction text
 **Status**: Glitch Rendering ✅ | Tests ✅ | Build ✅
