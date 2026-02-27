@@ -1,7 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import { forwardRef, useCallback, useImperativeHandle, useMemo, useState } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { ANIMATION_CONFIG, WHEEL_CONFIG } from '../../constants/defaults';
-import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useNameStore } from '../../stores/useNameStore';
 import type { Name } from '../../types/name';
 import { CenterButton } from './CenterButton';
@@ -25,18 +24,7 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
     const [pendingSelectionIndex, setPendingSelectionIndex] = useState<number | null>(null);
     const recordSelection = useNameStore((state) => state.recordSelection);
-    const { isSmallScreen, isMediumScreen } = useMediaQuery();
     const shouldReduceMotion = useReducedMotion();
-
-    const responsiveStyles = useMemo(() => {
-      if (isSmallScreen) {
-        return { maxWidth: '350px' };
-      }
-      if (isMediumScreen) {
-        return { maxWidth: '500px' };
-      }
-      return { maxWidth: '900px' };
-    }, [isSmallScreen, isMediumScreen]);
 
     const handleSpin = useCallback(() => {
       if (isSpinning || names.length === 0) return;
@@ -60,10 +48,7 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
     );
 
     return (
-      <div
-        className="relative w-full aspect-square flex items-center justify-center"
-        style={responsiveStyles}
-      >
+      <div className="relative w-full aspect-square flex items-center justify-center sm:max-w-[500px] lg:max-w-[900px]">
         <motion.div
           className="absolute inset-0 flex items-center justify-center"
           animate={{ rotate: rotation }}
@@ -90,11 +75,8 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
           }}
         >
           <svg
-            className="absolute"
-            style={{
-              width: WHEEL_CONFIG.svgSize,
-              height: WHEEL_CONFIG.svgSize,
-            }}
+            className="absolute w-full h-full"
+            viewBox={`0 0 ${WHEEL_CONFIG.svgSize} ${WHEEL_CONFIG.svgSize}`}
           >
             <title>Wheel of Fortune with names</title>
             <circle
