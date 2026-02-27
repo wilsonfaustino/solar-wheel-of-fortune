@@ -9,7 +9,8 @@
       "Bash(bun test:run:*)",
       "Bash(bun run test:e2e:*)",
       "Bash(bun run test:e2e:ui:*)",
-      "mcp__serena__get_symbols_overview"
+      "mcp__serena__get_symbols_overview",
+      "Bash(bun test:coverage:*)"
     ],
     "deny": ["Bash(sleep)"],
     "ask": []
