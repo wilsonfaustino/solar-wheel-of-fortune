@@ -32,7 +32,7 @@ function NameLabelComponent({ name, index, totalNames, isSelected }: NameLabelPr
         opacity={isSelected ? 1 : LABEL_CONFIG.defaultOpacity}
         letterSpacing="2"
         style={{
-          transition: 'all 0.3s ease',
+          transition: 'opacity 0.3s ease, fill 0.3s ease, font-size 0.3s ease',
         }}
       >
         {name}
