@@ -30,38 +30,6 @@ export const defaultNameList: NameList = {
 };
 
 /**
- * Secondary name list for multi-list tests
- */
-export const secondaryNameList: NameList = {
-  id: 'secondary',
-  title: 'Team B',
-  names: [
-    {
-      id: '6',
-      value: 'Frank',
-      weight: 1,
-      createdAt: now,
-      lastSelectedAt: null,
-      selectionCount: 0,
-      isExcluded: false,
-      categoryId: null,
-    },
-    {
-      id: '7',
-      value: 'Grace',
-      weight: 1,
-      createdAt: now,
-      lastSelectedAt: null,
-      selectionCount: 0,
-      isExcluded: false,
-      categoryId: null,
-    },
-  ],
-  createdAt: now,
-  updatedAt: now,
-};
-
-/**
  * Sample selection history records
  */
 export const sampleSelectionHistory: SelectionRecord[] = [

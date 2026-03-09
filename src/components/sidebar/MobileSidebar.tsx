@@ -1,5 +1,5 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { memo } from 'react';
 
@@ -17,7 +17,7 @@ function MobileSidebarComponent({ isOpen, onClose, children }: MobileSidebarProp
       <Dialog.Portal>
         {/* Backdrop */}
         <Dialog.Overlay asChild>
-          <motion.div
+          <m.div
             className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -28,7 +28,7 @@ function MobileSidebarComponent({ isOpen, onClose, children }: MobileSidebarProp
 
         {/* Drawer */}
         <Dialog.Content asChild>
-          <motion.div
+          <m.div
             className="fixed top-0 left-0 h-screen z-40 border-r flex flex-col overflow-hidden bg-black/90 border-r-(--color-border-light) focus:outline-none"
             initial={{ x: '-100%' }}
             animate={{ x: isOpen ? 0 : '-100%' }}
@@ -59,7 +59,7 @@ function MobileSidebarComponent({ isOpen, onClose, children }: MobileSidebarProp
 
             {/* Drawer Content */}
             <div className="flex-1 overflow-y-auto scrollbar-themed">{children}</div>
-          </motion.div>
+          </m.div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
