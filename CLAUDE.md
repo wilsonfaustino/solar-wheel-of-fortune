@@ -599,6 +599,7 @@ After plan approval, create 2 files **before implementation starts**:
    - Present plan to user for approval
 
 3. **Pre-Implementation** (Before Session Starts)
+   - **ALWAYS create the feature branch before writing any code**: `git checkout -b <branch-name>` using the branch name defined in the plan
    - Create session prompt file with detailed execution steps
    - Optionally create session doc skeleton (to be filled during implementation)
    - Update CLAUDE.md if new patterns/guidelines are introduced
