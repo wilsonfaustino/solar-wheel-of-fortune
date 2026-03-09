@@ -1,3 +1,5 @@
+export const AUTHOR_NAME = 'Wilson Faustino';
+
 export const DEFAULT_NAMES = [
   'ALEX',
   'JORDAN',

@@ -1,8 +1,7 @@
 import { Github } from 'lucide-react';
+import { AUTHOR_NAME } from '../constants/defaults';
 import { useNameStore } from '../stores/useNameStore';
 import { GlitchText } from './ui/GlitchText';
-
-const authorName = 'Wilson Faustino';
 
 export const Footer = () => {
   const currentTheme = useNameStore((state) => state.currentTheme);
@@ -18,7 +17,7 @@ export const Footer = () => {
           rel="noopener noreferrer"
           className="hover:text-(--color-accent) transition-colors"
         >
-          {isMatrixTheme ? <GlitchText>{authorName}</GlitchText> : authorName}
+          {isMatrixTheme ? <GlitchText>{AUTHOR_NAME}</GlitchText> : AUTHOR_NAME}
         </a>
       </div>
 
