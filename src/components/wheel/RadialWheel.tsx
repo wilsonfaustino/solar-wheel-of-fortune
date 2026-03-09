@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { ANIMATION_CONFIG, WHEEL_CONFIG } from '../../constants/defaults';
 import { useNameStore } from '../../stores/useNameStore';
@@ -49,7 +49,7 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
 
     return (
       <div className="relative w-full aspect-square flex items-center justify-center sm:max-w-[500px] lg:max-w-[900px]">
-        <motion.div
+        <m.div
           className="absolute inset-0 flex items-center justify-center"
           animate={{ rotate: rotation }}
           transition={
@@ -99,7 +99,7 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
               ))}
             </g>
           </svg>
-        </motion.div>
+        </m.div>
 
         <CenterButton onClick={handleSpin} isSpinning={isSpinning} disabled={names.length === 0} />
       </div>

@@ -1,3 +1,4 @@
+import { domAnimation, LazyMotion } from 'framer-motion';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 import { Footer } from './components/Footer';
@@ -94,38 +95,42 @@ function App() {
   });
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-background">
-      {/* Mobile Header */}
-      {(isSmallScreen || isMediumScreen) && <MobileHeader onToggleSidebar={handleToggleSidebar} />}
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Desktop Sidebar */}
-        {isLargeScreen && <NameManagementSidebar />}
-
-        {/* Mobile/Tablet Sidebar Drawer */}
+    <LazyMotion features={domAnimation}>
+      <div className="flex flex-col h-screen w-screen bg-background">
+        {/* Mobile Header */}
         {(isSmallScreen || isMediumScreen) && (
-          <Suspense fallback={null}>
-            <MobileSidebar isOpen={sidebarOpen} onClose={handleCloseSidebar}>
-              <NameManagementSidebar isMobile />
-            </MobileSidebar>
-          </Suspense>
+          <MobileHeader onToggleSidebar={handleToggleSidebar} />
         )}
 
-        {/* Main Wheel Area */}
-        <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative">
-          <Toaster />
-          <div className="relative w-full sm:max-w-2xl lg:max-w-4xl h-full flex items-center justify-center">
-            <RadialWheel ref={wheelRef} names={names} onSelect={handleSelect} />
+        {/* Main Content Area */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Desktop Sidebar */}
+          {isLargeScreen && <NameManagementSidebar />}
 
-            <div className="absolute top-2 sm:top-4 lg:top-8 left-1/2 -translate-x-1/2 text-xs tracking-wider font-mono text-text/40">
-              {isMatrixTheme ? <GlitchText>{instructionText}</GlitchText> : instructionText}
+          {/* Mobile/Tablet Sidebar Drawer */}
+          {(isSmallScreen || isMediumScreen) && (
+            <Suspense fallback={null}>
+              <MobileSidebar isOpen={sidebarOpen} onClose={handleCloseSidebar}>
+                <NameManagementSidebar isMobile />
+              </MobileSidebar>
+            </Suspense>
+          )}
+
+          {/* Main Wheel Area */}
+          <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative">
+            <Toaster />
+            <div className="relative w-full sm:max-w-2xl lg:max-w-4xl h-full flex items-center justify-center">
+              <RadialWheel ref={wheelRef} names={names} onSelect={handleSelect} />
+
+              <div className="absolute top-2 sm:top-4 lg:top-8 left-1/2 -translate-x-1/2 text-xs tracking-wider font-mono text-text/40">
+                {isMatrixTheme ? <GlitchText>{instructionText}</GlitchText> : instructionText}
+              </div>
             </div>
+            <Footer />
           </div>
-          <Footer />
         </div>
       </div>
-    </div>
+    </LazyMotion>
   );
 }
 
