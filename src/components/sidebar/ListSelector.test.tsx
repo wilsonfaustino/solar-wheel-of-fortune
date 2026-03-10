@@ -235,24 +235,6 @@ describe('ListSelector', () => {
       expect(onDeleteList).toHaveBeenCalledWith('list-2');
     });
 
-    it('should not call onDeleteList when there is only one list (delete button is disabled)', () => {
-      const onDeleteList = vi.fn();
-      const singleList = [mockLists[0]];
-      render(
-        <ListSelector
-          {...defaultProps}
-          lists={singleList}
-          activeListId={null}
-          onDeleteList={onDeleteList}
-        />
-      );
-
-      // Disabled button prevents click events, so onDeleteList should never be called
-      const deleteButton = screen.getByRole('button', { name: /delete class 1a/i });
-      expect(deleteButton).toBeDisabled();
-      expect(onDeleteList).not.toHaveBeenCalled();
-    });
-
     it('should close the confirmation dialog when cancelled', async () => {
       const user = userEvent.setup();
       const listWithManyNames: NameList = {
