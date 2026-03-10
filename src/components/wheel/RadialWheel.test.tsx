@@ -1,8 +1,10 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
 import { useReducedMotion } from 'framer-motion';
+import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import type { Name } from '../../types/name';
-import { RadialWheel } from './RadialWheel';
+import { RadialWheel, type RadialWheelRef } from './RadialWheel';
 
 vi.mock('framer-motion', async (importOriginal) => {
   const actual = await importOriginal<typeof import('framer-motion')>();
@@ -78,5 +80,90 @@ describe('RadialWheel', () => {
   it('should render with empty names list', () => {
     const { container } = render(<RadialWheel names={[]} onSelect={vi.fn()} />);
     expect(container.querySelector('svg')).toBeInTheDocument();
+  });
+
+  it('should expose spin method via ref', () => {
+    const wheelRef = createRef<RadialWheelRef>();
+    render(<RadialWheel ref={wheelRef} names={MOCK_NAMES} onSelect={vi.fn()} />);
+    expect(wheelRef.current?.spin).toBeDefined();
+    expect(typeof wheelRef.current?.spin).toBe('function');
+  });
+
+  it('should expose clearSelection method via ref', () => {
+    const wheelRef = createRef<RadialWheelRef>();
+    render(<RadialWheel ref={wheelRef} names={MOCK_NAMES} onSelect={vi.fn()} />);
+    expect(wheelRef.current?.clearSelection).toBeDefined();
+    expect(typeof wheelRef.current?.clearSelection).toBe('function');
+
+    act(() => {
+      wheelRef.current?.clearSelection();
+    });
+    // clearSelection sets selectedIndex to null — no error thrown confirms it works
+  });
+
+  it('should not call onSelect when spin is called with empty names list', () => {
+    const onSelectMock = vi.fn();
+    const wheelRef = createRef<RadialWheelRef>();
+    render(<RadialWheel ref={wheelRef} names={[]} onSelect={onSelectMock} />);
+
+    act(() => {
+      wheelRef.current?.spin();
+    });
+
+    expect(onSelectMock).not.toHaveBeenCalled();
+  });
+
+  it('should disable the spin button when names list is empty', () => {
+    render(<RadialWheel names={[]} onSelect={vi.fn()} />);
+    const spinButton = screen.getByRole('button', { name: /randomize selection/i });
+    expect(spinButton).toBeDisabled();
+  });
+
+  it('should enable the spin button when names are present', () => {
+    render(<RadialWheel names={MOCK_NAMES} onSelect={vi.fn()} />);
+    const spinButton = screen.getByRole('button', { name: /randomize selection/i });
+    expect(spinButton).not.toBeDisabled();
+  });
+
+  it('should disable the spin button after spin is triggered via ref', async () => {
+    const wheelRef = createRef<RadialWheelRef>();
+    render(<RadialWheel ref={wheelRef} names={MOCK_NAMES} onSelect={vi.fn()} />);
+
+    act(() => {
+      wheelRef.current?.spin();
+    });
+
+    const spinButton = screen.getByRole('button', { name: /randomize selection/i });
+    expect(spinButton).toBeDisabled();
+  });
+
+  it('should disable the spin button after CenterButton click', async () => {
+    const user = userEvent.setup();
+    render(<RadialWheel names={MOCK_NAMES} onSelect={vi.fn()} />);
+    const spinButton = screen.getByRole('button', { name: /randomize selection/i });
+
+    await user.click(spinButton);
+
+    expect(spinButton).toBeDisabled();
+  });
+
+  it('should not spin again when spin ref is called while already spinning', () => {
+    const wheelRef = createRef<RadialWheelRef>();
+    render(<RadialWheel ref={wheelRef} names={MOCK_NAMES} onSelect={vi.fn()} />);
+
+    act(() => {
+      wheelRef.current?.spin();
+    });
+
+    const spinButton = screen.getByRole('button', { name: /randomize selection/i });
+    expect(spinButton).toBeDisabled();
+
+    // Calling spin a second time while spinning should be a no-op
+    act(() => {
+      wheelRef.current?.spin();
+    });
+
+    // Button remains disabled — still in spinning state
+    expect(spinButton).toBeDisabled();
   });
 });
