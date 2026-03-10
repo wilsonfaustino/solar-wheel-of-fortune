@@ -1,3 +1,5 @@
+import { render } from '@testing-library/react';
+import type React from 'react';
 import { toast } from 'sonner';
 import type { Name } from '../../types/name';
 import { showSelectionToast } from './showSelectionToast';
@@ -61,5 +63,19 @@ describe('showSelectionToast', () => {
 
     const callArgs = (toast.custom as ReturnType<typeof vi.fn>).mock.calls[0][1];
     expect(callArgs.id).toContain('selection-test-id');
+  });
+
+  it('factory function renders SelectionToast and onDismiss invokes toast.dismiss', () => {
+    showSelectionToast(mockName);
+
+    const factoryFn = vi.mocked(toast.custom).mock.calls[0][0] as (id: string) => React.ReactNode;
+
+    const element = factoryFn('test-toast-id');
+    expect(element).toBeDefined();
+
+    const { getByRole } = render(element as React.ReactElement);
+    getByRole('button', { name: /dismiss/i }).click();
+
+    expect(toast.dismiss).toHaveBeenCalledWith('test-toast-id');
   });
 });
