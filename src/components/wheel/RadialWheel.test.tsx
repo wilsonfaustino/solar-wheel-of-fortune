@@ -1,6 +1,6 @@
 import { act, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import type { Name } from '../../types/name';
@@ -11,6 +11,22 @@ vi.mock('framer-motion', async (importOriginal) => {
   return {
     ...actual,
     useReducedMotion: vi.fn().mockReturnValue(null),
+    m: {
+      ...actual.m,
+      div: vi.fn(
+        ({
+          onAnimationComplete,
+          children,
+          ...rest
+        }: {
+          onAnimationComplete?: () => void;
+          children?: React.ReactNode;
+          [key: string]: unknown;
+        }) => {
+          return <div {...rest}>{children}</div>;
+        }
+      ),
+    },
   };
 });
 
@@ -61,12 +77,14 @@ describe('RadialWheel', () => {
   });
 
   it('should use instant transition when reduced motion is preferred', () => {
+    // Asserts render succeeds; transition prop values not testable in happy-dom
     vi.mocked(useReducedMotion).mockReturnValue(true);
     const { container } = render(<RadialWheel names={MOCK_NAMES} onSelect={vi.fn()} />);
     expect(container.querySelector('svg')).toBeInTheDocument();
   });
 
   it('should use spring transition when reduced motion is not preferred', () => {
+    // Asserts render succeeds; transition prop values not testable in happy-dom
     vi.mocked(useReducedMotion).mockReturnValue(false);
     const { container } = render(<RadialWheel names={MOCK_NAMES} onSelect={vi.fn()} />);
     expect(container.querySelector('svg')).toBeInTheDocument();
@@ -165,5 +183,34 @@ describe('RadialWheel', () => {
 
     // Button remains disabled — still in spinning state
     expect(spinButton).toBeDisabled();
+  });
+
+  it('should call onSelect and reset spinning state when onAnimationComplete fires', () => {
+    const onSelect = vi.fn();
+    const wheelRef = createRef<RadialWheelRef>();
+    render(<RadialWheel ref={wheelRef} names={MOCK_NAMES} onSelect={onSelect} />);
+
+    act(() => {
+      wheelRef.current?.spin();
+    });
+
+    const mockDiv = vi.mocked(m.div);
+    const lastCallProps = mockDiv.mock.calls[mockDiv.mock.calls.length - 1][0];
+    const onAnimationComplete = lastCallProps.onAnimationComplete as (() => void) | undefined;
+
+    expect(onAnimationComplete).toBeDefined();
+
+    act(() => {
+      onAnimationComplete?.();
+    });
+
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(onSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ id: expect.any(String), value: expect.any(String) })
+    );
+
+    // After animation completes, spinning state is cleared and button re-enables
+    const spinButton = screen.getByRole('button', { name: /randomize selection/i });
+    expect(spinButton).not.toBeDisabled();
   });
 });
