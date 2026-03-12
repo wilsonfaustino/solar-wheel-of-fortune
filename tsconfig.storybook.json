@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "noUncheckedSideEffectImports": false,
+    "types": ["vite/client", "vitest/globals", "node"]
+  },
+  "include": [".storybook", "src"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.spec.ts", "src/**/*.spec.tsx"]
+}

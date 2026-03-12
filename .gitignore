@@ -31,6 +31,9 @@ playwright-results.xml
 test-results/
 .playwright/
 
+# Storybook
+storybook-static/
+
 # AI Tool Configuration
 .agents/
 .serena/
