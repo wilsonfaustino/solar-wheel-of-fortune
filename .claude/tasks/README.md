@@ -6,6 +6,20 @@ Quick navigation for ongoing development sessions.
 
 ## Current Session Tasks
 
+### Session 32: Coverage Improvements (Complete ✅)
+**Summary**: [sessions/session-32-coverage-improvements.md](./sessions/session-32-coverage-improvements.md) - New test files and extensions bring 5 files from 0-50% to ≥91% coverage
+**Status**: Tests ✅ | PR #53 Open ✅
+
+**All Steps Completed**:
+- ✅ Create `MobileHeader.test.tsx` (0% → 100%, 5 tests)
+- ✅ Create `useMediaQuery.test.ts` (0% → 100%, 7 tests) — mocked `window.matchMedia` for happy-dom
+- ✅ Create `ListSelector.test.tsx` (25% → 91.66%, 19 tests) — mocked Radix DropdownMenu to bypass portal rendering
+- ✅ Extend `RadialWheel.test.tsx` (43% → 100%, +9 tests) — mocked `m.div` to invoke `onAnimationComplete`
+- ✅ Extend `showSelectionToast.test.tsx` (50% → 100%, +1 test) — invoked toast factory function from mock call args
+- ✅ **301 tests passing, 1 skipped** (260 → 301, +41 new tests)
+- ✅ Overall coverage: 82.84% → 93.58%
+- ✅ 8 atomic commits on branch `test/coverage-improvements`
+
 ### Session 30: Mobile Wheel Clipping Fix (Complete ✅)
 **Summary**: [sessions/session-30-mobile-wheel-clipping.md](./sessions/session-30-mobile-wheel-clipping.md) - SVG viewBox + Tailwind responsive classes replace fixed inline size
 **Status**: Bug Fixed ✅ | Tests ✅ | PR #50 Merged ✅
