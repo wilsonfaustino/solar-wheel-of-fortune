@@ -25,7 +25,7 @@ test.describe('Name Exclusion and Editing', () => {
     await expect(deleteButton).toBeVisible();
   });
 
-  test('should display selection count badge', async ({ sidebarPage, wheelPage, page }) => {
+  test('should display selection count badge', async ({ wheelPage, page }) => {
     // Spin wheel to select ALEX
     await wheelPage.spin();
 
