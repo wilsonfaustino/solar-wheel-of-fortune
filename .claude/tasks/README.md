@@ -6,6 +6,19 @@ Quick navigation for ongoing development sessions.
 
 ## Current Session Tasks
 
+### Session 33: Spin Sound Effect Behind Feature Flag (Complete ✅)
+**Summary**: [sessions/session-33-spin-sound.md](./sessions/session-33-spin-sound.md) - Roletrando sound plays on spin, gated behind `?ff=sound` query param
+**Status**: Tests ✅ | Manual verification ✅
+
+**All Steps Completed**:
+- ✅ Add `public/sounds/roletrando.mp3` asset (5.0s, ~79KB)
+- ✅ Create `useSpinSound` hook (lazy `Audio` init, flag read at play time, rejection swallowed)
+- ✅ Create `useSpinSound.test.ts` (5 tests)
+- ✅ Wire `playSpinSound()` into `RadialWheel.handleSpin`
+- ✅ **306 tests passing, 1 skipped** (301 → 306, +5 new tests)
+- ✅ Manual verification via chrome-devtools MCP: flag off = silent + no fetch, flag on = sound fetch + plays
+- ✅ 3 atomic commits on branch `feat/spin-sound-ff`
+
 ### Session 32: Coverage Improvements (Complete ✅)
 **Summary**: [sessions/session-32-coverage-improvements.md](./sessions/session-32-coverage-improvements.md) - New test files and extensions bring 5 files from 0-50% to ≥91% coverage
 **Status**: Tests ✅ | PR #53 Open ✅
