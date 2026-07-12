@@ -1,6 +1,7 @@
 import { m, useReducedMotion } from 'framer-motion';
 import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { ANIMATION_CONFIG, WHEEL_CONFIG } from '../../constants/defaults';
+import { useSpinSound } from '../../hooks';
 import { useNameStore } from '../../stores/useNameStore';
 import type { Name } from '../../types/name';
 import { CenterButton } from './CenterButton';
@@ -25,10 +26,12 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
     const [pendingSelectionIndex, setPendingSelectionIndex] = useState<number | null>(null);
     const recordSelection = useNameStore((state) => state.recordSelection);
     const shouldReduceMotion = useReducedMotion();
+    const { playSpinSound } = useSpinSound();
 
     const handleSpin = useCallback(() => {
       if (isSpinning || names.length === 0) return;
 
+      playSpinSound();
       setIsSpinning(true);
       setSelectedIndex(null);
 
@@ -36,7 +39,7 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
 
       setPendingSelectionIndex(finalIndex);
       setRotation(targetRotation);
-    }, [isSpinning, names, rotation]);
+    }, [isSpinning, names, rotation, playSpinSound]);
 
     useImperativeHandle(
       ref,
