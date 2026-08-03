@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { useNameStore } from '@/stores/useNameStore';
 import { clearPersistedState, renderWithStore } from '@/test/integration-helpers';
 import { sampleNames } from '@/test/test-data';
@@ -9,16 +9,10 @@ import { NameManagementSidebar } from './NameManagementSidebar';
 describe('NameManagementSidebar Integration Tests', () => {
   beforeEach(() => {
     clearPersistedState();
-    // Mock window.prompt for list creation
-    vi.stubGlobal(
-      'prompt',
-      vi.fn((_message: string, defaultValue?: string) => defaultValue)
-    );
   });
 
   afterEach(() => {
     clearPersistedState();
-    vi.unstubAllGlobals();
   });
 
   describe('Full Name Management Flow', () => {
@@ -90,12 +84,14 @@ describe('NameManagementSidebar Integration Tests', () => {
         expect(screen.getByRole('menu')).toBeInTheDocument();
       });
 
-      // Step 2: Create new list
-      // Mock prompt to return "Team B"
-      vi.mocked(prompt).mockReturnValueOnce('Team B');
-
+      // Step 2: Create new list via the create dialog
       const createButton = screen.getByRole('menuitem', { name: /create new list/i });
       await user.click(createButton);
+
+      const listNameInput = await screen.findByLabelText('List name');
+      await user.clear(listNameInput);
+      await user.type(listNameInput, 'Team B');
+      await user.click(screen.getByRole('button', { name: 'CREATE' }));
 
       // Verify new list created and active
       await waitFor(() => {

@@ -153,16 +153,68 @@ describe('ListSelector', () => {
   });
 
   describe('create list', () => {
-    it('should call onCreateList when "CREATE NEW LIST" is clicked', async () => {
+    const openCreateDialog = async (user: ReturnType<typeof userEvent.setup>) => {
+      const createItem = screen.getByText('CREATE NEW LIST').closest('[role="menuitem"]');
+      if (!createItem) throw new Error('CREATE NEW LIST menu item not found');
+      await user.click(createItem);
+    };
+
+    it('should open the create dialog when "CREATE NEW LIST" is clicked', async () => {
       const onCreateList = vi.fn();
       const user = userEvent.setup();
       render(<ListSelector {...defaultProps} onCreateList={onCreateList} />);
 
-      const createItem = screen.getByText('CREATE NEW LIST').closest('[role="menuitem"]');
-      if (!createItem) throw new Error('CREATE NEW LIST menu item not found');
-      await user.click(createItem);
+      await openCreateDialog(user);
 
-      expect(onCreateList).toHaveBeenCalled();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByLabelText('List name')).toHaveValue('New List');
+      expect(onCreateList).not.toHaveBeenCalled();
+    });
+
+    it('should call onCreateList with the trimmed title on submit', async () => {
+      const onCreateList = vi.fn();
+      const user = userEvent.setup();
+      render(<ListSelector {...defaultProps} onCreateList={onCreateList} />);
+
+      await openCreateDialog(user);
+
+      const input = screen.getByLabelText('List name');
+      await user.clear(input);
+      await user.type(input, '  Team B  ');
+      await user.click(screen.getByRole('button', { name: 'CREATE' }));
+
+      expect(onCreateList).toHaveBeenCalledWith('Team B');
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('should disable CREATE and ignore submit for a blank title', async () => {
+      const onCreateList = vi.fn();
+      const user = userEvent.setup();
+      render(<ListSelector {...defaultProps} onCreateList={onCreateList} />);
+
+      await openCreateDialog(user);
+
+      const input = screen.getByLabelText('List name');
+      await user.clear(input);
+
+      expect(screen.getByRole('button', { name: 'CREATE' })).toBeDisabled();
+
+      await user.type(input, '   ');
+      await user.keyboard('{Enter}');
+
+      expect(onCreateList).not.toHaveBeenCalled();
+    });
+
+    it('should close the create dialog on CANCEL without creating', async () => {
+      const onCreateList = vi.fn();
+      const user = userEvent.setup();
+      render(<ListSelector {...defaultProps} onCreateList={onCreateList} />);
+
+      await openCreateDialog(user);
+      await user.click(screen.getByRole('button', { name: 'CANCEL' }));
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(onCreateList).not.toHaveBeenCalled();
     });
   });
 

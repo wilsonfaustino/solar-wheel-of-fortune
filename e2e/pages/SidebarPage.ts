@@ -71,18 +71,12 @@ export class SidebarPage extends BasePage {
   // List management methods
   async createList(name: string) {
     await this.listSelector.click();
+    await this.page.getByRole('menuitem', { name: /create new list/i }).click();
 
-    // Set up prompt dialog handler before clicking
-    this.page.once('dialog', async (dialog) => {
-      await dialog.accept(name);
-    });
-
-    // Click "CREATE NEW LIST" menu item
-    const createItem = this.page.getByText(/create new list/i);
-    await createItem.click();
-
-    // Wait for dropdown to close after list creation
-    await this.page.waitForTimeout(500);
+    const dialog = this.page.getByRole('dialog');
+    await dialog.getByLabel('List name').fill(name);
+    await dialog.getByRole('button', { name: 'CREATE' }).click();
+    await dialog.waitFor({ state: 'hidden' });
   }
 
   async switchToList(listName: string) {

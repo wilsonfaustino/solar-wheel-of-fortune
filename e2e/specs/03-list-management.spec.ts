@@ -1,7 +1,7 @@
 import { expect, test } from '../fixtures/localStorage.fixture';
 
 test.describe('List Management', () => {
-  test('should create new list via prompt dialog', async ({ sidebarPage }) => {
+  test('should create new list via create dialog', async ({ sidebarPage }) => {
     // Create new list
     await sidebarPage.createList('Work');
 
