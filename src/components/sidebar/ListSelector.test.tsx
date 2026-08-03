@@ -219,7 +219,7 @@ describe('ListSelector', () => {
   });
 
   describe('delete list', () => {
-    it('should call onDeleteList directly when list has 5 or fewer names and is not the only list', async () => {
+    it('should call onDeleteList directly when the list is empty and is not the only list', async () => {
       const onDeleteList = vi.fn();
       const user = userEvent.setup();
       // list-2 has 0 names and there are 2 lists total
@@ -240,20 +240,18 @@ describe('ListSelector', () => {
       expect(deleteButton).toBeDisabled();
     });
 
-    it('should show confirmation dialog when deleting a list with more than 5 names', async () => {
+    it('should show confirmation dialog when deleting a list holding a single name', async () => {
       const onDeleteList = vi.fn();
       const user = userEvent.setup();
-      const listWithManyNames: NameList = {
+      const listWithOneName: NameList = {
         id: 'list-2',
         title: 'Class 1B',
-        names: makeNames(6),
+        names: makeNames(1),
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      const listsWithManyNames = [mockLists[0], listWithManyNames];
-      render(
-        <ListSelector {...defaultProps} lists={listsWithManyNames} onDeleteList={onDeleteList} />
-      );
+      const listsWithNames = [mockLists[0], listWithOneName];
+      render(<ListSelector {...defaultProps} lists={listsWithNames} onDeleteList={onDeleteList} />);
 
       const deleteButton = screen.getByRole('button', { name: /delete class 1b/i });
       await user.click(deleteButton);
@@ -262,7 +260,7 @@ describe('ListSelector', () => {
       expect(screen.getByText('Delete List?')).toBeInTheDocument();
     });
 
-    it('should call onDeleteList when confirming deletion of a list with more than 5 names', async () => {
+    it('should call onDeleteList when confirming deletion of a list with names', async () => {
       const onDeleteList = vi.fn();
       const user = userEvent.setup();
       const listWithManyNames: NameList = {

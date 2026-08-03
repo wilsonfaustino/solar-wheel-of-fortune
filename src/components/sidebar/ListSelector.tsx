@@ -53,7 +53,8 @@ function ListSelectorComponent({
       return;
     }
 
-    if (list.names.length > 5) {
+    // Only confirm when the delete would lose names; an empty list costs nothing to recreate
+    if (list.names.length > 0) {
       setDeleteConfirm({
         listId: list.id,
         title: list.title,

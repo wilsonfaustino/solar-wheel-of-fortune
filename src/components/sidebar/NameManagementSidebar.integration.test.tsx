@@ -132,8 +132,11 @@ describe('NameManagementSidebar Integration Tests', () => {
         expect(activeList?.names.some((n) => n.value === 'FRANK')).toBe(false);
       });
 
-      // Step 5: Delete Team B (inactive lists expose the delete action; <=5 names skips confirm)
+      // Step 5: Delete Team B (only inactive lists expose the delete action)
       await user.click(await screen.findByLabelText('Delete Team B'));
+
+      // Team B holds names, so deletion goes through the confirmation dialog
+      await user.click(await screen.findByRole('button', { name: /^delete$/i }));
 
       await waitFor(() => {
         const state = useNameStore.getState();
