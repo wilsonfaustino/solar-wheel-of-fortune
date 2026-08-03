@@ -37,18 +37,16 @@ Root cause is the page object, not the tests. `SidebarPage.createList()` still i
 
 **Correction to the original scoping**: `prompt()` is *still* live at `NameManagementSidebar.tsx:61`. The mock stays until that refactor lands - see item 6.
 
-## 6. Replace list-creation `prompt()` with a Radix dialog
+## 6. Replace list-creation `prompt()` with a Radix dialog (DONE)
 
 **Files**: `src/components/sidebar/NameManagementSidebar.tsx:61`, `e2e/pages/SidebarPage.ts`
 **Effort**: ~40 min
 
 The only native dialog left in `src/`. Blocks removing the `prompt` stub from the sidebar integration test, and item 1's `createList` page-object fix depends on which direction this goes.
 
-**Steps**:
-- Add an input dialog next to `ConfirmDialog` in `src/components/shared`
-- Swap `handleCreateList` to open it
-- Drop the `prompt` stub from the integration test
-- Update `SidebarPage.createList()` to drive the dialog
+**How it landed**: the dialog lives inside `ListSelector` rather than as a shared component - it has one call site, and `ListSelector` already owns the delete `ConfirmDialog`. `NameManagementSidebar` now passes the `createList` store action straight through, so its `prompt` callback is gone. `prompt(` no longer appears anywhere in `src/` or `e2e/`.
+
+**Correction to the original scoping**: item 1's `createList` page-object fix is done as part of this - `SidebarPage.createList()` drives the dialog and its E2E test passes. The three `test.skip` markers in `03-list-management.spec.ts` are still open.
 
 ## 3. Ship spin sound out of the feature flag
 
