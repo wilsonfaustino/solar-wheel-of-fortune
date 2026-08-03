@@ -33,6 +33,7 @@ function ListSelectorComponent({
   const [createTitle, setCreateTitle] = useState<string | null>(null);
 
   const activeList = lists.find((list) => list.id === activeListId);
+  const deleteNameLabel = deleteConfirm?.nameCount === 1 ? 'name' : 'names';
 
   const handleCreateSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -253,7 +254,7 @@ function ListSelectorComponent({
         description={
           deleteConfirm?.listId === 'error'
             ? 'You must have at least one list. Create another list before deleting this one.'
-            : `Delete "${deleteConfirm?.title}" and its ${deleteConfirm?.nameCount} ${deleteConfirm?.nameCount === 1 ? 'name' : 'names'}? This action cannot be undone.`
+            : `Delete "${deleteConfirm?.title}" and its ${deleteConfirm?.nameCount} ${deleteNameLabel}? This action cannot be undone.`
         }
         confirmLabel={deleteConfirm?.listId === 'error' ? undefined : 'Delete'}
         onConfirm={handleConfirmDelete}
