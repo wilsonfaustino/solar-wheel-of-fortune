@@ -57,13 +57,6 @@ function NameManagementSidebarComponent({
   );
 
   // Callbacks
-  const handleCreateList = useCallback(() => {
-    const title = prompt('Enter list name:', 'New List');
-    if (title?.trim()) {
-      createList(title.trim());
-    }
-  }, [createList]);
-
   const handleEditName = useCallback(
     (nameId: string, newValue: string) => {
       updateName(nameId, { value: newValue.toUpperCase() });
@@ -112,7 +105,7 @@ function NameManagementSidebarComponent({
             lists={lists}
             activeListId={activeListId}
             onSelectList={setActiveList}
-            onCreateList={handleCreateList}
+            onCreateList={createList}
             onDeleteList={deleteList}
             onRenameList={updateListTitle}
           />
