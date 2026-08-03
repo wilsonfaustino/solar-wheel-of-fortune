@@ -258,6 +258,27 @@ describe('ListSelector', () => {
 
       expect(onDeleteList).not.toHaveBeenCalled();
       expect(screen.getByText('Delete List?')).toBeInTheDocument();
+      expect(
+        screen.getByText('Delete "Class 1B" and its 1 name? This action cannot be undone.')
+      ).toBeInTheDocument();
+    });
+
+    it('should pluralize the name count in the confirmation copy', async () => {
+      const user = userEvent.setup();
+      const listWithNames: NameList = {
+        id: 'list-2',
+        title: 'Class 1B',
+        names: makeNames(3),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      render(<ListSelector {...defaultProps} lists={[mockLists[0], listWithNames]} />);
+
+      await user.click(screen.getByRole('button', { name: /delete class 1b/i }));
+
+      expect(
+        screen.getByText('Delete "Class 1B" and its 3 names? This action cannot be undone.')
+      ).toBeInTheDocument();
     });
 
     it('should call onDeleteList when confirming deletion of a list with names', async () => {

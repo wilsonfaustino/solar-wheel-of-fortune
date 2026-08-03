@@ -25,9 +25,11 @@ function ListSelectorComponent({
   onRenameList,
 }: ListSelectorProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ listId: string; title: string } | null>(
-    null
-  );
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    listId: string;
+    title: string;
+    nameCount: number;
+  } | null>(null);
   const [createTitle, setCreateTitle] = useState<string | null>(null);
 
   const activeList = lists.find((list) => list.id === activeListId);
@@ -49,6 +51,7 @@ function ListSelectorComponent({
       setDeleteConfirm({
         listId: 'error',
         title: 'Cannot delete the only list',
+        nameCount: 0,
       });
       return;
     }
@@ -58,6 +61,7 @@ function ListSelectorComponent({
       setDeleteConfirm({
         listId: list.id,
         title: list.title,
+        nameCount: list.names.length,
       });
     } else {
       onDeleteList(listId);
@@ -249,7 +253,7 @@ function ListSelectorComponent({
         description={
           deleteConfirm?.listId === 'error'
             ? 'You must have at least one list. Create another list before deleting this one.'
-            : `Delete "${deleteConfirm?.title}" with names? This action cannot be undone.`
+            : `Delete "${deleteConfirm?.title}" and its ${deleteConfirm?.nameCount} ${deleteConfirm?.nameCount === 1 ? 'name' : 'names'}? This action cannot be undone.`
         }
         confirmLabel={deleteConfirm?.listId === 'error' ? undefined : 'Delete'}
         onConfirm={handleConfirmDelete}
