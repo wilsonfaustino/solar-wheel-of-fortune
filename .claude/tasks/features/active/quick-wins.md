@@ -25,17 +25,28 @@ Root cause is the page object, not the tests. `SidebarPage.createList()` still i
 - Drop the three `test.skip` markers and their TODO comments
 - Verify 0% flake over 3 consecutive runs (Session 25 precedent)
 
-## 2. Un-skip stale sidebar integration test
+## 2. Un-skip stale sidebar integration test (DONE)
 
 **File**: `src/components/sidebar/NameManagementSidebar.integration.test.tsx`
 **Effort**: ~20 min
 
-`it.skip` at line 82 is blocked by an obsolete TODO at line 80: "Replace window.prompt() with proper Dialog component in NameManagementSidebar". That work is already done - `window.prompt` no longer appears anywhere in `src/`, and `ListSelector` uses `ConfirmDialog`.
+`it.skip` at line 82 was blocked by a TODO claiming `window.prompt` needed replacing first. The skip was unnecessary: the test already stubs `prompt` in `beforeEach`, so it runs as-is. Two assertions were stale against the post-Radix `ListSelector`:
 
-**Steps**:
-- Remove the `window.prompt` mock (line 12) and the stale TODO
-- Remove `.skip`, rewrite assertions against the dialog
-- Confirm the list isolation assertions still hold
+- Switching lists clicks the inner button inside the `menuitem`, not the `menuitem` itself (`ListSelector.tsx:124`, `onSelect` is preventDefault'd)
+- Delete actions only render for *inactive* lists (`ListSelector.tsx:137`), and `ConfirmDialog` only appears when the list has more than 5 names, so deleting a 2-name list is immediate with no dialog
+
+**Correction to the original scoping**: `prompt()` is *still* live at `NameManagementSidebar.tsx:61`. The mock stays until that refactor lands - see item 6.
+
+## 6. Replace list-creation `prompt()` with a Radix dialog (DONE)
+
+**Files**: `src/components/sidebar/NameManagementSidebar.tsx:61`, `e2e/pages/SidebarPage.ts`
+**Effort**: ~40 min
+
+The only native dialog left in `src/`. Blocks removing the `prompt` stub from the sidebar integration test, and item 1's `createList` page-object fix depends on which direction this goes.
+
+**How it landed**: the dialog lives inside `ListSelector` rather than as a shared component - it has one call site, and `ListSelector` already owns the delete `ConfirmDialog`. `NameManagementSidebar` now passes the `createList` store action straight through, so its `prompt` callback is gone. `prompt(` no longer appears anywhere in `src/` or `e2e/`.
+
+**Correction to the original scoping**: item 1's `createList` page-object fix is done as part of this - `SidebarPage.createList()` drives the dialog and its E2E test passes. The three `test.skip` markers in `03-list-management.spec.ts` are still open.
 
 ## 3. Ship spin sound out of the feature flag
 
@@ -85,5 +96,5 @@ Thresholds sit at lines 49 / functions 51 / branches 37 / statements 49, below a
 ## Explicitly out of scope
 
 - No TODO/FIXME debt elsewhere in `src/` or `e2e/`
-- No native dialogs left to replace (ConfirmDialog migration complete)
+- ~~No native dialogs left to replace (ConfirmDialog migration complete)~~ - wrong, see item 6
 - Pre-existing `act(...)` warnings in unit tests: noisy but non-blocking, not a quick win

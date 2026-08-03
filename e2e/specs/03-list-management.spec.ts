@@ -1,7 +1,7 @@
 import { expect, test } from '../fixtures/localStorage.fixture';
 
 test.describe('List Management', () => {
-  test('should create new list via prompt dialog', async ({ sidebarPage }) => {
+  test('should create new list via create dialog', async ({ sidebarPage }) => {
     // Create new list
     await sidebarPage.createList('Work');
 
@@ -32,7 +32,7 @@ test.describe('List Management', () => {
 
   test.skip('should delete list with confirmation', async ({ sidebarPage }) => {
     // TODO: Confirm button locator needs investigation
-    // Create list with >5 names to trigger confirmation
+    // Create list with names to trigger confirmation
     await sidebarPage.createList('Temp List');
     const names = ['Alice', 'Bob', 'Charlie', 'David', 'Eve', 'Frank'];
     for (const name of names) {

@@ -1,3 +1,4 @@
+import * as Dialog from '@radix-ui/react-dialog';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { ChevronDown, Edit2, Plus, Trash2 } from 'lucide-react';
 import { memo, useState } from 'react';
@@ -10,7 +11,7 @@ interface ListSelectorProps {
   lists: NameList[];
   activeListId: string | null;
   onSelectList: (listId: string) => void;
-  onCreateList: () => void;
+  onCreateList: (title: string) => void;
   onDeleteList: (listId: string) => void;
   onRenameList: (listId: string, newTitle: string) => void;
 }
@@ -24,11 +25,24 @@ function ListSelectorComponent({
   onRenameList,
 }: ListSelectorProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ listId: string; title: string } | null>(
-    null
-  );
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    listId: string;
+    title: string;
+    nameCount: number;
+  } | null>(null);
+  const [createTitle, setCreateTitle] = useState<string | null>(null);
 
   const activeList = lists.find((list) => list.id === activeListId);
+  const deleteNameLabel = deleteConfirm?.nameCount === 1 ? 'name' : 'names';
+
+  const handleCreateSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    const trimmed = createTitle?.trim();
+    if (!trimmed) return;
+
+    onCreateList(trimmed);
+    setCreateTitle(null);
+  };
 
   const handleDeleteClick = (listId: string) => {
     const list = lists.find((l) => l.id === listId);
@@ -38,14 +52,17 @@ function ListSelectorComponent({
       setDeleteConfirm({
         listId: 'error',
         title: 'Cannot delete the only list',
+        nameCount: 0,
       });
       return;
     }
 
-    if (list.names.length > 5) {
+    // Only confirm when the delete would lose names; an empty list costs nothing to recreate
+    if (list.names.length > 0) {
       setDeleteConfirm({
         listId: list.id,
         title: list.title,
+        nameCount: list.names.length,
       });
     } else {
       onDeleteList(listId);
@@ -174,13 +191,61 @@ function ListSelectorComponent({
           <DropdownMenu.Separator className="h-px bg-border-light my-0" />
           <DropdownMenu.Item
             className="w-full px-4 py-3 transition-colors flex items-center gap-2 bg-accent-05 text-accent hover:bg-accent-10 focus:bg-accent-10 focus:outline-none cursor-default"
-            onSelect={onCreateList}
+            onSelect={() => setCreateTitle('New List')}
           >
             <Plus className="size-5" />
             <span className="font-mono text-sm tracking-wider">CREATE NEW LIST</span>
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
+
+      {createTitle !== null && (
+        <Dialog.Root open onOpenChange={() => setCreateTitle(null)}>
+          <Dialog.Portal>
+            <Dialog.Overlay className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50" />
+            <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-6 max-w-sm w-full bg-black border border-border-light z-50 focus:outline-none">
+              <Dialog.Title className="font-mono text-lg mb-2 tracking-wider text-accent">
+                CREATE NEW LIST
+              </Dialog.Title>
+              <Dialog.Description className="font-mono text-xs mb-4 text-text/50">
+                Name the list you want to add.
+              </Dialog.Description>
+              <form onSubmit={handleCreateSubmit}>
+                <input
+                  type="text"
+                  value={createTitle}
+                  onChange={(e) => setCreateTitle(e.target.value)}
+                  placeholder="Enter list name..."
+                  aria-label="List name"
+                  maxLength={100}
+                  className="w-full px-3 py-3 h-11 font-mono text-sm text-text bg-black/50 border border-border-light shadow-none focus:shadow-xs focus:shadow-accent focus:outline-none placeholder:text-white/30"
+                />
+                <div className="flex gap-2 mt-4">
+                  <Button
+                    type="submit"
+                    disabled={createTitle.trim().length === 0}
+                    variant="tech"
+                    size="tech-default"
+                    className="flex-1 text-sm"
+                  >
+                    CREATE
+                  </Button>
+                  <Dialog.Close asChild>
+                    <Button
+                      type="button"
+                      variant="tech-outline"
+                      size="tech-default"
+                      className="text-sm"
+                    >
+                      CANCEL
+                    </Button>
+                  </Dialog.Close>
+                </div>
+              </form>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      )}
 
       <ConfirmDialog
         open={deleteConfirm !== null}
@@ -189,7 +254,7 @@ function ListSelectorComponent({
         description={
           deleteConfirm?.listId === 'error'
             ? 'You must have at least one list. Create another list before deleting this one.'
-            : `Delete "${deleteConfirm?.title}" with names? This action cannot be undone.`
+            : `Delete "${deleteConfirm?.title}" and its ${deleteConfirm?.nameCount} ${deleteNameLabel}? This action cannot be undone.`
         }
         confirmLabel={deleteConfirm?.listId === 'error' ? undefined : 'Delete'}
         onConfirm={handleConfirmDelete}

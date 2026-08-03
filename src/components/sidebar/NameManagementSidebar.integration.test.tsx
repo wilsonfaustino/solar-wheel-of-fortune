@@ -1,6 +1,6 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { useNameStore } from '@/stores/useNameStore';
 import { clearPersistedState, renderWithStore } from '@/test/integration-helpers';
 import { sampleNames } from '@/test/test-data';
@@ -9,16 +9,10 @@ import { NameManagementSidebar } from './NameManagementSidebar';
 describe('NameManagementSidebar Integration Tests', () => {
   beforeEach(() => {
     clearPersistedState();
-    // Mock window.prompt for list creation
-    vi.stubGlobal(
-      'prompt',
-      vi.fn((_message: string, defaultValue?: string) => defaultValue)
-    );
   });
 
   afterEach(() => {
     clearPersistedState();
-    vi.unstubAllGlobals();
   });
 
   describe('Full Name Management Flow', () => {
@@ -77,9 +71,7 @@ describe('NameManagementSidebar Integration Tests', () => {
   });
 
   describe('Multi-List Operations Flow', () => {
-    // TODO: Replace window.prompt() with proper Dialog component in NameManagementSidebar
-    // This test is skipped due to prompt() usage which should be refactored to use Radix Dialog
-    it.skip('should create, switch, and delete lists with proper isolation', async () => {
+    it('should create, switch, and delete lists with proper isolation', async () => {
       renderWithStore(<NameManagementSidebar />);
       const user = userEvent.setup();
 
@@ -92,12 +84,14 @@ describe('NameManagementSidebar Integration Tests', () => {
         expect(screen.getByRole('menu')).toBeInTheDocument();
       });
 
-      // Step 2: Create new list
-      // Mock prompt to return "Team B"
-      vi.mocked(prompt).mockReturnValueOnce('Team B');
-
+      // Step 2: Create new list via the create dialog
       const createButton = screen.getByRole('menuitem', { name: /create new list/i });
       await user.click(createButton);
+
+      const listNameInput = await screen.findByLabelText('List name');
+      await user.clear(listNameInput);
+      await user.type(listNameInput, 'Team B');
+      await user.click(screen.getByRole('button', { name: 'CREATE' }));
 
       // Verify new list created and active
       await waitFor(() => {
@@ -126,12 +120,9 @@ describe('NameManagementSidebar Integration Tests', () => {
       });
 
       // Step 4: Switch back to default list
-      await user.click(screen.getByRole('button', { name: /team b/i }));
-      await waitFor(() => {
-        expect(screen.getByRole('menu')).toBeInTheDocument();
-      });
-      const defaultMenuItem = screen.getByRole('menuitem', { name: /default list/i });
-      await user.click(defaultMenuItem);
+      await user.click(screen.getByRole('button', { name: /active list team b/i }));
+      const menu = await screen.findByRole('menu');
+      await user.click(within(menu).getByRole('button', { name: /^default list \d+ names$/i }));
 
       // Verify list switched and names isolated
       await waitFor(() => {
@@ -141,30 +132,12 @@ describe('NameManagementSidebar Integration Tests', () => {
         expect(activeList?.names.some((n) => n.value === 'FRANK')).toBe(false);
       });
 
-      // Step 5: Delete Team B list
-      await user.click(screen.getByRole('button', { name: /default list/i }));
-      await waitFor(() => {
-        expect(screen.getByRole('menu')).toBeInTheDocument();
-      });
+      // Step 5: Delete Team B (only inactive lists expose the delete action)
+      await user.click(await screen.findByLabelText('Delete Team B'));
 
-      // Switch to Team B first
-      const teamBMenuItem = screen.getByRole('menuitem', { name: /team b/i });
-      await user.click(teamBMenuItem);
+      // Team B holds names, so deletion goes through the confirmation dialog
+      await user.click(await screen.findByRole('button', { name: /^delete$/i }));
 
-      // Click delete list button
-      await waitFor(() => {
-        expect(screen.getByLabelText(/delete list/i)).toBeInTheDocument();
-      });
-      const deleteListButton = screen.getByLabelText(/delete list/i);
-      await user.click(deleteListButton);
-
-      // Confirm deletion
-      await waitFor(() => {
-        expect(screen.getByRole('alertdialog')).toBeInTheDocument();
-      });
-      await user.click(screen.getByRole('button', { name: /confirm/i }));
-
-      // Verify list deleted and reverted to default
       await waitFor(() => {
         const state = useNameStore.getState();
         expect(state.lists).toHaveLength(1);

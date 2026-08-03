@@ -153,21 +153,73 @@ describe('ListSelector', () => {
   });
 
   describe('create list', () => {
-    it('should call onCreateList when "CREATE NEW LIST" is clicked', async () => {
+    const openCreateDialog = async (user: ReturnType<typeof userEvent.setup>) => {
+      const createItem = screen.getByText('CREATE NEW LIST').closest('[role="menuitem"]');
+      if (!createItem) throw new Error('CREATE NEW LIST menu item not found');
+      await user.click(createItem);
+    };
+
+    it('should open the create dialog when "CREATE NEW LIST" is clicked', async () => {
       const onCreateList = vi.fn();
       const user = userEvent.setup();
       render(<ListSelector {...defaultProps} onCreateList={onCreateList} />);
 
-      const createItem = screen.getByText('CREATE NEW LIST').closest('[role="menuitem"]');
-      if (!createItem) throw new Error('CREATE NEW LIST menu item not found');
-      await user.click(createItem);
+      await openCreateDialog(user);
 
-      expect(onCreateList).toHaveBeenCalled();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByLabelText('List name')).toHaveValue('New List');
+      expect(onCreateList).not.toHaveBeenCalled();
+    });
+
+    it('should call onCreateList with the trimmed title on submit', async () => {
+      const onCreateList = vi.fn();
+      const user = userEvent.setup();
+      render(<ListSelector {...defaultProps} onCreateList={onCreateList} />);
+
+      await openCreateDialog(user);
+
+      const input = screen.getByLabelText('List name');
+      await user.clear(input);
+      await user.type(input, '  Team B  ');
+      await user.click(screen.getByRole('button', { name: 'CREATE' }));
+
+      expect(onCreateList).toHaveBeenCalledWith('Team B');
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('should disable CREATE and ignore submit for a blank title', async () => {
+      const onCreateList = vi.fn();
+      const user = userEvent.setup();
+      render(<ListSelector {...defaultProps} onCreateList={onCreateList} />);
+
+      await openCreateDialog(user);
+
+      const input = screen.getByLabelText('List name');
+      await user.clear(input);
+
+      expect(screen.getByRole('button', { name: 'CREATE' })).toBeDisabled();
+
+      await user.type(input, '   ');
+      await user.keyboard('{Enter}');
+
+      expect(onCreateList).not.toHaveBeenCalled();
+    });
+
+    it('should close the create dialog on CANCEL without creating', async () => {
+      const onCreateList = vi.fn();
+      const user = userEvent.setup();
+      render(<ListSelector {...defaultProps} onCreateList={onCreateList} />);
+
+      await openCreateDialog(user);
+      await user.click(screen.getByRole('button', { name: 'CANCEL' }));
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(onCreateList).not.toHaveBeenCalled();
     });
   });
 
   describe('delete list', () => {
-    it('should call onDeleteList directly when list has 5 or fewer names and is not the only list', async () => {
+    it('should call onDeleteList directly when the list is empty and is not the only list', async () => {
       const onDeleteList = vi.fn();
       const user = userEvent.setup();
       // list-2 has 0 names and there are 2 lists total
@@ -188,29 +240,48 @@ describe('ListSelector', () => {
       expect(deleteButton).toBeDisabled();
     });
 
-    it('should show confirmation dialog when deleting a list with more than 5 names', async () => {
+    it('should show confirmation dialog when deleting a list holding a single name', async () => {
       const onDeleteList = vi.fn();
       const user = userEvent.setup();
-      const listWithManyNames: NameList = {
+      const listWithOneName: NameList = {
         id: 'list-2',
         title: 'Class 1B',
-        names: makeNames(6),
+        names: makeNames(1),
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      const listsWithManyNames = [mockLists[0], listWithManyNames];
-      render(
-        <ListSelector {...defaultProps} lists={listsWithManyNames} onDeleteList={onDeleteList} />
-      );
+      const listsWithNames = [mockLists[0], listWithOneName];
+      render(<ListSelector {...defaultProps} lists={listsWithNames} onDeleteList={onDeleteList} />);
 
       const deleteButton = screen.getByRole('button', { name: /delete class 1b/i });
       await user.click(deleteButton);
 
       expect(onDeleteList).not.toHaveBeenCalled();
       expect(screen.getByText('Delete List?')).toBeInTheDocument();
+      expect(
+        screen.getByText('Delete "Class 1B" and its 1 name? This action cannot be undone.')
+      ).toBeInTheDocument();
     });
 
-    it('should call onDeleteList when confirming deletion of a list with more than 5 names', async () => {
+    it('should pluralize the name count in the confirmation copy', async () => {
+      const user = userEvent.setup();
+      const listWithNames: NameList = {
+        id: 'list-2',
+        title: 'Class 1B',
+        names: makeNames(3),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      render(<ListSelector {...defaultProps} lists={[mockLists[0], listWithNames]} />);
+
+      await user.click(screen.getByRole('button', { name: /delete class 1b/i }));
+
+      expect(
+        screen.getByText('Delete "Class 1B" and its 3 names? This action cannot be undone.')
+      ).toBeInTheDocument();
+    });
+
+    it('should call onDeleteList when confirming deletion of a list with names', async () => {
       const onDeleteList = vi.fn();
       const user = userEvent.setup();
       const listWithManyNames: NameList = {
