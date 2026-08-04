@@ -127,4 +127,19 @@ test.describe('SettingsPanel', () => {
     const visibleAgain = await settingsPage.isClearSelectionVisible();
     expect(visibleAgain).toBe(true);
   });
+
+  test('should persist the spin sound toggle across reloads', async ({ settingsPage, page }) => {
+    await settingsPage.switchToSettingsTab();
+
+    expect(await settingsPage.isSoundEnabled()).toBe(false);
+
+    await settingsPage.toggleSound();
+    expect(await settingsPage.isSoundEnabled()).toBe(true);
+    expect((await settingsPage.getSettingsFromStorage()).soundEnabled).toBe(true);
+
+    await page.reload();
+    await settingsPage.switchToSettingsTab();
+
+    expect(await settingsPage.isSoundEnabled()).toBe(true);
+  });
 });
