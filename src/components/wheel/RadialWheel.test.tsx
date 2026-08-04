@@ -1,13 +1,13 @@
 import { act, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { m, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'motion/react';
 import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import type { Name } from '../../types/name';
 import { RadialWheel, type RadialWheelRef } from './RadialWheel';
 
-vi.mock('framer-motion', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('framer-motion')>();
+vi.mock('motion/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('motion/react')>();
   return {
     ...actual,
     useReducedMotion: vi.fn().mockReturnValue(null),

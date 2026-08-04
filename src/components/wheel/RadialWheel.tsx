@@ -1,4 +1,4 @@
-import { m, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'motion/react';
 import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { ANIMATION_CONFIG, WHEEL_CONFIG } from '../../constants/defaults';
 import { useSpinSound } from '../../hooks';

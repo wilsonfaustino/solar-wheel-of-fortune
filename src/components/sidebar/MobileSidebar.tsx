@@ -1,6 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import { m, useReducedMotion } from 'framer-motion';
 import { X } from 'lucide-react';
+import { m, useReducedMotion } from 'motion/react';
 import { memo } from 'react';
 
 interface MobileSidebarProps {
