@@ -6,6 +6,18 @@ Quick navigation for ongoing development sessions.
 
 ## Current Session Tasks
 
+### Session 34: Spin Sound Setting (Complete ✅)
+**Summary**: [sessions/session-34-sound-setting.md](./sessions/session-34-sound-setting.md) - Persisted `soundEnabled` setting replaces the `?ff=sound` URL flag, with an AUDIO toggle in Settings
+**Status**: Tests ✅ | E2E ✅
+
+**All Steps Completed**:
+- ✅ Add `soundEnabled` to `useSettingsStore` (persisted, default off)
+- ✅ Gate `useSpinSound` on the setting via `getState()`, remove the `?ff=sound` URL flag
+- ✅ Add AUDIO section with spin sound toggle to `SettingsPanel`
+- ✅ Rename generic `SwitchSettings` props to `checked`/`onCheckedChange`
+- ✅ **323 unit tests passing**, **35 E2E passing, 3 skipped**
+- ✅ 4 atomic commits on branch `wilsonfaustino/Add-sound-fx-toggle-in-Settings`
+
 ### Session 33: Spin Sound Effect Behind Feature Flag (Complete ✅)
 **Summary**: [sessions/session-33-spin-sound.md](./sessions/session-33-spin-sound.md) - Roletrando sound plays on spin, gated behind `?ff=sound` query param
 **Status**: Tests ✅ | Manual verification ✅

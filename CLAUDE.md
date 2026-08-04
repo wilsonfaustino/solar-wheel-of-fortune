@@ -925,6 +925,13 @@ Install Playwright extension: `ms-playwright.playwright`
 - Store check via `useNameStore.getState()` inside timer
 - No breaking changes to existing selection flow
 
+### Session 34: Spin Sound Setting (Completed)
+- [x] Add `soundEnabled` to `useSettingsStore` (persisted, default off)
+- [x] Gate `useSpinSound` on the setting, remove the `?ff=sound` URL flag
+- [x] Add AUDIO section with spin sound toggle to SettingsPanel
+- [x] Rename generic `SwitchSettings` props to `checked` / `onCheckedChange`
+- [x] Unit tests for store, hook, and panel; E2E persistence test
+
 ### Session 5: Selection History & Export (Planned)
 - [ ] Create selection history store (extend useNameStore)
 - [ ] Create history panel component
