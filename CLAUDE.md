@@ -108,7 +108,7 @@ bun hooks:uninstall # Remove git hooks
 **Quality Gates** (6 jobs):
 1. **Lint (Biome)** - `bun run ci` (fails on issues)
 2. **Type Check (TypeScript)** - `bun run tsc -b` (strict mode)
-3. **Test & Coverage (Vitest)** - `bun test:coverage` (190 tests, 45% threshold)
+3. **Test & Coverage (Vitest)** - `bun test:coverage` (323 tests, ~92% threshold)
 4. **Build (Vite)** - `bun run build` (production bundle)
 5. **E2E Tests (Playwright)** - `bun run test:e2e` (6 tests, Chromium only)
 6. **SonarQube Analysis** - Code quality + quality gate
@@ -133,7 +133,7 @@ bun test:coverage:ui  # Coverage with Vitest UI
 - `coverage/lcov.info` - SonarQube format (gitignored)
 - `coverage/index.html` - HTML report for local review (gitignored)
 
-**Thresholds**: 45% minimum for lines/functions/statements, 30% branches (baseline)
+**Thresholds**: lines 92, functions 92, statements 91, branches 80 (ratcheted to actual minus ~1 point of headroom)
 
 **Coverage Provider**: v8 (modern, fast, accurate)
 
