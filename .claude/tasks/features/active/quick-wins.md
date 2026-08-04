@@ -48,7 +48,7 @@ The only native dialog left in `src/`. Blocks removing the `prompt` stub from th
 
 **Correction to the original scoping**: item 1's `createList` page-object fix is done as part of this - `SidebarPage.createList()` drives the dialog and its E2E test passes. The three `test.skip` markers in `03-list-management.spec.ts` are still open.
 
-## 3. Ship spin sound out of the feature flag
+## 3. Ship spin sound out of the feature flag (DONE)
 
 **Files**: `src/hooks/useSpinSound.ts`, `src/stores/useNameStore.ts`, SettingsPanel
 **Effort**: ~40 min
@@ -60,6 +60,8 @@ Session 33 shipped the spin sound gated behind `?ff=sound` (`useSpinSound.ts:6`)
 - Add one Switch to SettingsPanel
 - Keep `?ff=sound` as an override or remove it once the toggle lands
 - Unit tests for the new setting, E2E toggle test following `SettingsPage` page object
+
+**How it landed**: The `?ff=sound` flag was removed outright rather than kept as an override. Sound is now gated on a persisted `soundEnabled` setting that is toggled from the AUDIO section of the Settings tab (default off).
 
 ## 4. Migrate framer-motion to motion/react
 
