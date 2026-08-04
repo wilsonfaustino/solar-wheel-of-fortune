@@ -6,6 +6,7 @@ export class SidebarPage extends BasePage {
   readonly addButton: Locator;
   readonly bulkImportButton: Locator;
   readonly listSelector: Locator;
+  readonly listMenu: Locator;
   readonly nameItems: Locator;
 
   constructor(page: Page) {
@@ -15,6 +16,7 @@ export class SidebarPage extends BasePage {
     this.bulkImportButton = page.getByRole('button', { name: /bulk import/i });
     // List selector button contains "ACTIVE LIST" text
     this.listSelector = page.locator('button:has-text("ACTIVE LIST")').first();
+    this.listMenu = page.getByRole('menu');
     // Name items are divs containing edit/delete buttons
     this.nameItems = page
       .locator('.group')
@@ -69,57 +71,70 @@ export class SidebarPage extends BasePage {
   }
 
   // List management methods
+
+  // List items call preventDefault on onSelect, so the dropdown stays open after
+  // acting on one. Every list method opens and closes it explicitly instead.
+  private async openListMenu() {
+    if ((await this.listSelector.getAttribute('data-state')) !== 'open') {
+      await this.listSelector.click();
+    }
+    await this.listMenu.waitFor({ state: 'visible' });
+  }
+
+  private async closeListMenu() {
+    if (await this.listMenu.isVisible()) {
+      await this.pressEscape();
+      await this.listMenu.waitFor({ state: 'hidden' });
+    }
+  }
+
+  private listItem(listName: string): Locator {
+    return this.listMenu.getByRole('menuitem').filter({ hasText: listName });
+  }
+
   async createList(name: string) {
-    await this.listSelector.click();
-    await this.page.getByRole('menuitem', { name: /create new list/i }).click();
+    await this.openListMenu();
+    await this.listMenu.getByRole('menuitem', { name: /create new list/i }).click();
 
     const dialog = this.page.getByRole('dialog');
     await dialog.getByLabel('List name').fill(name);
     await dialog.getByRole('button', { name: 'CREATE' }).click();
     await dialog.waitFor({ state: 'hidden' });
+    await this.closeListMenu();
   }
 
   async switchToList(listName: string) {
-    // If dropdown is stuck open, close it first with Escape
-    await this.pressEscape();
-    await this.page.waitForTimeout(200);
-
-    await this.listSelector.click();
-    const listItem = this.page.getByRole('menuitem').filter({ hasText: listName });
-    await listItem.click();
+    await this.openListMenu();
+    // The first button in the row selects the list; edit and delete follow it
+    await this.listItem(listName).locator('button').first().click();
+    await this.closeListMenu();
   }
 
+  // Assumes the list holds at least one name, which is the only case that
+  // opens a confirmation. Deleting an empty list is immediate.
   async deleteList(listName: string) {
-    // If dropdown is stuck open, close it first with Escape
-    await this.pressEscape();
-    await this.page.waitForTimeout(200);
+    await this.openListMenu();
+    const item = this.listItem(listName);
+    await item.hover();
+    await item.getByRole('button', { name: `Delete ${listName}` }).click();
 
-    await this.listSelector.click();
-    const listItem = this.page.locator('.group').filter({ hasText: listName });
-    // Hover over item to reveal delete button
-    await listItem.hover();
-    const deleteButton = listItem.getByRole('button', { name: /delete/i });
-    await deleteButton.click();
-    // Confirm deletion
-    const confirmButton = this.page.getByRole('button', { name: /confirm/i });
-    await confirmButton.click();
+    const confirmDialog = this.page.getByRole('alertdialog');
+    await confirmDialog.getByRole('button', { name: 'Delete' }).click();
+    await confirmDialog.waitFor({ state: 'hidden' });
+    await this.closeListMenu();
   }
 
   async renameList(oldName: string, newName: string) {
-    // If dropdown is stuck open, close it first with Escape
-    await this.pressEscape();
-    await this.page.waitForTimeout(200);
+    await this.openListMenu();
+    const item = this.listItem(oldName);
+    await item.hover();
+    await item.getByRole('button', { name: `Edit ${oldName}` }).click();
 
-    await this.listSelector.click();
-    const listItem = this.page.locator('.group').filter({ hasText: oldName });
-    // Hover over item to reveal edit button
-    await listItem.hover();
-    const editButton = listItem.getByRole('button', { name: /edit/i });
-    await editButton.click();
-    // Edit inline input
-    const input = listItem.getByRole('textbox');
+    // Edit mode swaps the menu item out for an input, so scope to the menu
+    const input = this.listMenu.getByRole('textbox');
     await input.fill(newName);
     await input.press('Enter');
+    await this.closeListMenu();
   }
 
   async getCurrentListName(): Promise<string | null> {

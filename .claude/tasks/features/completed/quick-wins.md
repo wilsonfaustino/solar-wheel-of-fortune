@@ -1,12 +1,12 @@
 # Quick Wins Backlog
 
-**Status**: Active (scoped, not yet implemented)
+**Status**: Complete - all six items shipped
 **Branch**: `wilsonfaustino/quick_wins`
 **Context**: Post-MVP scan of the codebase for low-effort, high-payoff items. Repo is MVP-complete, tests green, no lint debt, so these are cleanup and reach items rather than new features.
 
 ---
 
-## 1. Un-skip list-management E2E tests
+## 1. Un-skip list-management E2E tests (DONE)
 
 **Files**: `e2e/specs/03-list-management.spec.ts`, `e2e/pages/SidebarPage.ts`
 **Effort**: ~45 min
@@ -24,6 +24,15 @@ Root cause is the page object, not the tests. `SidebarPage.createList()` still i
 - Remove the Escape-if-stuck workarounds once locators wait on real dialog state
 - Drop the three `test.skip` markers and their TODO comments
 - Verify 0% flake over 3 consecutive runs (Session 25 precedent)
+
+**How it landed**: two dead locators and one real root cause.
+
+- The delete confirmation button is labelled `Delete` (`ConfirmDialog` `confirmLabel`), not `Confirm`, and it lives in an `alertdialog`, so `getByRole('button', { name: /confirm/i })` never matched
+- Inline rename replaces the `DropdownMenu.Item` with an input (`ListSelector.tsx:113`), so scoping `getByRole('textbox')` to that item could not match either. The input is now located from the menu instead
+- List items call `preventDefault` on `onSelect` (`ListSelector.tsx:136`), so the dropdown stays open after acting on one. With Radix's modal dropdown that leaves outside content `aria-hidden`, breaking any role-based locator that follows. That is what the "flaky" TODO was describing. `openListMenu` / `closeListMenu` helpers now make the state explicit and wait on it, replacing the Escape-if-stuck workarounds and the fixed `waitForTimeout(200)` calls
+- Also worth knowing: the dropdown's menu items carry the `group` class, the same hook `nameItems` filters on, so a stuck-open menu poisoned that locator too
+
+**Result**: full suite went from 34 passed / 3 skipped / 1 failed to **38 passed, 0 skipped, 0 failed**, three consecutive runs. The `04-selection-history` flake did not reproduce in any of the three, though it was not directly targeted.
 
 ## 2. Un-skip stale sidebar integration test (DONE)
 
@@ -99,7 +108,7 @@ Thresholds sit at lines 49 / functions 51 / branches 37 / statements 49, below a
 - ~~4 and 5 are mechanical and can ride along with any branch~~ - shipped together
 - 3 is the only item that changes user-facing behavior, so it deserves its own PR
 
-**Remaining**: item 1 only.
+**Remaining**: none. Backlog closed.
 
 ## Explicitly out of scope
 

@@ -10,8 +10,7 @@ test.describe('List Management', () => {
     expect(currentList).toContain('Work');
   });
 
-  test.skip('should switch between lists', async ({ sidebarPage }) => {
-    // TODO: Flaky test - dropdown state management needs investigation
+  test('should switch between lists', async ({ sidebarPage }) => {
     // Create second list
     await sidebarPage.createList('Work');
     await sidebarPage.addName('Bob');
@@ -30,8 +29,7 @@ test.describe('List Management', () => {
     await expect(bobItem).toBeVisible();
   });
 
-  test.skip('should delete list with confirmation', async ({ sidebarPage }) => {
-    // TODO: Confirm button locator needs investigation
+  test('should delete list with confirmation', async ({ sidebarPage }) => {
     // Create list with names to trigger confirmation
     await sidebarPage.createList('Temp List');
     const names = ['Alice', 'Bob', 'Charlie', 'David', 'Eve', 'Frank'];
@@ -50,8 +48,7 @@ test.describe('List Management', () => {
     expect(currentList).toContain('Default List');
   });
 
-  test.skip('should rename list inline', async ({ sidebarPage }) => {
-    // TODO: Inline edit textbox locator needs investigation
+  test('should rename list inline', async ({ sidebarPage }) => {
     // Create new list
     await sidebarPage.createList('Old Name');
 
