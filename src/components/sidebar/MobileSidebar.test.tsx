@@ -1,11 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { useReducedMotion } from 'framer-motion';
+import { useReducedMotion } from 'motion/react';
 import { describe, expect, it, vi } from 'vitest';
 import { MobileSidebar } from './MobileSidebar';
 
-vi.mock('framer-motion', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('framer-motion')>();
+vi.mock('motion/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('motion/react')>();
   return {
     ...actual,
     useReducedMotion: vi.fn().mockReturnValue(null),

@@ -1,4 +1,4 @@
-import { domAnimation, LazyMotion } from 'framer-motion';
+import { domAnimation, LazyMotion } from 'motion/react';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 import { Footer } from './components/Footer';
