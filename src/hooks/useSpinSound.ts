@@ -1,17 +1,14 @@
 import { useCallback, useRef } from 'react';
+import { useSettingsStore } from '../stores/useSettingsStore';
 
 const SPIN_SOUND_URL = '/sounds/roletrando.mp3';
-
-function isSoundEnabled(): boolean {
-  const featureFlags = new URLSearchParams(window.location.search).get('ff');
-  return featureFlags?.split(',').includes('sound') ?? false;
-}
 
 export function useSpinSound() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const playSpinSound = useCallback(() => {
-    if (!isSoundEnabled()) return;
+    // read at call time so the callback identity stays stable across setting changes
+    if (!useSettingsStore.getState().soundEnabled) return;
     if (!audioRef.current) {
       audioRef.current = new Audio(SPIN_SOUND_URL);
     }

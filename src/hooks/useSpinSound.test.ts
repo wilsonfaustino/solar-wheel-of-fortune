@@ -1,4 +1,5 @@
 import { renderHook } from '@testing-library/react';
+import { useSettingsStore } from '../stores/useSettingsStore';
 import { useSpinSound } from './useSpinSound';
 
 describe('useSpinSound', () => {
@@ -17,23 +18,23 @@ describe('useSpinSound', () => {
         return audioInstance;
       })
     );
-    window.history.replaceState(null, '', '/');
+    useSettingsStore.setState({ soundEnabled: false });
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
-    window.history.replaceState(null, '', '/');
+    useSettingsStore.setState({ soundEnabled: false });
   });
 
-  it('does not create or play audio when flag is absent', () => {
+  it('does not create or play audio when the sound setting is off', () => {
     const { result } = renderHook(() => useSpinSound());
     result.current.playSpinSound();
     expect(audioInstances).toHaveLength(0);
     expect(playMock).not.toHaveBeenCalled();
   });
 
-  it('creates audio with the sound URL and plays when ?ff=sound', () => {
-    window.history.replaceState(null, '', '/?ff=sound');
+  it('creates audio with the sound URL and plays when the sound setting is on', () => {
+    useSettingsStore.setState({ soundEnabled: true });
     const { result } = renderHook(() => useSpinSound());
     result.current.playSpinSound();
     expect(audioInstances).toHaveLength(1);
@@ -41,15 +42,22 @@ describe('useSpinSound', () => {
     expect(playMock).toHaveBeenCalledTimes(1);
   });
 
-  it('recognizes the flag inside a comma-separated list', () => {
-    window.history.replaceState(null, '', '/?ff=other,sound');
+  it('picks up a setting change without re-rendering the hook', () => {
     const { result } = renderHook(() => useSpinSound());
+    const initialCallback = result.current.playSpinSound;
+
     result.current.playSpinSound();
+    expect(playMock).not.toHaveBeenCalled();
+
+    useSettingsStore.setState({ soundEnabled: true });
+    result.current.playSpinSound();
+
     expect(playMock).toHaveBeenCalledTimes(1);
+    expect(result.current.playSpinSound).toBe(initialCallback);
   });
 
   it('reuses a single audio instance and resets currentTime on replay', () => {
-    window.history.replaceState(null, '', '/?ff=sound');
+    useSettingsStore.setState({ soundEnabled: true });
     const { result } = renderHook(() => useSpinSound());
     result.current.playSpinSound();
     result.current.playSpinSound();
@@ -59,9 +67,17 @@ describe('useSpinSound', () => {
   });
 
   it('does not throw when play is rejected by the browser', () => {
-    window.history.replaceState(null, '', '/?ff=sound');
+    useSettingsStore.setState({ soundEnabled: true });
     playMock.mockRejectedValue(new Error('autoplay blocked'));
     const { result } = renderHook(() => useSpinSound());
     expect(() => result.current.playSpinSound()).not.toThrow();
+  });
+
+  it('ignores the legacy ff=sound url flag', () => {
+    window.history.replaceState(null, '', '/?ff=sound');
+    const { result } = renderHook(() => useSpinSound());
+    result.current.playSpinSound();
+    expect(playMock).not.toHaveBeenCalled();
+    window.history.replaceState(null, '', '/');
   });
 });

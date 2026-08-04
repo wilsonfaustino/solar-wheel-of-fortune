@@ -7,6 +7,7 @@ describe('useSettingsStore', () => {
     const state = useSettingsStore.getState();
     state.autoExcludeEnabled = true;
     state.clearSelectionAfterExclude = false;
+    state.soundEnabled = false;
   });
 
   describe('initial state', () => {
@@ -18,6 +19,11 @@ describe('useSettingsStore', () => {
     test('should have clearSelectionAfterExclude set to false by default', () => {
       const state = useSettingsStore.getState();
       expect(state.clearSelectionAfterExclude).toBe(false);
+    });
+
+    test('should have soundEnabled set to false by default', () => {
+      const state = useSettingsStore.getState();
+      expect(state.soundEnabled).toBe(false);
     });
   });
 
@@ -60,6 +66,36 @@ describe('useSettingsStore', () => {
 
       const state = useSettingsStore.getState();
       expect(state.clearSelectionAfterExclude).toBe(false);
+    });
+  });
+
+  describe('setSoundEnabled', () => {
+    test('should enable sound when set to true', () => {
+      const { setSoundEnabled } = useSettingsStore.getState();
+
+      setSoundEnabled(true);
+
+      const state = useSettingsStore.getState();
+      expect(state.soundEnabled).toBe(true);
+    });
+
+    test('should disable sound when set to false', () => {
+      const { setSoundEnabled } = useSettingsStore.getState();
+
+      setSoundEnabled(true);
+      setSoundEnabled(false);
+
+      const state = useSettingsStore.getState();
+      expect(state.soundEnabled).toBe(false);
+    });
+
+    test('changing sound should not affect autoExclude', () => {
+      const { setSoundEnabled } = useSettingsStore.getState();
+
+      setSoundEnabled(true);
+
+      const state = useSettingsStore.getState();
+      expect(state.autoExcludeEnabled).toBe(true);
     });
   });
 
