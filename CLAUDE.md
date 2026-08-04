@@ -110,7 +110,7 @@ bun hooks:uninstall # Remove git hooks
 2. **Type Check (TypeScript)** - `bun run tsc -b` (strict mode)
 3. **Test & Coverage (Vitest)** - `bun test:coverage` (323 tests, ~92% threshold)
 4. **Build (Vite)** - `bun run build` (production bundle)
-5. **E2E Tests (Playwright)** - `bun run test:e2e` (6 tests, Chromium only)
+5. **E2E Tests (Playwright)** - `bun run test:e2e` (38 tests, Chromium only)
 6. **SonarQube Analysis** - Code quality + quality gate
 
 **Job Dependencies**:
@@ -750,7 +750,7 @@ bun test:run  # Run tests once
 - **Architecture**: Page Object Model (POM)
 - **Browser**: Chromium only (fastest CI execution)
 - **Test Directory**: `/e2e/` (separate from Vitest unit tests)
-- **Test Count**: 21 tests passing, 4 skipped (Phase 2 partial)
+- **Test Count**: 38 tests passing, 0 skipped
 - **CI Integration**: 6th quality gate (runs after lint + typecheck)
 
 ### Running E2E Tests
@@ -777,7 +777,7 @@ bun run test:e2e:codegen  # Generate test code via browser interaction
 **Test Specs** (`e2e/specs/`):
 - 01-wheel-spin.spec.ts - Spin animation, toast notifications (4 tests)
 - 02-name-management.spec.ts - Add, bulk import (2 tests)
-- 03-list-management.spec.ts - List CRUD operations (1 passing, 3 skipped)
+- 03-list-management.spec.ts - List CRUD operations (4 tests)
 - 04-selection-history.spec.ts - History tracking and management (4 tests)
 - 05-export.spec.ts - CSV/JSON export downloads (3 tests)
 - 06-theme-switching.spec.ts - Theme persistence and visual changes (2 tests)
