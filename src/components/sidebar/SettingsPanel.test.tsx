@@ -9,6 +9,7 @@ describe('SettingsPanel', () => {
     useSettingsStore.setState({
       autoExcludeEnabled: true,
       clearSelectionAfterExclude: false,
+      soundEnabled: false,
     });
   });
 
@@ -56,6 +57,20 @@ describe('SettingsPanel', () => {
       expect(
         screen.getByRole('switch', { name: 'Clear selection after exclusion' })
       ).toBeInTheDocument();
+    });
+
+    it('should render the audio section header', () => {
+      render(<SettingsPanel />);
+
+      expect(screen.getByText('AUDIO')).toBeInTheDocument();
+    });
+
+    it('should render the spin sound toggle', () => {
+      render(<SettingsPanel />);
+
+      expect(screen.getByText('Spin sound')).toBeInTheDocument();
+      expect(screen.getByText('Play a sound effect when the wheel spins')).toBeInTheDocument();
+      expect(screen.getByRole('switch', { name: 'Spin sound' })).toBeInTheDocument();
     });
   });
 
@@ -142,6 +157,57 @@ describe('SettingsPanel', () => {
       await user.click(label);
 
       expect(useSettingsStore.getState().clearSelectionAfterExclude).toBe(true);
+    });
+  });
+
+  describe('spin sound toggle interactions', () => {
+    it('should be off by default', () => {
+      render(<SettingsPanel />);
+
+      expect(screen.getByRole('switch', { name: 'Spin sound' })).toHaveAttribute(
+        'data-state',
+        'unchecked'
+      );
+    });
+
+    it('should enable sound when clicked', async () => {
+      const user = userEvent.setup();
+      render(<SettingsPanel />);
+
+      const soundSwitch = screen.getByRole('switch', { name: 'Spin sound' });
+      await user.click(soundSwitch);
+
+      expect(useSettingsStore.getState().soundEnabled).toBe(true);
+      expect(soundSwitch).toHaveAttribute('data-state', 'checked');
+    });
+
+    it('should disable sound when clicked while enabled', async () => {
+      useSettingsStore.setState({ soundEnabled: true });
+      const user = userEvent.setup();
+      render(<SettingsPanel />);
+
+      const soundSwitch = screen.getByRole('switch', { name: 'Spin sound' });
+      expect(soundSwitch).toHaveAttribute('data-state', 'checked');
+
+      await user.click(soundSwitch);
+
+      expect(useSettingsStore.getState().soundEnabled).toBe(false);
+    });
+
+    it('should be clickable via label', async () => {
+      const user = userEvent.setup();
+      render(<SettingsPanel />);
+
+      await user.click(screen.getByText('Spin sound'));
+
+      expect(useSettingsStore.getState().soundEnabled).toBe(true);
+    });
+
+    it('should stay visible when auto-exclude is off', () => {
+      useSettingsStore.setState({ autoExcludeEnabled: false });
+      render(<SettingsPanel />);
+
+      expect(screen.getByRole('switch', { name: 'Spin sound' })).toBeInTheDocument();
     });
   });
 
