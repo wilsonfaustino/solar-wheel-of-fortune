@@ -71,7 +71,7 @@ function CyclesPanelComponent() {
           aria-label="Cycle name"
         />
         <label className="flex items-center justify-between gap-3 whitespace-nowrap font-mono text-xs tracking-wider text-white/60">
-          FROM
+          <span>FROM</span>
           <input
             type="date"
             value={start}
@@ -81,7 +81,7 @@ function CyclesPanelComponent() {
           />
         </label>
         <label className="flex items-center justify-between gap-3 whitespace-nowrap font-mono text-xs tracking-wider text-white/60">
-          TO
+          <span>TO</span>
           <input
             type="date"
             value={end}
@@ -91,7 +91,7 @@ function CyclesPanelComponent() {
           />
         </label>
         <label className="flex items-center justify-between gap-3 whitespace-nowrap font-mono text-xs tracking-wider text-white/60">
-          COOLDOWN WEEKS
+          <span>COOLDOWN WEEKS</span>
           <input
             type="number"
             min={0}
