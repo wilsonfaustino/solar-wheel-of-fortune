@@ -118,7 +118,7 @@ function CycleWidgetComponent() {
           </>
         )}
 
-        {status.nextCycle && (
+        {isCooldown && status.nextCycle && (
           <div className="flex flex-col gap-1">
             <span className="text-[10px] tracking-[0.2em] text-text/35">
               NEXT — {status.nextCycle.cycle.name.toUpperCase()} · {status.nextCycle.cycle.start}
