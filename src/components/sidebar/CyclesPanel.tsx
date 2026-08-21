@@ -70,22 +70,26 @@ function CyclesPanelComponent() {
           maxLength={50}
           aria-label="Cycle name"
         />
-        <div className="flex gap-2">
+        <label className="flex items-center justify-between gap-3 whitespace-nowrap font-mono text-xs tracking-wider text-white/60">
+          FROM
           <input
             type="date"
             value={start}
             onChange={(e) => setStart(e.target.value)}
-            className={INPUT_CLASS}
+            className={cn(INPUT_CLASS, 'w-40 shrink-0')}
             aria-label="Cycle start date"
           />
+        </label>
+        <label className="flex items-center justify-between gap-3 whitespace-nowrap font-mono text-xs tracking-wider text-white/60">
+          TO
           <input
             type="date"
             value={end}
             onChange={(e) => setEnd(e.target.value)}
-            className={INPUT_CLASS}
+            className={cn(INPUT_CLASS, 'w-40 shrink-0')}
             aria-label="Cycle end date"
           />
-        </div>
+        </label>
         <label className="flex items-center justify-between gap-3 whitespace-nowrap font-mono text-xs tracking-wider text-white/60">
           COOLDOWN WEEKS
           <input
