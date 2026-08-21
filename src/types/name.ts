@@ -14,6 +14,7 @@ export interface NameList {
   title: string;
   description?: string;
   names: Name[];
+  cycles?: Cycle[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,4 +30,28 @@ export interface SelectionRecord {
   sessionId: string;
   spinDuration: number;
   selectionMethod?: SelectionMethod;
+}
+
+/** Dates are ISO day strings (YYYY-MM-DD) to avoid timezone drift and Date rehydration. */
+export interface Cycle {
+  id: string;
+  name: string;
+  start: string;
+  end: string;
+  cooldownWeeks: number;
+}
+
+export type CyclePhase = 'cycle' | 'cooldown';
+
+export interface CycleStatus {
+  cycle: Cycle;
+  phase: CyclePhase;
+  dayOfPhase: number;
+  totalPhaseDays: number;
+  percentComplete: number;
+  weekOfCycle: number;
+  totalCycleWeeks: number;
+  daysToCooldownStart: number;
+  daysToCycleEnd: number;
+  nextCycle: { cycle: Cycle; daysUntilStart: number } | null;
 }

@@ -1,6 +1,7 @@
 import { domAnimation, LazyMotion } from 'motion/react';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
+import { CycleWidget } from './components/cycle';
 import { Footer } from './components/Footer';
 import { MobileHeader } from './components/MobileHeader';
 import { NameManagementSidebar } from './components/sidebar';
@@ -117,8 +118,9 @@ function App() {
           )}
 
           {/* Main Wheel Area */}
-          <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative">
+          <div className="flex-1 flex flex-col items-center justify-center gap-4 p-4 sm:p-6 lg:p-8 relative">
             <Toaster />
+            <CycleWidget />
             <div className="relative w-full sm:max-w-2xl lg:max-w-4xl h-full flex items-center justify-center">
               <RadialWheel ref={wheelRef} names={names} onSelect={handleSelect} />
 

@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { DEFAULT_NAMES } from '../constants/defaults';
 import { DEFAULT_THEME } from '../constants/themes';
-import type { Name, NameList, SelectionMethod, SelectionRecord } from '../types/name';
+import type { Cycle, Name, NameList, SelectionMethod, SelectionRecord } from '../types/name';
 import type { Theme } from '../types/theme';
 
 function generateId(): string {
@@ -60,6 +60,9 @@ interface NameActions {
   clearHistory: () => void;
   deleteHistoryItem: (id: string) => void;
   setTheme: (theme: Theme) => void;
+  addCycle: (cycle: Omit<Cycle, 'id'>) => void;
+  updateCycle: (cycleId: string, updates: Partial<Omit<Cycle, 'id'>>) => void;
+  deleteCycle: (cycleId: string) => void;
 }
 
 type NameStore = NameState & NameActions;
@@ -71,6 +74,37 @@ export const useNameStore = create<NameStore>()(
       activeListId: initialList.id,
       history: [],
       currentTheme: DEFAULT_THEME,
+
+      addCycle: (cycle: Omit<Cycle, 'id'>) => {
+        set((draft) => {
+          const activeList = draft.lists.find((list) => list.id === draft.activeListId);
+          if (!activeList) return;
+          activeList.cycles = activeList.cycles ?? [];
+          activeList.cycles.push({ ...cycle, id: generateId() });
+          activeList.cycles.sort((a, b) => a.start.localeCompare(b.start));
+          activeList.updatedAt = new Date();
+        });
+      },
+
+      updateCycle: (cycleId: string, updates: Partial<Omit<Cycle, 'id'>>) => {
+        set((draft) => {
+          const activeList = draft.lists.find((list) => list.id === draft.activeListId);
+          const cycle = activeList?.cycles?.find((c) => c.id === cycleId);
+          if (!activeList || !cycle) return;
+          Object.assign(cycle, updates);
+          activeList.cycles?.sort((a, b) => a.start.localeCompare(b.start));
+          activeList.updatedAt = new Date();
+        });
+      },
+
+      deleteCycle: (cycleId: string) => {
+        set((draft) => {
+          const activeList = draft.lists.find((list) => list.id === draft.activeListId);
+          if (!activeList?.cycles) return;
+          activeList.cycles = activeList.cycles.filter((c) => c.id !== cycleId);
+          activeList.updatedAt = new Date();
+        });
+      },
 
       addName: (value: string) => {
         const trimmedValue = value.trim().toUpperCase();

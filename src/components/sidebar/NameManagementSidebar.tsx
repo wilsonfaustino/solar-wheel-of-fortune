@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { useNameStore } from '../../stores/useNameStore';
 import { AddNameForm } from './AddNameForm';
 import { BulkActionsPanel } from './BulkActionsPanel';
+import { CyclesPanel } from './CyclesPanel';
 import { HistoryPanel } from './HistoryPanel';
 import { ListSelector } from './ListSelector';
 import { NameListDisplay } from './NameListDisplay';
@@ -20,7 +21,7 @@ function NameManagementSidebarComponent({
   className = '',
   isMobile = false,
 }: NameManagementSidebarProps) {
-  const [activeTab, setActiveTab] = useState<'names' | 'history' | 'settings'>('names');
+  const [activeTab, setActiveTab] = useState<'names' | 'history' | 'cycles' | 'settings'>('names');
 
   // Select store state
   const { lists, activeListId } = useNameStore(
@@ -89,6 +90,13 @@ function NameManagementSidebarComponent({
           History
         </TabSelectionButton>
         <TabSelectionButton
+          aria-label="Cycles tab"
+          isActiveTab={activeTab === 'cycles'}
+          onSelectTab={() => setActiveTab('cycles')}
+        >
+          Cycles
+        </TabSelectionButton>
+        <TabSelectionButton
           aria-label="Settings tab"
           isActiveTab={activeTab === 'settings'}
           onSelectTab={() => setActiveTab('settings')}
@@ -138,6 +146,9 @@ function NameManagementSidebarComponent({
           <HistoryPanel />
         </div>
       )}
+
+      {/* Cycles Tab Content */}
+      {activeTab === 'cycles' && <CyclesPanel />}
 
       {/* Settings Tab Content */}
       {activeTab === 'settings' && (
