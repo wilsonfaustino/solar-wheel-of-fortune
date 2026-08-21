@@ -30,13 +30,13 @@ describe('CyclesPanel', () => {
     render(<CyclesPanel />);
 
     await user.type(screen.getByLabelText('Cycle name'), 'Cycle 2');
-    fillDates('2026-08-11', '2026-09-18');
+    fillDates('2026-08-11', '2026-10-02');
     await user.clear(screen.getByLabelText('COOLDOWN WEEKS'));
     await user.type(screen.getByLabelText('COOLDOWN WEEKS'), '2');
     await user.click(screen.getByRole('button', { name: /add cycle/i }));
 
     expect(screen.getByText('Cycle 2')).toBeInTheDocument();
-    expect(screen.getByText('AUG 11 → SEP 18')).toBeInTheDocument();
+    expect(screen.getByText('AUG 11 → OCT 2')).toBeInTheDocument();
     expect(screen.getByText('2W · SEP 19 → OCT 2')).toBeInTheDocument();
     expect(getActiveCycles()).toHaveLength(1);
   });
@@ -45,7 +45,7 @@ describe('CyclesPanel', () => {
     const user = userEvent.setup();
     render(<CyclesPanel />);
 
-    fillDates('2026-08-11', '2026-09-18');
+    fillDates('2026-08-11', '2026-10-02');
     await user.clear(screen.getByLabelText('COOLDOWN WEEKS'));
     await user.type(screen.getByLabelText('COOLDOWN WEEKS'), '0');
     await user.click(screen.getByRole('button', { name: /add cycle/i }));
@@ -62,9 +62,14 @@ describe('CyclesPanel', () => {
     await user.click(submit);
     expect(screen.getByText('Start and end dates are required')).toBeInTheDocument();
 
-    fillDates('2026-09-18', '2026-08-11');
+    fillDates('2026-10-02', '2026-08-11');
     await user.click(submit);
     expect(screen.getByText('End date must be after start date')).toBeInTheDocument();
+
+    fillDates('2026-08-11', '2026-08-21');
+    fireEvent.change(screen.getByLabelText('COOLDOWN WEEKS'), { target: { value: '2' } });
+    await user.click(submit);
+    expect(screen.getByText('Cooldown must fit inside the cycle')).toBeInTheDocument();
 
     expect(getActiveCycles()).toHaveLength(0);
   });
@@ -74,7 +79,7 @@ describe('CyclesPanel', () => {
     render(<CyclesPanel />);
 
     await user.type(screen.getByLabelText('Cycle name'), 'Cycle 2');
-    fillDates('2026-08-11', '2026-09-18');
+    fillDates('2026-08-11', '2026-10-02');
     await user.click(screen.getByRole('button', { name: /add cycle/i }));
 
     await user.click(screen.getByRole('button', { name: 'Delete Cycle 2' }));

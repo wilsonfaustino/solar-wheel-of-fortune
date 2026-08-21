@@ -16,17 +16,19 @@ test.describe('Cycles management', () => {
     await expect(cyclesPage.widget).toBeVisible();
     await expect(cyclesPage.widget).toContainText('IN CYCLE');
     await expect(cyclesPage.widget).toContainText('WEEK 3');
+    await expect(cyclesPage.widget).toContainText('TO COOLDOWN');
+    await expect(cyclesPage.widget).toContainText('7 DAYS');
     await expect(cyclesPage.widget).toContainText('20 DAYS');
-    await expect(cyclesPage.widget).toContainText('34 DAYS');
   });
 
   test('should show the cooldown state and the next cycle countdown', async ({ cyclesPage }) => {
     await cyclesPage.switchToCyclesTab();
-    await cyclesPage.addCycle('Cycle 1', isoDayOffset(-40), isoDayOffset(-3), 2);
+    await cyclesPage.addCycle('Cycle 1', isoDayOffset(-40), isoDayOffset(4), 2);
     await cyclesPage.addCycle('Cycle 2', isoDayOffset(15), isoDayOffset(50), 1);
 
-    await expect(cyclesPage.widget).toContainText('COOLDOWN');
-    await expect(cyclesPage.widget).toContainText('DAY 3');
+    await expect(cyclesPage.widget).toContainText('COOLDOWN LEFT');
+    await expect(cyclesPage.widget).toContainText('DAY 10');
+    await expect(cyclesPage.widget).toContainText('4 DAYS');
     await expect(cyclesPage.widget).toContainText('STARTS IN 15 DAYS');
   });
 

@@ -38,11 +38,17 @@ function CyclesPanelComponent() {
         setError('End date must be after start date');
         return;
       }
+      const totalDays = Math.round((Date.parse(end) - Date.parse(start)) / 86_400_000) + 1;
+      const weeks = Number(cooldownWeeks) || 0;
+      if (weeks * 7 >= totalDays) {
+        setError('Cooldown must fit inside the cycle');
+        return;
+      }
       addCycle({
         name: name.trim() || `Cycle ${cycles.length + 1}`,
         start,
         end,
-        cooldownWeeks: Number(cooldownWeeks) || 0,
+        cooldownWeeks: weeks,
       });
       setName('');
       setStart('');

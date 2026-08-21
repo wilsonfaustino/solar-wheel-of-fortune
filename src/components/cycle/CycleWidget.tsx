@@ -21,6 +21,8 @@ function CycleWidgetComponent() {
   if (!status) return null;
 
   const isCooldown = status.phase === 'cooldown';
+  const cooldownDays = status.cycle.cooldownWeeks * 7;
+  const buildDays = status.totalCycleWeeks * 7 - cooldownDays;
 
   return (
     <div
@@ -75,22 +77,37 @@ function CycleWidgetComponent() {
 
       <div className="flex flex-col gap-2">
         <div className="flex h-2.5 gap-0.5">
-          <div className="flex flex-5 border border-border-light bg-accent-10">
+          <div
+            className="flex border border-border-light bg-accent-10"
+            style={{ flexGrow: buildDays }}
+          >
             <div
-              className={cn('h-full', isCooldown ? 'w-full bg-white/25' : 'bg-accent')}
-              style={isCooldown ? undefined : { width: `${status.percentComplete}%` }}
+              className="h-full bg-accent"
+              style={{
+                width: `${Math.min(100, (status.percentComplete / 100) * ((buildDays + cooldownDays) / buildDays) * 100)}%`,
+              }}
             />
           </div>
-          <div className="flex flex-1 border border-dashed border-white/25 bg-white/4">
-            {isCooldown && (
-              <div className="h-full bg-white/35" style={{ width: `${status.percentComplete}%` }} />
-            )}
-          </div>
+          {cooldownDays > 0 && (
+            <div
+              className="flex border border-dashed border-white/25 bg-white/4"
+              style={{ flexGrow: cooldownDays }}
+            >
+              {isCooldown && (
+                <div
+                  className="h-full bg-white/35"
+                  style={{
+                    width: `${Math.round((status.dayOfPhase / status.totalPhaseDays) * 100)}%`,
+                  }}
+                />
+              )}
+            </div>
+          )}
         </div>
         <div className="flex justify-between text-[10px] tracking-[0.18em] text-text/30">
           <span>START</span>
+          {cooldownDays > 0 && <span>COOLDOWN START</span>}
           <span>CYCLE END</span>
-          <span>COOLDOWN END</span>
         </div>
       </div>
 
@@ -99,21 +116,21 @@ function CycleWidgetComponent() {
           <div className="flex flex-col gap-1">
             <span className="text-[10px] tracking-[0.2em] text-text/35">COOLDOWN LEFT</span>
             <span className="text-lg font-medium text-text">
-              {formatDays(status.daysToCooldownEnd)}
+              {formatDays(status.daysToCycleEnd)}
             </span>
           </div>
         ) : (
           <>
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] tracking-[0.2em] text-text/35">TO CYCLE END</span>
+              <span className="text-[10px] tracking-[0.2em] text-text/35">TO COOLDOWN</span>
               <span className="text-lg font-medium text-text">
-                {formatDays(status.daysToCycleEnd)}
+                {formatDays(status.daysToCooldownStart)}
               </span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] tracking-[0.2em] text-text/35">TO COOLDOWN END</span>
+              <span className="text-[10px] tracking-[0.2em] text-text/35">TO CYCLE END</span>
               <span className="text-lg font-medium text-text/60">
-                {formatDays(status.daysToCooldownEnd)}
+                {formatDays(status.daysToCycleEnd)}
               </span>
             </div>
           </>

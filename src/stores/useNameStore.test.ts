@@ -609,7 +609,7 @@ describe('useNameStore', () => {
   });
 
   describe('cycle actions', () => {
-    const baseCycle = { name: 'Cycle 2', start: '2026-08-11', end: '2026-09-18', cooldownWeeks: 2 };
+    const baseCycle = { name: 'Cycle 2', start: '2026-08-11', end: '2026-10-02', cooldownWeeks: 2 };
 
     function activeCycles() {
       const state = useNameStore.getState();
