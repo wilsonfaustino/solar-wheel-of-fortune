@@ -23,7 +23,9 @@ export function getCooldownRange(cycle: Cycle): { start: string; end: string } {
 }
 
 export function getCycleStatus(cycles: Cycle[], todayISO: string): CycleStatus | null {
-  for (const cycle of cycles) {
+  const sorted = [...cycles].sort((a, b) => a.start.localeCompare(b.start));
+
+  for (const cycle of sorted) {
     const cooldown = getCooldownRange(cycle);
     if (todayISO < cycle.start || todayISO > cooldown.end) continue;
 
@@ -33,12 +35,21 @@ export function getCycleStatus(cycles: Cycle[], todayISO: string): CycleStatus |
     const totalPhaseDays = daysBetween(phaseStart, phaseEnd) + 1;
     const dayOfPhase = daysBetween(phaseStart, todayISO) + 1;
 
+    const upcoming = sorted.find((candidate) => candidate.start > todayISO);
+
     return {
       cycle,
       phase: inCooldown ? 'cooldown' : 'cycle',
       dayOfPhase,
       totalPhaseDays,
       percentComplete: Math.round((dayOfPhase / totalPhaseDays) * 100),
+      weekOfCycle: Math.floor(Math.max(0, daysBetween(cycle.start, todayISO)) / 7) + 1,
+      totalCycleWeeks: Math.ceil((daysBetween(cycle.start, cycle.end) + 1) / 7),
+      daysToCycleEnd: Math.max(0, daysBetween(todayISO, cycle.end)),
+      daysToCooldownEnd: Math.max(0, daysBetween(todayISO, cooldown.end)),
+      nextCycle: upcoming
+        ? { cycle: upcoming, daysUntilStart: daysBetween(todayISO, upcoming.start) }
+        : null,
     };
   }
   return null;

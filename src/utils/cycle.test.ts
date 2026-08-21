@@ -43,3 +43,34 @@ describe('getCycleStatus', () => {
     });
   });
 });
+
+describe('getCycleStatus extras', () => {
+  const next: Cycle = {
+    id: '2',
+    name: 'Cycle 2',
+    start: '2026-02-23',
+    end: '2026-03-27',
+    cooldownWeeks: 1,
+  };
+
+  it('reports week, day countdowns and the next cycle during cooldown', () => {
+    const status = getCycleStatus([cycle, next], '2026-02-18');
+    expect(status).toMatchObject({
+      phase: 'cooldown',
+      daysToCycleEnd: 0,
+      daysToCooldownEnd: 2,
+      nextCycle: { daysUntilStart: 5 },
+    });
+    expect(status?.nextCycle?.cycle.id).toBe('2');
+  });
+
+  it('counts weeks from the cycle start', () => {
+    expect(getCycleStatus([cycle], '2026-01-18')?.weekOfCycle).toBe(1);
+    expect(getCycleStatus([cycle], '2026-01-19')?.weekOfCycle).toBe(2);
+    expect(getCycleStatus([cycle], '2026-01-19')?.totalCycleWeeks).toBe(5);
+  });
+
+  it('has no next cycle when none is defined ahead', () => {
+    expect(getCycleStatus([cycle], '2026-01-20')?.nextCycle).toBeNull();
+  });
+});

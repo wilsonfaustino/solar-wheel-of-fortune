@@ -49,4 +49,9 @@ export interface CycleStatus {
   dayOfPhase: number;
   totalPhaseDays: number;
   percentComplete: number;
+  weekOfCycle: number;
+  totalCycleWeeks: number;
+  daysToCycleEnd: number;
+  daysToCooldownEnd: number;
+  nextCycle: { cycle: Cycle; daysUntilStart: number } | null;
 }
