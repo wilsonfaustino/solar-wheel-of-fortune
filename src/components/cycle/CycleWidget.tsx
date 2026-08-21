@@ -24,6 +24,7 @@ function CycleWidgetComponent() {
 
   return (
     <div
+      data-testid="cycle-widget"
       className={cn(
         'w-full max-w-3xl flex flex-col gap-3 border px-5 py-4 font-mono',
         isCooldown ? 'border-white/20 bg-white/3' : 'border-border-light bg-black/90'

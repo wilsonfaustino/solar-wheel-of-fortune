@@ -607,4 +607,54 @@ describe('useNameStore', () => {
       expect(state.currentTheme).toBe('cyan');
     });
   });
+
+  describe('cycle actions', () => {
+    const baseCycle = { name: 'Cycle 2', start: '2026-08-11', end: '2026-09-18', cooldownWeeks: 2 };
+
+    function activeCycles() {
+      const state = useNameStore.getState();
+      return state.lists.find((list) => list.id === state.activeListId)?.cycles ?? [];
+    }
+
+    it('should add cycles to the active list sorted by start date', () => {
+      const { addCycle } = useNameStore.getState();
+
+      addCycle(baseCycle);
+      addCycle({ ...baseCycle, name: 'Cycle 1', start: '2026-07-06', end: '2026-08-07' });
+
+      expect(activeCycles().map((cycle) => cycle.name)).toEqual(['Cycle 1', 'Cycle 2']);
+    });
+
+    it('should update a cycle and keep the list sorted', () => {
+      const { addCycle, updateCycle } = useNameStore.getState();
+      addCycle(baseCycle);
+      addCycle({ ...baseCycle, name: 'Cycle 3', start: '2026-10-05', end: '2026-11-06' });
+
+      const [first] = activeCycles();
+      updateCycle(first.id, { start: '2026-12-01', end: '2026-12-18', cooldownWeeks: 1 });
+
+      const cycles = activeCycles();
+      expect(cycles.map((cycle) => cycle.name)).toEqual(['Cycle 3', 'Cycle 2']);
+      expect(cycles[1]).toMatchObject({ start: '2026-12-01', cooldownWeeks: 1 });
+    });
+
+    it('should ignore updates for an unknown cycle', () => {
+      const { addCycle, updateCycle } = useNameStore.getState();
+      addCycle(baseCycle);
+
+      updateCycle('missing-id', { name: 'Nope' });
+
+      expect(activeCycles()).toHaveLength(1);
+      expect(activeCycles()[0].name).toBe('Cycle 2');
+    });
+
+    it('should delete a cycle', () => {
+      const { addCycle, deleteCycle } = useNameStore.getState();
+      addCycle(baseCycle);
+
+      deleteCycle(activeCycles()[0].id);
+
+      expect(activeCycles()).toHaveLength(0);
+    });
+  });
 });
