@@ -54,3 +54,24 @@ export function getCycleStatus(cycles: Cycle[], todayISO: string): CycleStatus |
   }
   return null;
 }
+
+const MONTH_LABELS = [
+  'JAN',
+  'FEB',
+  'MAR',
+  'APR',
+  'MAY',
+  'JUN',
+  'JUL',
+  'AUG',
+  'SEP',
+  'OCT',
+  'NOV',
+  'DEC',
+];
+
+/** Compact label for narrow surfaces: 2026-08-11 -> AUG 11. */
+export function formatShortDay(isoDay: string): string {
+  const [, month, day] = isoDay.split('-');
+  return `${MONTH_LABELS[Number(month) - 1]} ${Number(day)}`;
+}

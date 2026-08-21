@@ -1,5 +1,5 @@
 import type { Cycle } from '../types/name';
-import { getCooldownRange, getCycleStatus } from './cycle';
+import { formatShortDay, getCooldownRange, getCycleStatus } from './cycle';
 
 const cycle: Cycle = {
   id: '1',
@@ -72,5 +72,12 @@ describe('getCycleStatus extras', () => {
 
   it('has no next cycle when none is defined ahead', () => {
     expect(getCycleStatus([cycle], '2026-01-20')?.nextCycle).toBeNull();
+  });
+});
+
+describe('formatShortDay', () => {
+  it('renders a compact month and day label', () => {
+    expect(formatShortDay('2026-08-11')).toBe('AUG 11');
+    expect(formatShortDay('2026-01-02')).toBe('JAN 2');
   });
 });

@@ -1,8 +1,9 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
+import { cn } from '@/lib/utils';
 import { useNameStore } from '../../stores/useNameStore';
-import { getCooldownRange } from '../../utils/cycle';
+import { formatShortDay, getCooldownRange } from '../../utils/cycle';
 import { Button } from '../ui/button';
 
 const INPUT_CLASS =
@@ -85,7 +86,7 @@ function CyclesPanelComponent() {
             aria-label="Cycle end date"
           />
         </div>
-        <label className="flex items-center gap-2 font-mono text-xs text-white/60 tracking-wider">
+        <label className="flex items-center justify-between gap-3 whitespace-nowrap font-mono text-xs tracking-wider text-white/60">
           COOLDOWN WEEKS
           <input
             type="number"
@@ -93,7 +94,7 @@ function CyclesPanelComponent() {
             max={12}
             value={cooldownWeeks}
             onChange={(e) => setCooldownWeeks(e.target.value)}
-            className={`${INPUT_CLASS} w-20`}
+            className={cn(INPUT_CLASS, 'w-20 shrink-0')}
           />
         </label>
         {error && <div className="text-xs text-red-400 font-mono">{error}</div>}
@@ -117,12 +118,12 @@ function CyclesPanelComponent() {
               <div className="font-mono text-xs text-text/80">
                 <div className="text-text tracking-wider">{cycle.name}</div>
                 <div className="text-white/50">
-                  {cycle.start} → {cycle.end}
+                  {formatShortDay(cycle.start)} → {formatShortDay(cycle.end)}
                 </div>
-                <div className="text-white/50">
+                <div className="text-white/40">
                   {cycle.cooldownWeeks > 0
-                    ? `cooldown ${cooldown.start} → ${cooldown.end}`
-                    : 'no cooldown'}
+                    ? `${cycle.cooldownWeeks}W · ${formatShortDay(cooldown.start)} → ${formatShortDay(cooldown.end)}`
+                    : 'NO COOLDOWN'}
                 </div>
               </div>
               <Button
