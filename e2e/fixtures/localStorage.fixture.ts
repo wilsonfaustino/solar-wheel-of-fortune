@@ -1,7 +1,16 @@
 import { test as base } from '@playwright/test';
-import { HistoryPage, MobilePage, SettingsPage, SidebarPage, ThemePage, WheelPage } from '../pages';
+import {
+  CyclesPage,
+  HistoryPage,
+  MobilePage,
+  SettingsPage,
+  SidebarPage,
+  ThemePage,
+  WheelPage,
+} from '../pages';
 
 type MyFixtures = {
+  cyclesPage: CyclesPage;
   wheelPage: WheelPage;
   sidebarPage: SidebarPage;
   historyPage: HistoryPage;
@@ -11,6 +20,12 @@ type MyFixtures = {
 };
 
 export const test = base.extend<MyFixtures>({
+  cyclesPage: async ({ page }, use) => {
+    const cyclesPage = new CyclesPage(page);
+    await cyclesPage.goto();
+    await use(cyclesPage);
+  },
+
   wheelPage: async ({ page }, use) => {
     const wheelPage = new WheelPage(page);
     await wheelPage.goto();

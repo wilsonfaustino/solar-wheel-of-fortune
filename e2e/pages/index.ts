@@ -1,4 +1,5 @@
 export { BasePage } from './BasePage';
+export { CyclesPage } from './CyclesPage';
 export { HistoryPage } from './HistoryPage';
 export { MobilePage } from './MobilePage';
 export { SettingsPage } from './SettingsPage';
