@@ -657,4 +657,51 @@ describe('useNameStore', () => {
       expect(activeCycles()).toHaveLength(0);
     });
   });
+
+  describe('special event actions', () => {
+    const baseEvent = { name: 'Launch Day', start: '2026-09-10', end: '2026-09-12' };
+
+    function activeEvents() {
+      const state = useNameStore.getState();
+      return state.lists.find((list) => list.id === state.activeListId)?.events ?? [];
+    }
+
+    it('should add events to the active list sorted by start date', () => {
+      const { addEvent } = useNameStore.getState();
+
+      addEvent(baseEvent);
+      addEvent({ ...baseEvent, name: 'Kickoff', start: '2026-09-01', end: '2026-09-01' });
+
+      expect(activeEvents().map((event) => event.name)).toEqual(['Kickoff', 'Launch Day']);
+    });
+
+    it('should update an event and keep the list sorted', () => {
+      const { addEvent, updateEvent } = useNameStore.getState();
+      addEvent(baseEvent);
+      addEvent({ ...baseEvent, name: 'Demo', start: '2026-09-20', end: '2026-09-20' });
+
+      updateEvent(activeEvents()[0].id, { start: '2026-09-25', end: '2026-09-25' });
+
+      expect(activeEvents().map((event) => event.name)).toEqual(['Demo', 'Launch Day']);
+    });
+
+    it('should ignore updates for unknown event ids', () => {
+      const { addEvent, updateEvent } = useNameStore.getState();
+      addEvent(baseEvent);
+
+      updateEvent('missing-id', { name: 'Nope' });
+
+      expect(activeEvents()).toHaveLength(1);
+      expect(activeEvents()[0].name).toBe('Launch Day');
+    });
+
+    it('should delete events from the active list', () => {
+      const { addEvent, deleteEvent } = useNameStore.getState();
+      addEvent(baseEvent);
+
+      deleteEvent(activeEvents()[0].id);
+
+      expect(activeEvents()).toHaveLength(0);
+    });
+  });
 });
