@@ -3,7 +3,14 @@ import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { DEFAULT_NAMES } from '../constants/defaults';
 import { DEFAULT_THEME } from '../constants/themes';
-import type { Cycle, Name, NameList, SelectionMethod, SelectionRecord } from '../types/name';
+import type {
+  Cycle,
+  Name,
+  NameList,
+  SelectionMethod,
+  SelectionRecord,
+  SpecialEvent,
+} from '../types/name';
 import type { Theme } from '../types/theme';
 
 function generateId(): string {
@@ -63,6 +70,9 @@ interface NameActions {
   addCycle: (cycle: Omit<Cycle, 'id'>) => void;
   updateCycle: (cycleId: string, updates: Partial<Omit<Cycle, 'id'>>) => void;
   deleteCycle: (cycleId: string) => void;
+  addEvent: (event: Omit<SpecialEvent, 'id'>) => void;
+  updateEvent: (eventId: string, updates: Partial<Omit<SpecialEvent, 'id'>>) => void;
+  deleteEvent: (eventId: string) => void;
 }
 
 type NameStore = NameState & NameActions;
@@ -102,6 +112,37 @@ export const useNameStore = create<NameStore>()(
           const activeList = draft.lists.find((list) => list.id === draft.activeListId);
           if (!activeList?.cycles) return;
           activeList.cycles = activeList.cycles.filter((c) => c.id !== cycleId);
+          activeList.updatedAt = new Date();
+        });
+      },
+
+      addEvent: (event: Omit<SpecialEvent, 'id'>) => {
+        set((draft) => {
+          const activeList = draft.lists.find((list) => list.id === draft.activeListId);
+          if (!activeList) return;
+          activeList.events = activeList.events ?? [];
+          activeList.events.push({ ...event, id: generateId() });
+          activeList.events.sort((a, b) => a.start.localeCompare(b.start));
+          activeList.updatedAt = new Date();
+        });
+      },
+
+      updateEvent: (eventId: string, updates: Partial<Omit<SpecialEvent, 'id'>>) => {
+        set((draft) => {
+          const activeList = draft.lists.find((list) => list.id === draft.activeListId);
+          const event = activeList?.events?.find((e) => e.id === eventId);
+          if (!activeList || !event) return;
+          Object.assign(event, updates);
+          activeList.events?.sort((a, b) => a.start.localeCompare(b.start));
+          activeList.updatedAt = new Date();
+        });
+      },
+
+      deleteEvent: (eventId: string) => {
+        set((draft) => {
+          const activeList = draft.lists.find((list) => list.id === draft.activeListId);
+          if (!activeList?.events) return;
+          activeList.events = activeList.events.filter((e) => e.id !== eventId);
           activeList.updatedAt = new Date();
         });
       },

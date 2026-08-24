@@ -5,6 +5,7 @@ import { useNameStore } from '../../stores/useNameStore';
 import { AddNameForm } from './AddNameForm';
 import { BulkActionsPanel } from './BulkActionsPanel';
 import { CyclesPanel } from './CyclesPanel';
+import { EventsPanel } from './EventsPanel';
 import { HistoryPanel } from './HistoryPanel';
 import { ListSelector } from './ListSelector';
 import { NameListDisplay } from './NameListDisplay';
@@ -148,7 +149,12 @@ function NameManagementSidebarComponent({
       )}
 
       {/* Cycles Tab Content */}
-      {activeTab === 'cycles' && <CyclesPanel />}
+      {activeTab === 'cycles' && (
+        <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
+          <CyclesPanel />
+          <EventsPanel />
+        </div>
+      )}
 
       {/* Settings Tab Content */}
       {activeTab === 'settings' && (

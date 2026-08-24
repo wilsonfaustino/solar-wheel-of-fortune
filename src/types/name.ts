@@ -15,6 +15,7 @@ export interface NameList {
   description?: string;
   names: Name[];
   cycles?: Cycle[];
+  events?: SpecialEvent[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -54,4 +55,26 @@ export interface CycleStatus {
   daysToCooldownStart: number;
   daysToCycleEnd: number;
   nextCycle: { cycle: Cycle; daysUntilStart: number } | null;
+}
+
+/** A dated highlight (launch, demo day, holiday) rendered over the cycle timeline. */
+export interface SpecialEvent {
+  id: string;
+  name: string;
+  start: string;
+  end: string;
+}
+
+export interface EventCountdown {
+  event: SpecialEvent;
+  isActive: boolean;
+  daysUntilStart: number;
+  daysRemaining: number;
+}
+
+export interface EventOverlap {
+  event: SpecialEvent;
+  leftPercent: number;
+  widthPercent: number;
+  clipped: boolean;
 }
