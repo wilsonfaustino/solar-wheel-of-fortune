@@ -10,6 +10,7 @@ import { HistoryPanel } from './HistoryPanel';
 import { ListSelector } from './ListSelector';
 import { NameListDisplay } from './NameListDisplay';
 import { SettingsPanel } from './SettingsPanel';
+import { ShareListActions } from './ShareListActions';
 import { TabSelectionButton } from './TabSelectionButton';
 import { ThemeSwitcher } from './ThemeSwitcher';
 
@@ -138,6 +139,8 @@ function NameManagementSidebarComponent({
             onClearSelections={clearSelections}
             onResetList={resetList}
           />
+
+          <ShareListActions activeList={activeList} />
         </div>
       )}
 

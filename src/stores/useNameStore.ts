@@ -56,6 +56,7 @@ interface NameActions {
   markSelected: (nameId: string) => void;
   setActiveList: (listId: string) => void;
   createList: (title: string) => void;
+  importList: (list: NameList) => void;
   deleteList: (listId: string) => void;
   updateListTitle: (listId: string, title: string) => void;
   toggleNameExclusion: (nameId: string) => void;
@@ -194,6 +195,13 @@ export const useNameStore = create<NameStore>()(
               activeList.updatedAt = new Date();
             }
           }
+        });
+      },
+
+      importList: (list: NameList) => {
+        set((draft) => {
+          draft.lists.push(list);
+          draft.activeListId = list.id;
         });
       },
 
