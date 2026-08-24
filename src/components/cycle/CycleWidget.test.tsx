@@ -40,7 +40,7 @@ describe('CycleWidget', () => {
   afterEach(() => {
     vi.useRealTimers();
     useNameStore.setState((current) => ({
-      lists: current.lists.map((list) => ({ ...list, cycles: [] })),
+      lists: current.lists.map((list) => ({ ...list, cycles: [], events: [] })),
     }));
   });
 
@@ -73,5 +73,25 @@ describe('CycleWidget', () => {
     expect(screen.getByText('DAY 12')).toBeInTheDocument();
     expect(screen.getByText('COOLDOWN LEFT')).toBeInTheDocument();
     expect(screen.getByText('STARTS IN 5 DAYS')).toBeInTheDocument();
+  });
+
+  it('renders a band for each event overlapping the active cycle', () => {
+    vi.setSystemTime(new Date('2026-08-25T12:00:00Z'));
+    seedCycle();
+    useNameStore.setState((current) => ({
+      lists: current.lists.map((list) => ({
+        ...list,
+        events: [
+          { id: 'e1', name: 'Launch Day', start: '2026-09-01', end: '2026-09-03' },
+          { id: 'e2', name: 'Off cycle', start: '2027-01-01', end: '2027-01-02' },
+        ],
+      })),
+    }));
+
+    render(<CycleWidget />);
+
+    const bands = screen.getAllByTestId('cycle-event-band');
+    expect(bands).toHaveLength(1);
+    expect(bands[0]).toHaveAttribute('title', 'Launch Day · 2026-09-01 → 2026-09-03');
   });
 });

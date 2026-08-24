@@ -3,6 +3,7 @@ import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import { useNameStore } from '../../stores/useNameStore';
 import { getCycleStatus, toISODay } from '../../utils/cycle';
+import { getEventOverlaps } from '../../utils/event';
 
 function formatDays(days: number): string {
   return `${days} ${days === 1 ? 'DAY' : 'DAYS'}`;
@@ -13,10 +14,20 @@ function CycleWidgetComponent() {
     useShallow((state) => ({ lists: state.lists, activeListId: state.activeListId }))
   );
 
-  const status = useMemo(() => {
-    const cycles = lists.find((list) => list.id === activeListId)?.cycles ?? [];
-    return getCycleStatus(cycles, toISODay(new Date()));
-  }, [lists, activeListId]);
+  const activeList = useMemo(
+    () => lists.find((list) => list.id === activeListId),
+    [lists, activeListId]
+  );
+
+  const status = useMemo(
+    () => getCycleStatus(activeList?.cycles ?? [], toISODay(new Date())),
+    [activeList]
+  );
+
+  const overlaps = useMemo(
+    () => (status ? getEventOverlaps(status.cycle, activeList?.events ?? []) : []),
+    [status, activeList]
+  );
 
   if (!status) return null;
 
@@ -76,7 +87,7 @@ function CycleWidgetComponent() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <div className="flex h-2.5 gap-0.5">
+        <div className="relative flex h-2.5 gap-0.5">
           <div
             className="flex border border-border-light bg-accent-10"
             style={{ flexGrow: buildDays }}
@@ -103,6 +114,15 @@ function CycleWidgetComponent() {
               )}
             </div>
           )}
+          {overlaps.map((overlap) => (
+            <div
+              key={overlap.event.id}
+              data-testid="cycle-event-band"
+              title={`${overlap.event.name} · ${overlap.event.start} → ${overlap.event.end}`}
+              className="pointer-events-auto absolute -top-1 bottom-[-4px] border-x-2 border-accent bg-accent/25"
+              style={{ left: `${overlap.leftPercent}%`, width: `${overlap.widthPercent}%` }}
+            />
+          ))}
         </div>
         <div className="flex justify-between text-[10px] tracking-[0.18em] text-text/30">
           <span>START</span>
