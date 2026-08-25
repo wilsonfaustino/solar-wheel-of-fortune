@@ -2,6 +2,7 @@ import type { Cycle, Name, NameList, SelectionRecord, SpecialEvent } from '../ty
 import { downloadFile } from './export';
 
 const SHARE_FORMAT_V1 = 'name-list-v1';
+const MAX_NAME_LENGTH = 100;
 const SHARE_FORMAT_V2 = 'name-list-v2';
 
 /** History entries key on the name value: ids are rebuilt by the importing store. */
@@ -19,7 +20,7 @@ interface SharedName {
 }
 
 interface SharedListFile {
-  metadata: { exportDate: string; format: string };
+  metadata: { exportDate: string; format: string; includesState?: boolean };
   list: {
     title: string;
     description?: string;
@@ -32,6 +33,8 @@ interface SharedListFile {
 
 /** Ready to import: ids are minted by the store so it can merge or create a list. */
 export interface ParsedSharedList {
+  /** False when the sender opted out of state, so importers must not touch theirs. */
+  includesState: boolean;
   title: string;
   description?: string;
   names: Omit<Name, 'id'>[];
@@ -60,7 +63,11 @@ export function exportListToJSON(
   const { history = [], includeState = true, filename } = options;
 
   const payload: SharedListFile = {
-    metadata: { exportDate: new Date().toISOString(), format: SHARE_FORMAT_V2 },
+    metadata: {
+      exportDate: new Date().toISOString(),
+      format: SHARE_FORMAT_V2,
+      includesState: includeState,
+    },
     list: {
       title: list.title,
       description: list.description,
@@ -106,7 +113,7 @@ function parseName(entry: SharedName | string): Omit<Name, 'id'> {
       : entry;
 
   return {
-    value: shared.value,
+    value: shared.value.trim().toUpperCase(),
     weight: shared.weight ?? 1.0,
     createdAt: new Date(),
     lastSelectedAt: shared.lastSelectedAt ? new Date(shared.lastSelectedAt) : null,
@@ -134,11 +141,13 @@ export function parseSharedList(fileContent: string): ParsedSharedList {
   return {
     title: parsed.list.title || 'Imported List',
     description: parsed.list.description,
+    includesState: parsed.metadata?.includesState ?? false,
     names: parsed.list.names
       .filter((entry) => typeof entry === 'string' || typeof entry?.value === 'string')
-      .map(parseName),
+      .map(parseName)
+      .filter((name) => name.value.length > 0 && name.value.length <= MAX_NAME_LENGTH),
     cycles: (parsed.list.cycles ?? []).map(({ id: _id, ...cycle }) => cycle),
     events: (parsed.list.events ?? []).map(({ id: _id, ...event }) => event),
-    history: parsed.list.history ?? [],
+    history: Array.isArray(parsed.list.history) ? parsed.list.history : [],
   };
 }

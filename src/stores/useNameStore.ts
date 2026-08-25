@@ -227,25 +227,31 @@ export const useNameStore = create<NameStore>()(
 
           shared.names.forEach((sharedName) => {
             const existing = target.names.find((name) => name.value === sharedName.value);
-            if (existing) {
-              Object.assign(existing, sharedName, {
-                id: existing.id,
-                createdAt: existing.createdAt,
-              });
-            } else {
+            if (!existing) {
               target.names.push({ ...sharedName, id: generateId() });
+              return;
+            }
+            existing.weight = sharedName.weight;
+            if (shared.includesState) {
+              existing.isExcluded = sharedName.isExcluded;
+              existing.selectionCount = sharedName.selectionCount;
+              existing.lastSelectedAt = sharedName.lastSelectedAt;
             }
           });
 
           target.cycles = target.cycles ?? [];
           shared.cycles.forEach((cycle) => {
-            const isKnown = target.cycles?.some(
+            const known = target.cycles?.find(
               (existing) =>
                 existing.name === cycle.name &&
                 existing.start === cycle.start &&
                 existing.end === cycle.end
             );
-            if (!isKnown) target.cycles?.push({ ...cycle, id: generateId() });
+            if (known) {
+              known.cooldownWeeks = cycle.cooldownWeeks;
+            } else {
+              target.cycles?.push({ ...cycle, id: generateId() });
+            }
           });
 
           target.events = target.events ?? [];
@@ -262,17 +268,32 @@ export const useNameStore = create<NameStore>()(
           shared.history.forEach((record) => {
             const name = target.names.find((entry) => entry.value === record.nameValue);
             if (!name) return;
+
+            const timestamp = new Date(record.timestamp);
+            const isDuplicate = draft.history.some(
+              (existing) =>
+                existing.nameId === name.id &&
+                new Date(existing.timestamp).getTime() === timestamp.getTime()
+            );
+            if (isDuplicate) return;
+
             draft.history.push({
               id: generateId(),
               nameId: name.id,
               nameValue: record.nameValue,
               listId: target.id,
-              timestamp: new Date(record.timestamp),
+              timestamp,
               sessionId: record.sessionId ?? '',
               spinDuration: record.spinDuration ?? 0,
               selectionMethod: record.selectionMethod,
             });
           });
+
+          // The app reads history order as chronological, so imported records must slot in by date
+          draft.history.sort(
+            (first, second) =>
+              new Date(first.timestamp).getTime() - new Date(second.timestamp).getTime()
+          );
           if (draft.history.length > HISTORY_LIMIT) {
             draft.history = draft.history.slice(-HISTORY_LIMIT);
           }
@@ -426,8 +447,8 @@ export const useNameStore = create<NameStore>()(
             selectionMethod: 'volunteer',
           };
           draft.history.push(record);
-          if (draft.history.length > 100) {
-            draft.history = draft.history.slice(-100);
+          if (draft.history.length > HISTORY_LIMIT) {
+            draft.history = draft.history.slice(-HISTORY_LIMIT);
           }
         });
       },

@@ -239,6 +239,7 @@ describe('useNameStore Integration Tests', () => {
 
 describe('importList', () => {
   const shared = {
+    includesState: true,
     title: 'Squad A',
     names: [
       {
@@ -326,6 +327,48 @@ describe('importList', () => {
     });
 
     expect(useNameStore.getState().history).toHaveLength(0);
+  });
+
+  it('leaves local selection state alone when the file carries none', () => {
+    useNameStore.setState((current) => ({
+      lists: current.lists.map((list) => ({
+        ...list,
+        names: list.names.map((name) => ({ ...name, selectionCount: 5, isExcluded: true })),
+      })),
+    }));
+
+    useNameStore.getState().importList({ ...shared, includesState: false });
+
+    expect(activeList()?.names[0]).toMatchObject({ selectionCount: 5, isExcluded: true });
+  });
+
+  it('does not duplicate history records on a second import', () => {
+    useNameStore.getState().importList(shared);
+    useNameStore.getState().importList(shared);
+
+    expect(useNameStore.getState().history).toHaveLength(1);
+  });
+
+  it('keeps history in chronological order after an import', () => {
+    useNameStore.setState({
+      history: [
+        {
+          id: 'local',
+          nameId: 'kept',
+          nameValue: 'ALICE',
+          listId: 'existing',
+          timestamp: new Date('2026-03-01'),
+          sessionId: '',
+          spinDuration: 0,
+        },
+      ],
+    });
+
+    useNameStore.getState().importList(shared);
+
+    const timestamps = useNameStore.getState().history.map((record) => record.timestamp.getTime());
+    expect(timestamps).toEqual([...timestamps].sort((first, second) => first - second));
+    expect(useNameStore.getState().history.at(-1)?.id).toBe('local');
   });
 
   it('creates a new active list when no title matches', () => {
