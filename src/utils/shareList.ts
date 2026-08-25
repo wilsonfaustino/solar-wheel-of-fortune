@@ -1,17 +1,43 @@
-import type { Cycle, Name, NameList, SpecialEvent } from '../types/name';
+import type { Cycle, Name, NameList, SelectionRecord, SpecialEvent } from '../types/name';
 import { downloadFile } from './export';
 
-const SHARE_FORMAT = 'name-list-v1';
+const SHARE_FORMAT_V1 = 'name-list-v1';
+const SHARE_FORMAT_V2 = 'name-list-v2';
+
+/** History entries key on the name value: ids are rebuilt by the importing store. */
+export type SharedRecord = Pick<
+  SelectionRecord,
+  'nameValue' | 'sessionId' | 'spinDuration' | 'selectionMethod'
+> & { timestamp: string };
+
+interface SharedName {
+  value: string;
+  weight: number;
+  isExcluded: boolean;
+  selectionCount: number;
+  lastSelectedAt: string | null;
+}
 
 interface SharedListFile {
   metadata: { exportDate: string; format: string };
   list: {
     title: string;
     description?: string;
-    names: string[];
+    names: SharedName[] | string[];
     cycles: Cycle[];
     events: SpecialEvent[];
+    history?: SharedRecord[];
   };
+}
+
+/** Ready to import: ids are minted by the store so it can merge or create a list. */
+export interface ParsedSharedList {
+  title: string;
+  description?: string;
+  names: Omit<Name, 'id'>[];
+  cycles: Omit<Cycle, 'id'>[];
+  events: Omit<SpecialEvent, 'id'>[];
+  history: SharedRecord[];
 }
 
 function slugify(title: string): string {
@@ -23,16 +49,41 @@ function slugify(title: string): string {
   );
 }
 
-/** Serializes a list's names, cycles and events into a shareable JSON file. */
-export function exportListToJSON(list: NameList, filename?: string): void {
+/**
+ * Serializes a list's names, cycles, events and, optionally, its selection state
+ * and the history records belonging to that list.
+ */
+export function exportListToJSON(
+  list: NameList,
+  options: { history?: SelectionRecord[]; includeState?: boolean; filename?: string } = {}
+): void {
+  const { history = [], includeState = true, filename } = options;
+
   const payload: SharedListFile = {
-    metadata: { exportDate: new Date().toISOString(), format: SHARE_FORMAT },
+    metadata: { exportDate: new Date().toISOString(), format: SHARE_FORMAT_V2 },
     list: {
       title: list.title,
       description: list.description,
-      names: list.names.map((name) => name.value),
+      names: list.names.map((name) => ({
+        value: name.value,
+        weight: name.weight,
+        isExcluded: includeState ? name.isExcluded : false,
+        selectionCount: includeState ? name.selectionCount : 0,
+        lastSelectedAt: includeState ? toISO(name.lastSelectedAt) : null,
+      })),
       cycles: list.cycles ?? [],
       events: list.events ?? [],
+      history: includeState
+        ? history
+            .filter((record) => record.listId === list.id)
+            .map((record) => ({
+              nameValue: record.nameValue,
+              timestamp: toISO(record.timestamp) ?? new Date().toISOString(),
+              sessionId: record.sessionId,
+              spinDuration: record.spinDuration,
+              selectionMethod: record.selectionMethod,
+            }))
+        : [],
     },
   };
 
@@ -43,40 +94,51 @@ export function exportListToJSON(list: NameList, filename?: string): void {
   downloadFile(blob, filename || `list_${slugify(list.title)}_${timestamp}.json`);
 }
 
-function createName(value: string): Name {
+function toISO(value: Date | string | null): string | null {
+  if (!value) return null;
+  return value instanceof Date ? value.toISOString() : String(value);
+}
+
+function parseName(entry: SharedName | string): Omit<Name, 'id'> {
+  const shared: SharedName =
+    typeof entry === 'string'
+      ? { value: entry, weight: 1.0, isExcluded: false, selectionCount: 0, lastSelectedAt: null }
+      : entry;
+
   return {
-    id: crypto.randomUUID(),
-    value,
-    weight: 1.0,
+    value: shared.value,
+    weight: shared.weight ?? 1.0,
     createdAt: new Date(),
-    lastSelectedAt: null,
-    selectionCount: 0,
-    isExcluded: false,
+    lastSelectedAt: shared.lastSelectedAt ? new Date(shared.lastSelectedAt) : null,
+    selectionCount: shared.selectionCount ?? 0,
+    isExcluded: shared.isExcluded ?? false,
     categoryId: null,
   };
 }
 
 /**
- * Parses a shared list file into a fresh NameList.
- * Selection state is not shared: names start unselected and included.
- * Throws on malformed input so callers can surface the failure.
+ * Parses a shared list file. Accepts both the v1 format (plain name strings, no
+ * selection state) and v2. Throws on malformed input so callers can surface it.
  */
-export function parseSharedList(fileContent: string): NameList {
+export function parseSharedList(fileContent: string): ParsedSharedList {
   const parsed = JSON.parse(fileContent) as Partial<SharedListFile>;
+  const format = parsed?.metadata?.format;
 
-  if (parsed?.metadata?.format !== SHARE_FORMAT || !Array.isArray(parsed.list?.names)) {
+  if (
+    (format !== SHARE_FORMAT_V1 && format !== SHARE_FORMAT_V2) ||
+    !Array.isArray(parsed.list?.names)
+  ) {
     throw new Error('Unrecognized list file');
   }
 
-  const now = new Date();
   return {
-    id: crypto.randomUUID(),
     title: parsed.list.title || 'Imported List',
     description: parsed.list.description,
-    names: parsed.list.names.filter((value) => typeof value === 'string').map(createName),
-    cycles: (parsed.list.cycles ?? []).map((cycle) => ({ ...cycle, id: crypto.randomUUID() })),
-    events: (parsed.list.events ?? []).map((event) => ({ ...event, id: crypto.randomUUID() })),
-    createdAt: now,
-    updatedAt: now,
+    names: parsed.list.names
+      .filter((entry) => typeof entry === 'string' || typeof entry?.value === 'string')
+      .map(parseName),
+    cycles: (parsed.list.cycles ?? []).map(({ id: _id, ...cycle }) => cycle),
+    events: (parsed.list.events ?? []).map(({ id: _id, ...event }) => event),
+    history: parsed.list.history ?? [],
   };
 }
