@@ -12,6 +12,7 @@ import type {
   SpecialEvent,
 } from '../types/name';
 import type { Theme } from '../types/theme';
+import type { ParsedSharedList } from '../utils/shareList';
 
 function generateId(): string {
   return crypto.randomUUID();
@@ -40,6 +41,21 @@ function createDefaultList(): NameList {
   };
 }
 
+function createEmptyList(title: string, description?: string): NameList {
+  return {
+    id: generateId(),
+    title,
+    description,
+    names: [],
+    cycles: [],
+    events: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+}
+
+const HISTORY_LIMIT = 100;
+
 const initialList = createDefaultList();
 
 interface NameState {
@@ -56,7 +72,7 @@ interface NameActions {
   markSelected: (nameId: string) => void;
   setActiveList: (listId: string) => void;
   createList: (title: string) => void;
-  importList: (list: NameList) => void;
+  importList: (shared: ParsedSharedList) => void;
   deleteList: (listId: string) => void;
   updateListTitle: (listId: string, title: string) => void;
   toggleNameExclusion: (nameId: string) => void;
@@ -198,10 +214,71 @@ export const useNameStore = create<NameStore>()(
         });
       },
 
-      importList: (list: NameList) => {
+      importList: (shared: ParsedSharedList) => {
         set((draft) => {
-          draft.lists.push(list);
-          draft.activeListId = list.id;
+          const target =
+            draft.lists.find(
+              (list) => list.title.trim().toLowerCase() === shared.title.trim().toLowerCase()
+            ) ?? createEmptyList(shared.title, shared.description);
+
+          if (!draft.lists.includes(target)) {
+            draft.lists.push(target);
+          }
+
+          shared.names.forEach((sharedName) => {
+            const existing = target.names.find((name) => name.value === sharedName.value);
+            if (existing) {
+              Object.assign(existing, sharedName, {
+                id: existing.id,
+                createdAt: existing.createdAt,
+              });
+            } else {
+              target.names.push({ ...sharedName, id: generateId() });
+            }
+          });
+
+          target.cycles = target.cycles ?? [];
+          shared.cycles.forEach((cycle) => {
+            const isKnown = target.cycles?.some(
+              (existing) =>
+                existing.name === cycle.name &&
+                existing.start === cycle.start &&
+                existing.end === cycle.end
+            );
+            if (!isKnown) target.cycles?.push({ ...cycle, id: generateId() });
+          });
+
+          target.events = target.events ?? [];
+          shared.events.forEach((event) => {
+            const isKnown = target.events?.some(
+              (existing) =>
+                existing.name === event.name &&
+                existing.start === event.start &&
+                existing.end === event.end
+            );
+            if (!isKnown) target.events?.push({ ...event, id: generateId() });
+          });
+
+          shared.history.forEach((record) => {
+            const name = target.names.find((entry) => entry.value === record.nameValue);
+            if (!name) return;
+            draft.history.push({
+              id: generateId(),
+              nameId: name.id,
+              nameValue: record.nameValue,
+              listId: target.id,
+              timestamp: new Date(record.timestamp),
+              sessionId: record.sessionId ?? '',
+              spinDuration: record.spinDuration ?? 0,
+              selectionMethod: record.selectionMethod,
+            });
+          });
+          if (draft.history.length > HISTORY_LIMIT) {
+            draft.history = draft.history.slice(-HISTORY_LIMIT);
+          }
+
+          target.updatedAt = new Date();
+          draft.activeListId = target.id;
         });
       },
 
@@ -319,8 +396,8 @@ export const useNameStore = create<NameStore>()(
           };
           draft.history.push(record);
           // Keep only last 100 records (FIFO)
-          if (draft.history.length > 100) {
-            draft.history = draft.history.slice(-100);
+          if (draft.history.length > HISTORY_LIMIT) {
+            draft.history = draft.history.slice(-HISTORY_LIMIT);
           }
         });
       },
