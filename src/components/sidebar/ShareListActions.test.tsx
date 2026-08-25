@@ -19,8 +19,18 @@ const list: NameList = {
 };
 
 const sharedFile = JSON.stringify({
-  metadata: { exportDate: '2026-01-01T00:00:00.000Z', format: 'name-list-v1' },
-  list: { title: 'Shared Squad', names: ['ALICE'], cycles: [], events: [] },
+  metadata: { exportDate: '2026-01-01T00:00:00.000Z', format: 'name-list-v2' },
+  list: {
+    title: 'Shared Squad',
+    names: [
+      { value: 'ALICE', weight: 1, isExcluded: true, selectionCount: 2, lastSelectedAt: null },
+    ],
+    cycles: [],
+    events: [],
+    history: [
+      { nameValue: 'ALICE', timestamp: '2026-02-01T00:00:00.000Z', sessionId: '', spinDuration: 0 },
+    ],
+  },
 });
 
 function uploadFile(content: string) {
@@ -39,7 +49,10 @@ describe('ShareListActions', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /share/i }));
 
-    expect(exportListToJSON).toHaveBeenCalledWith(list);
+    expect(exportListToJSON).toHaveBeenCalledWith(
+      list,
+      expect.objectContaining({ includeState: true })
+    );
   });
 
   it('disables share when there is no active list', () => {
@@ -58,7 +71,21 @@ describe('ShareListActions', () => {
       const active = state.lists.find((item) => item.id === state.activeListId);
       expect(active?.title).toBe('Shared Squad');
       expect(active?.names.map((name) => name.value)).toEqual(['ALICE']);
+      expect(active?.names[0].selectionCount).toBe(2);
+      expect(state.history.at(-1)).toMatchObject({ nameValue: 'ALICE', listId: active?.id });
     });
+  });
+
+  it('excludes selection state when the toggle is off', () => {
+    render(<ShareListActions activeList={list} />);
+
+    fireEvent.click(screen.getByLabelText('Include selection state and history'));
+    fireEvent.click(screen.getByRole('button', { name: /share/i }));
+
+    expect(exportListToJSON).toHaveBeenCalledWith(
+      list,
+      expect.objectContaining({ includeState: false })
+    );
   });
 
   it('shows an error for an unrecognized file', async () => {

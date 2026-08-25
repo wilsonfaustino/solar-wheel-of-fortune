@@ -236,3 +236,154 @@ describe('useNameStore Integration Tests', () => {
     });
   });
 });
+
+describe('importList', () => {
+  const shared = {
+    includesState: true,
+    title: 'Squad A',
+    names: [
+      {
+        value: 'ALICE',
+        weight: 1,
+        createdAt: new Date('2026-01-01'),
+        lastSelectedAt: new Date('2026-02-01'),
+        selectionCount: 3,
+        isExcluded: true,
+        categoryId: null,
+      },
+    ],
+    cycles: [{ name: 'Q1', start: '2026-01-01', end: '2026-03-31', cooldownWeeks: 2 }],
+    events: [{ name: 'Demo', start: '2026-02-10', end: '2026-02-11' }],
+    history: [
+      { nameValue: 'ALICE', timestamp: '2026-02-01T00:00:00.000Z', sessionId: '', spinDuration: 0 },
+    ],
+  };
+
+  function activeList() {
+    const state = useNameStore.getState();
+    return state.lists.find((list) => list.id === state.activeListId);
+  }
+
+  beforeEach(() => {
+    useNameStore.setState({
+      lists: [
+        {
+          id: 'existing',
+          title: 'Squad A',
+          names: [
+            {
+              id: 'kept',
+              value: 'ALICE',
+              weight: 1,
+              createdAt: new Date('2025-01-01'),
+              lastSelectedAt: null,
+              selectionCount: 0,
+              isExcluded: false,
+              categoryId: null,
+            },
+          ],
+          cycles: [],
+          events: [],
+          createdAt: new Date('2025-01-01'),
+          updatedAt: new Date('2025-01-01'),
+        },
+      ],
+      activeListId: 'existing',
+      history: [],
+    });
+  });
+
+  it('merges into a list with the same title, keeping name ids', () => {
+    useNameStore.getState().importList(shared);
+
+    const list = activeList();
+    expect(useNameStore.getState().lists).toHaveLength(1);
+    expect(list?.id).toBe('existing');
+    expect(list?.names).toHaveLength(1);
+    expect(list?.names[0]).toMatchObject({ id: 'kept', selectionCount: 3, isExcluded: true });
+    expect(list?.cycles).toHaveLength(1);
+    expect(list?.events).toHaveLength(1);
+  });
+
+  it('rebuilds history records against the merged names', () => {
+    useNameStore.getState().importList(shared);
+
+    const [record] = useNameStore.getState().history;
+    expect(record).toMatchObject({ nameId: 'kept', listId: 'existing', nameValue: 'ALICE' });
+    expect(record.timestamp).toEqual(new Date('2026-02-01T00:00:00.000Z'));
+  });
+
+  it('drops history records with no matching name', () => {
+    useNameStore.getState().importList({
+      ...shared,
+      history: [
+        {
+          nameValue: 'GHOST',
+          timestamp: '2026-02-01T00:00:00.000Z',
+          sessionId: '',
+          spinDuration: 0,
+        },
+      ],
+    });
+
+    expect(useNameStore.getState().history).toHaveLength(0);
+  });
+
+  it('leaves local selection state alone when the file carries none', () => {
+    useNameStore.setState((current) => ({
+      lists: current.lists.map((list) => ({
+        ...list,
+        names: list.names.map((name) => ({ ...name, selectionCount: 5, isExcluded: true })),
+      })),
+    }));
+
+    useNameStore.getState().importList({ ...shared, includesState: false });
+
+    expect(activeList()?.names[0]).toMatchObject({ selectionCount: 5, isExcluded: true });
+  });
+
+  it('does not duplicate history records on a second import', () => {
+    useNameStore.getState().importList(shared);
+    useNameStore.getState().importList(shared);
+
+    expect(useNameStore.getState().history).toHaveLength(1);
+  });
+
+  it('keeps history in chronological order after an import', () => {
+    useNameStore.setState({
+      history: [
+        {
+          id: 'local',
+          nameId: 'kept',
+          nameValue: 'ALICE',
+          listId: 'existing',
+          timestamp: new Date('2026-03-01'),
+          sessionId: '',
+          spinDuration: 0,
+        },
+      ],
+    });
+
+    useNameStore.getState().importList(shared);
+
+    const timestamps = useNameStore.getState().history.map((record) => record.timestamp.getTime());
+    expect(timestamps).toEqual([...timestamps].sort((first, second) => first - second));
+    expect(useNameStore.getState().history.at(-1)?.id).toBe('local');
+  });
+
+  it('creates a new active list when no title matches', () => {
+    useNameStore.getState().importList({ ...shared, title: 'Squad B' });
+
+    expect(useNameStore.getState().lists).toHaveLength(2);
+    expect(activeList()?.title).toBe('Squad B');
+    expect(activeList()?.names[0].id).not.toBe('kept');
+  });
+
+  it('does not duplicate cycles and events on a second import', () => {
+    useNameStore.getState().importList(shared);
+    useNameStore.getState().importList(shared);
+
+    expect(activeList()?.cycles).toHaveLength(1);
+    expect(activeList()?.events).toHaveLength(1);
+  });
+});
