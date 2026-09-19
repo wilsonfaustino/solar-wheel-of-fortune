@@ -87,4 +87,81 @@ describe('CyclesPanel', () => {
     expect(screen.getByText('NO CYCLES YET')).toBeInTheDocument();
     expect(getActiveCycles()).toHaveLength(0);
   });
+
+  it('edits a cycle through the form and persists the change', async () => {
+    const user = userEvent.setup();
+    render(<CyclesPanel />);
+
+    await user.type(screen.getByLabelText('Cycle name'), 'Cycle 2');
+    fillDates('2026-08-11', '2026-10-02');
+    await user.click(screen.getByRole('button', { name: /add cycle/i }));
+
+    await user.click(screen.getByRole('button', { name: 'Edit Cycle 2' }));
+
+    expect(screen.getByLabelText('Cycle name')).toHaveValue('Cycle 2');
+    expect(screen.getByLabelText('Cycle start date')).toHaveValue('2026-08-11');
+    expect(screen.getByLabelText('Cycle end date')).toHaveValue('2026-10-02');
+
+    await user.clear(screen.getByLabelText('Cycle name'));
+    await user.type(screen.getByLabelText('Cycle name'), 'Cycle 2 revised');
+    fillDates('2026-08-11', '2026-09-30');
+    await user.click(screen.getByRole('button', { name: /save cycle/i }));
+
+    const cycles = getActiveCycles();
+    expect(cycles).toHaveLength(1);
+    expect(cycles[0].name).toBe('Cycle 2 revised');
+    expect(cycles[0].end).toBe('2026-09-30');
+    expect(screen.getByRole('button', { name: /add cycle/i })).toBeInTheDocument();
+    expect(screen.getByLabelText('Cycle name')).toHaveValue('');
+  });
+
+  it('keeps the cycle unchanged when an edit is cancelled', async () => {
+    const user = userEvent.setup();
+    render(<CyclesPanel />);
+
+    await user.type(screen.getByLabelText('Cycle name'), 'Cycle 2');
+    fillDates('2026-08-11', '2026-10-02');
+    await user.click(screen.getByRole('button', { name: /add cycle/i }));
+
+    await user.click(screen.getByRole('button', { name: 'Edit Cycle 2' }));
+    await user.clear(screen.getByLabelText('Cycle name'));
+    await user.type(screen.getByLabelText('Cycle name'), 'Discarded');
+    await user.click(screen.getByRole('button', { name: /^cancel$/i }));
+
+    expect(getActiveCycles()[0].name).toBe('Cycle 2');
+    expect(screen.queryByRole('button', { name: /^cancel$/i })).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Cycle name')).toHaveValue('');
+  });
+
+  it('rejects an inverted range while editing', async () => {
+    const user = userEvent.setup();
+    render(<CyclesPanel />);
+
+    await user.type(screen.getByLabelText('Cycle name'), 'Cycle 2');
+    fillDates('2026-08-11', '2026-10-02');
+    await user.click(screen.getByRole('button', { name: /add cycle/i }));
+
+    await user.click(screen.getByRole('button', { name: 'Edit Cycle 2' }));
+    fillDates('2026-10-02', '2026-08-11');
+    await user.click(screen.getByRole('button', { name: /save cycle/i }));
+
+    expect(screen.getByText('End date must be after start date')).toBeInTheDocument();
+    expect(getActiveCycles()[0].end).toBe('2026-10-02');
+  });
+
+  it('leaves edit mode when the edited cycle is deleted', async () => {
+    const user = userEvent.setup();
+    render(<CyclesPanel />);
+
+    await user.type(screen.getByLabelText('Cycle name'), 'Cycle 2');
+    fillDates('2026-08-11', '2026-10-02');
+    await user.click(screen.getByRole('button', { name: /add cycle/i }));
+
+    await user.click(screen.getByRole('button', { name: 'Edit Cycle 2' }));
+    await user.click(screen.getByRole('button', { name: 'Delete Cycle 2' }));
+
+    expect(screen.getByRole('button', { name: /add cycle/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^cancel$/i })).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Cycle name')).toHaveValue('');
+  });
 });

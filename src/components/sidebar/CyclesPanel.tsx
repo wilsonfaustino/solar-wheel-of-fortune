@@ -1,8 +1,9 @@
-import { Plus, Trash2 } from 'lucide-react';
+import { Edit2, Plus, Trash2 } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import { useNameStore } from '../../stores/useNameStore';
+import type { Cycle } from '../../types/name';
 import { formatShortDay, getCooldownRange } from '../../utils/cycle';
 import { Button } from '../ui/button';
 
@@ -14,6 +15,7 @@ function CyclesPanelComponent() {
     useShallow((state) => ({ lists: state.lists, activeListId: state.activeListId }))
   );
   const addCycle = useNameStore((state) => state.addCycle);
+  const updateCycle = useNameStore((state) => state.updateCycle);
   const deleteCycle = useNameStore((state) => state.deleteCycle);
 
   const cycles = useMemo(
@@ -21,11 +23,21 @@ function CyclesPanelComponent() {
     [lists, activeListId]
   );
 
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
   const [cooldownWeeks, setCooldownWeeks] = useState('1');
   const [error, setError] = useState('');
+
+  const resetForm = useCallback(() => {
+    setEditingId(null);
+    setName('');
+    setStart('');
+    setEnd('');
+    setCooldownWeeks('1');
+    setError('');
+  }, []);
 
   const handleSubmit = useCallback(
     (event: React.FormEvent) => {
@@ -44,18 +56,37 @@ function CyclesPanelComponent() {
         setError('Cooldown must fit inside the cycle');
         return;
       }
-      addCycle({
+      const values = {
         name: name.trim() || `Cycle ${cycles.length + 1}`,
         start,
         end,
         cooldownWeeks: weeks,
-      });
-      setName('');
-      setStart('');
-      setEnd('');
-      setError('');
+      };
+      if (editingId) {
+        updateCycle(editingId, values);
+      } else {
+        addCycle(values);
+      }
+      resetForm();
     },
-    [addCycle, cooldownWeeks, cycles.length, end, name, start]
+    [addCycle, cooldownWeeks, cycles.length, editingId, end, name, resetForm, start, updateCycle]
+  );
+
+  const handleEdit = useCallback((cycle: Cycle) => {
+    setEditingId(cycle.id);
+    setName(cycle.name);
+    setStart(cycle.start);
+    setEnd(cycle.end);
+    setCooldownWeeks(String(cycle.cooldownWeeks));
+    setError('');
+  }, []);
+
+  const handleDelete = useCallback(
+    (cycleId: string) => {
+      deleteCycle(cycleId);
+      if (cycleId === editingId) resetForm();
+    },
+    [deleteCycle, editingId, resetForm]
   );
 
   return (
@@ -102,10 +133,29 @@ function CyclesPanelComponent() {
           />
         </label>
         {error && <div className="text-xs text-red-400 font-mono">{error}</div>}
-        <Button type="submit" variant="tech" size="tech-default" className="w-full text-sm">
-          <Plus className="size-4" />
-          ADD CYCLE
-        </Button>
+        <div className="flex gap-2">
+          <Button type="submit" variant="tech" size="tech-default" className="flex-1 text-sm">
+            {editingId ? (
+              'SAVE CYCLE'
+            ) : (
+              <>
+                <Plus className="size-4" />
+                ADD CYCLE
+              </>
+            )}
+          </Button>
+          {editingId && (
+            <Button
+              type="button"
+              variant="tech-outline"
+              size="tech-default"
+              className="text-sm"
+              onClick={resetForm}
+            >
+              CANCEL
+            </Button>
+          )}
+        </div>
       </form>
 
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
@@ -117,7 +167,10 @@ function CyclesPanelComponent() {
           return (
             <div
               key={cycle.id}
-              className="flex items-start justify-between gap-2 border border-border-light px-3 py-2"
+              className={cn(
+                'flex items-start justify-between gap-2 border px-3 py-2',
+                cycle.id === editingId ? 'border-accent' : 'border-border-light'
+              )}
             >
               <div className="font-mono text-xs text-text/80">
                 <div className="text-text tracking-wider">{cycle.name}</div>
@@ -130,14 +183,24 @@ function CyclesPanelComponent() {
                     : 'NO COOLDOWN'}
                 </div>
               </div>
-              <Button
-                variant="tech-ghost"
-                size="icon-sm"
-                aria-label={`Delete ${cycle.name}`}
-                onClick={() => deleteCycle(cycle.id)}
-              >
-                <Trash2 className="size-4" />
-              </Button>
+              <div className="flex shrink-0 items-center gap-1">
+                <Button
+                  variant="tech-ghost"
+                  size="icon-sm"
+                  aria-label={`Edit ${cycle.name}`}
+                  onClick={() => handleEdit(cycle)}
+                >
+                  <Edit2 className="size-4" />
+                </Button>
+                <Button
+                  variant="tech-ghost"
+                  size="icon-sm"
+                  aria-label={`Delete ${cycle.name}`}
+                  onClick={() => handleDelete(cycle.id)}
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+              </div>
             </div>
           );
         })}
