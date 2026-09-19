@@ -8,6 +8,7 @@ export class CyclesPage extends BasePage {
   readonly endInput: Locator;
   readonly cooldownWeeksInput: Locator;
   readonly addCycleButton: Locator;
+  readonly saveCycleButton: Locator;
   readonly widget: Locator;
 
   constructor(page: Page) {
@@ -18,6 +19,7 @@ export class CyclesPage extends BasePage {
     this.endInput = page.getByLabel('Cycle end date');
     this.cooldownWeeksInput = page.getByLabel('COOLDOWN WEEKS');
     this.addCycleButton = page.getByRole('button', { name: /add cycle/i });
+    this.saveCycleButton = page.getByRole('button', { name: /save cycle/i });
     this.widget = page.getByTestId('cycle-widget');
   }
 
@@ -38,6 +40,14 @@ export class CyclesPage extends BasePage {
       .locator('div')
       .filter({ hasText: new RegExp(`^${name}`) })
       .last();
+  }
+
+  async editCycle(name: string, updates: { name?: string; start?: string; end?: string }) {
+    await this.page.getByRole('button', { name: `Edit ${name}` }).click();
+    if (updates.name !== undefined) await this.nameInput.fill(updates.name);
+    if (updates.start !== undefined) await this.startInput.fill(updates.start);
+    if (updates.end !== undefined) await this.endInput.fill(updates.end);
+    await this.saveCycleButton.click();
   }
 
   async deleteCycle(name: string) {

@@ -1,8 +1,9 @@
-import { Plus, Trash2 } from 'lucide-react';
+import { Edit2, Plus, Trash2 } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import { useNameStore } from '../../stores/useNameStore';
+import type { SpecialEvent } from '../../types/name';
 import { formatShortDay } from '../../utils/cycle';
 import { Button } from '../ui/button';
 
@@ -14,6 +15,7 @@ function EventsPanelComponent() {
     useShallow((state) => ({ lists: state.lists, activeListId: state.activeListId }))
   );
   const addEvent = useNameStore((state) => state.addEvent);
+  const updateEvent = useNameStore((state) => state.updateEvent);
   const deleteEvent = useNameStore((state) => state.deleteEvent);
 
   const events = useMemo(
@@ -21,10 +23,19 @@ function EventsPanelComponent() {
     [lists, activeListId]
   );
 
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
   const [error, setError] = useState('');
+
+  const resetForm = useCallback(() => {
+    setEditingId(null);
+    setName('');
+    setStart('');
+    setEnd('');
+    setError('');
+  }, []);
 
   const handleSubmit = useCallback(
     (submitEvent: React.FormEvent) => {
@@ -38,13 +49,35 @@ function EventsPanelComponent() {
         setError('End date must be after start date');
         return;
       }
-      addEvent({ name: name.trim() || `Event ${events.length + 1}`, start, end: resolvedEnd });
-      setName('');
-      setStart('');
-      setEnd('');
-      setError('');
+      const values = {
+        name: name.trim() || `Event ${events.length + 1}`,
+        start,
+        end: resolvedEnd,
+      };
+      if (editingId) {
+        updateEvent(editingId, values);
+      } else {
+        addEvent(values);
+      }
+      resetForm();
     },
-    [addEvent, end, events.length, name, start]
+    [addEvent, editingId, end, events.length, name, resetForm, start, updateEvent]
+  );
+
+  const handleEdit = useCallback((specialEvent: SpecialEvent) => {
+    setEditingId(specialEvent.id);
+    setName(specialEvent.name);
+    setStart(specialEvent.start);
+    setEnd(specialEvent.end);
+    setError('');
+  }, []);
+
+  const handleDelete = useCallback(
+    (eventId: string) => {
+      deleteEvent(eventId);
+      if (eventId === editingId) resetForm();
+    },
+    [deleteEvent, editingId, resetForm]
   );
 
   return (
@@ -81,10 +114,29 @@ function EventsPanelComponent() {
           />
         </label>
         {error && <div className="text-xs text-red-400 font-mono">{error}</div>}
-        <Button type="submit" variant="tech" size="tech-default" className="w-full text-sm">
-          <Plus className="size-4" />
-          ADD EVENT
-        </Button>
+        <div className="flex gap-2">
+          <Button type="submit" variant="tech" size="tech-default" className="flex-1 text-sm">
+            {editingId ? (
+              'SAVE EVENT'
+            ) : (
+              <>
+                <Plus className="size-4" />
+                ADD EVENT
+              </>
+            )}
+          </Button>
+          {editingId && (
+            <Button
+              type="button"
+              variant="tech-outline"
+              size="tech-default"
+              className="text-sm"
+              onClick={resetForm}
+            >
+              CANCEL
+            </Button>
+          )}
+        </div>
       </form>
 
       <div className="px-4 pb-3 space-y-2">
@@ -94,7 +146,10 @@ function EventsPanelComponent() {
         {events.map((event) => (
           <div
             key={event.id}
-            className="flex items-start justify-between gap-2 border border-dashed border-accent/40 px-3 py-2"
+            className={cn(
+              'flex items-start justify-between gap-2 border border-dashed px-3 py-2',
+              event.id === editingId ? 'border-accent' : 'border-accent/40'
+            )}
           >
             <div className="font-mono text-xs text-text/80">
               <div className="text-accent tracking-wider">{event.name}</div>
@@ -104,14 +159,24 @@ function EventsPanelComponent() {
                   : `${formatShortDay(event.start)} → ${formatShortDay(event.end)}`}
               </div>
             </div>
-            <Button
-              variant="tech-ghost"
-              size="icon-sm"
-              aria-label={`Delete ${event.name}`}
-              onClick={() => deleteEvent(event.id)}
-            >
-              <Trash2 className="size-4" />
-            </Button>
+            <div className="flex shrink-0 items-center gap-1">
+              <Button
+                variant="tech-ghost"
+                size="icon-sm"
+                aria-label={`Edit ${event.name}`}
+                onClick={() => handleEdit(event)}
+              >
+                <Edit2 className="size-4" />
+              </Button>
+              <Button
+                variant="tech-ghost"
+                size="icon-sm"
+                aria-label={`Delete ${event.name}`}
+                onClick={() => handleDelete(event.id)}
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            </div>
           </div>
         ))}
       </div>
