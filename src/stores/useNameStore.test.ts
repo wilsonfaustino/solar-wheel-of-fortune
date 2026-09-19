@@ -33,7 +33,7 @@ describe('useNameStore', () => {
       addName('   ');
 
       const state = useNameStore.getState();
-      expect(state.lists[0].names.length).toBe(initialLength);
+      expect(state.lists[0].names).toHaveLength(initialLength);
     });
   });
 
@@ -55,7 +55,7 @@ describe('useNameStore', () => {
 
       useNameStore.getState().deleteName('non-existent-id');
 
-      expect(useNameStore.getState().lists[0].names.length).toBe(initialLength);
+      expect(useNameStore.getState().lists[0].names).toHaveLength(initialLength);
     });
   });
 
@@ -131,7 +131,7 @@ describe('useNameStore', () => {
       useNameStore.getState().createList('Brand New List');
 
       const state = useNameStore.getState();
-      expect(state.lists.length).toBe(initialListCount + 1);
+      expect(state.lists).toHaveLength(initialListCount + 1);
       expect(state.lists[state.lists.length - 1].title).toBe('Brand New List');
       expect(state.activeListId).toBe(state.lists[state.lists.length - 1].id);
     });
@@ -160,7 +160,7 @@ describe('useNameStore', () => {
 
       useNameStore.getState().deleteList(listIdToDelete);
 
-      expect(useNameStore.getState().lists.length).toBe(initialCount - 1);
+      expect(useNameStore.getState().lists).toHaveLength(initialCount - 1);
       expect(useNameStore.getState().lists.find((l) => l.id === listIdToDelete)).toBeUndefined();
     });
 
@@ -170,7 +170,7 @@ describe('useNameStore', () => {
 
       state.deleteList(onlyListId);
 
-      expect(useNameStore.getState().lists.length).toBe(1);
+      expect(useNameStore.getState().lists).toHaveLength(1);
     });
 
     it('should switch to first list if deleted list was active', () => {
@@ -305,7 +305,7 @@ describe('useNameStore', () => {
       useNameStore.getState().bulkAddNames(['Emma', 'Frank', 'Grace']);
 
       const state = useNameStore.getState();
-      expect(state.lists[0].names.length).toBe(initialLength + 3);
+      expect(state.lists[0].names).toHaveLength(initialLength + 3);
       expect(state.lists[0].names[initialLength].value).toBe('EMMA');
       expect(state.lists[0].names[initialLength + 1].value).toBe('FRANK');
       expect(state.lists[0].names[initialLength + 2].value).toBe('GRACE');
@@ -317,7 +317,7 @@ describe('useNameStore', () => {
       useNameStore.getState().bulkAddNames(['Valid', '   ', 'A'.repeat(101), 'Another']);
 
       const state = useNameStore.getState();
-      expect(state.lists[0].names.length).toBe(initialLength + 2);
+      expect(state.lists[0].names).toHaveLength(initialLength + 2);
     });
 
     it('should trim and uppercase names', () => {
@@ -335,7 +335,7 @@ describe('useNameStore', () => {
 
       useNameStore.getState().bulkAddNames([]);
 
-      expect(useNameStore.getState().lists[0].names.length).toBe(initialLength);
+      expect(useNameStore.getState().lists[0].names).toHaveLength(initialLength);
     });
   });
 
@@ -348,7 +348,9 @@ describe('useNameStore', () => {
 
       useNameStore.getState().addName('Name in Second List');
 
-      expect(useNameStore.getState().lists.find((l) => l.id === firstListId)?.names.length).toBe(2);
+      expect(useNameStore.getState().lists.find((l) => l.id === firstListId)?.names).toHaveLength(
+        2
+      );
       expect(useNameStore.getState().lists.find((l) => l.id === secondListId)?.names.length).toBe(
         1
       );
