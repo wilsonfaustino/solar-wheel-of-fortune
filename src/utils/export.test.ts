@@ -92,37 +92,14 @@ describe('Export Utilities', () => {
       expect(csvContent).toContain('CHARLIE');
     });
 
-    it('should escape CSV fields with commas', () => {
-      const record = {
-        ...mockRecords[0],
-        nameValue: 'ALICE, BOB',
-      };
-      exportToCSV([record], 'test.csv');
-      const csvContent = createdBlobContent[0];
+    it.each([
+      ['commas', 'ALICE, BOB', '"ALICE, BOB"'],
+      ['quotes', 'CHARLIE "CHUCK" BROWN', '"CHARLIE ""CHUCK"" BROWN"'],
+      ['newlines', 'MULTI\nLINE\nNAME', '"MULTI\nLINE\nNAME"'],
+    ])('should escape CSV fields with %s', (_kind, nameValue, expected) => {
+      exportToCSV([{ ...mockRecords[0], nameValue }], 'test.csv');
 
-      expect(csvContent).toContain('"ALICE, BOB"');
-    });
-
-    it('should escape CSV fields with quotes', () => {
-      const record = {
-        ...mockRecords[0],
-        nameValue: 'CHARLIE "CHUCK" BROWN',
-      };
-      exportToCSV([record], 'test.csv');
-      const csvContent = createdBlobContent[0];
-
-      expect(csvContent).toContain('"CHARLIE ""CHUCK"" BROWN"');
-    });
-
-    it('should escape CSV fields with newlines', () => {
-      const record = {
-        ...mockRecords[0],
-        nameValue: 'MULTI\nLINE\nNAME',
-      };
-      exportToCSV([record], 'test.csv');
-      const csvContent = createdBlobContent[0];
-
-      expect(csvContent).toContain('"MULTI\nLINE\nNAME"');
+      expect(createdBlobContent[0]).toContain(expected);
     });
 
     it('should handle empty records array', () => {
