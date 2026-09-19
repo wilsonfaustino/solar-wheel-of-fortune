@@ -52,4 +52,23 @@ test.describe('Cycles management', () => {
     expect(await cyclesPage.getCycleCount()).toBe(0);
     await expect(cyclesPage.widget).toBeHidden();
   });
+
+  test('should edit a cycle and persist the change across a reload', async ({
+    cyclesPage,
+    page,
+  }) => {
+    await cyclesPage.switchToCyclesTab();
+    await cyclesPage.addCycle('Cycle 2', isoDayOffset(-14), isoDayOffset(20), 2);
+
+    await cyclesPage.editCycle('Cycle 2', { name: 'Cycle 2 Revised', end: isoDayOffset(30) });
+
+    await expect(cyclesPage.addCycleButton).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Delete Cycle 2 Revised' })).toBeVisible();
+    expect(await cyclesPage.getCycleCount()).toBe(1);
+
+    await page.reload();
+    await cyclesPage.switchToCyclesTab();
+    await expect(page.getByRole('button', { name: 'Delete Cycle 2 Revised' })).toBeVisible();
+    await expect(cyclesPage.widget).toContainText('30 DAYS');
+  });
 });
