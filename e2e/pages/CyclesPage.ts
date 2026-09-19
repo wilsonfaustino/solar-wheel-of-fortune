@@ -19,6 +19,7 @@ export class CyclesPage extends BasePage {
   readonly holidaySwitch: Locator;
   readonly addEventButton: Locator;
   readonly eventBands: Locator;
+  readonly eventTooltip: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -39,6 +40,7 @@ export class CyclesPage extends BasePage {
     this.holidaySwitch = page.getByRole('switch', { name: 'Holiday' });
     this.addEventButton = page.getByRole('button', { name: /add event/i });
     this.eventBands = page.getByTestId('cycle-event-band');
+    this.eventTooltip = page.getByRole('tooltip');
   }
 
   async switchToCyclesTab() {
@@ -78,6 +80,10 @@ export class CyclesPage extends BasePage {
     await this.eventEndInput.fill(end);
     if (isHoliday) await this.holidaySwitch.click();
     await this.addEventButton.click();
+  }
+
+  async hoverEventBand(name: string) {
+    await this.page.getByRole('button', { name, exact: true }).hover();
   }
 
   async getCycleCount(): Promise<number> {
