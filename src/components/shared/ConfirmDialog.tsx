@@ -21,7 +21,7 @@ function ConfirmDialogComponent({
   cancelLabel = 'Cancel',
   onConfirm,
   variant = 'danger',
-}: ConfirmDialogProps) {
+}: Readonly<ConfirmDialogProps>) {
   const handleConfirm = () => {
     onConfirm();
     onOpenChange(false);

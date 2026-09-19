@@ -11,7 +11,7 @@ function ActionButtonsComponent({
   children,
   className,
   ...props
-}: ActionButtonsProps) {
+}: Readonly<ActionButtonsProps>) {
   return (
     <Button
       type="button"

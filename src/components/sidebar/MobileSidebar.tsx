@@ -9,7 +9,7 @@ interface MobileSidebarProps {
   children: React.ReactNode;
 }
 
-function MobileSidebarComponent({ isOpen, onClose, children }: MobileSidebarProps) {
+function MobileSidebarComponent({ isOpen, onClose, children }: Readonly<MobileSidebarProps>) {
   const shouldReduceMotion = useReducedMotion();
 
   return (

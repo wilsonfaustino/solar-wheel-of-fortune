@@ -7,7 +7,7 @@ interface SelectionToastProps {
   onDismiss?: () => void;
 }
 
-export function SelectionToast({ name, timestamp, onDismiss }: SelectionToastProps) {
+export function SelectionToast({ name, timestamp, onDismiss }: Readonly<SelectionToastProps>) {
   const formattedTime = timestamp.toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',

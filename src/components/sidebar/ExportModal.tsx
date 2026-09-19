@@ -11,7 +11,7 @@ interface ExportModalProps {
   onClose: () => void;
 }
 
-function ExportModalComponent({ records, onClose }: ExportModalProps) {
+function ExportModalComponent({ records, onClose }: Readonly<ExportModalProps>) {
   const [format, setFormat] = useState<ExportFormat>('csv');
   const [filename, setFilename] = useState('');
 

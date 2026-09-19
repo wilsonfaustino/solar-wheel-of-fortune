@@ -12,7 +12,7 @@ function TabSelectionButtonComponent({
   onSelectTab,
   children,
   ...props
-}: TabSelectionButtonProps) {
+}: Readonly<TabSelectionButtonProps>) {
   return (
     <Button
       type="button"
