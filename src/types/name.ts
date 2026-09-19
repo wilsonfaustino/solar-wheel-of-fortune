@@ -83,5 +83,7 @@ export interface EventOverlap {
   event: SpecialEvent;
   leftPercent: number;
   widthPercent: number;
+  /** Weekdays the event covers inside the cycle range. */
+  weekdaysInside: number;
   clipped: boolean;
 }

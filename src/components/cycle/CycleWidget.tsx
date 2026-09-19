@@ -2,8 +2,10 @@ import { memo, useMemo } from 'react';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import { useNameStore } from '../../stores/useNameStore';
+import type { EventOverlap } from '../../types/name';
 import { getCycleStatus, toISODay } from '../../utils/cycle';
 import { getEventOverlaps } from '../../utils/event';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 function formatDays(days: number): string {
   return `${days} ${days === 1 ? 'DAY' : 'DAYS'}`;
@@ -47,6 +49,67 @@ function buildWeekSlots(
   }
   return slots;
 }
+
+/** Weekdays are counted inside the cycle, so a clipped event spans more days than it shows here. */
+function formatSpan(weekdaysInside: number, clipped: boolean): string {
+  if (weekdaysInside === 0) return 'WEEKEND ONLY';
+  const unit = weekdaysInside === 1 ? 'WEEKDAY' : 'WEEKDAYS';
+  return clipped ? `${weekdaysInside} ${unit} IN CYCLE` : `${weekdaysInside} ${unit}`;
+}
+
+function EventBandTooltipComponent({ overlap }: Readonly<{ overlap: EventOverlap }>) {
+  const { event, leftPercent, widthPercent, weekdaysInside, clipped } = overlap;
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          data-testid="cycle-event-band"
+          data-holiday={Boolean(event.isHoliday)}
+          aria-label={event.name}
+          className={cn(
+            'pointer-events-auto absolute -top-1 bottom-[-4px] border-x-2',
+            'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent',
+            // A hairline band is only a few pixels wide, so widen the pointer target around it.
+            "before:absolute before:-inset-x-1.5 before:inset-y-0 before:content-['']",
+            event.isHoliday
+              ? 'border-dashed border-white/30 bg-white/8 backdrop-grayscale'
+              : 'border-accent bg-accent/25'
+          )}
+          style={{ left: `${leftPercent}%`, width: `${widthPercent}%` }}
+        />
+      </TooltipTrigger>
+      <TooltipContent side="top" className="w-66">
+        <div className="flex items-center justify-between gap-2.5 border-b border-accent-30 bg-accent-20 px-2.5 py-2">
+          <span className="truncate text-[11px] font-medium tracking-[0.14em] text-text">
+            {event.name.toUpperCase()}
+          </span>
+          {event.isHoliday && (
+            <span className="shrink-0 bg-accent px-1.5 py-0.5 text-[9px] tracking-[0.14em] text-background">
+              HOLIDAY
+            </span>
+          )}
+        </div>
+        <dl className="flex flex-col gap-1.5 px-2.5 pt-2.5 pb-3 text-[10px] tracking-[0.1em]">
+          <div className="flex gap-2.5">
+            <dt className="w-16 text-text/50">START</dt>
+            <dd className="text-text">{event.start}</dd>
+          </div>
+          <div className="flex gap-2.5">
+            <dt className="w-16 text-text/50">END</dt>
+            <dd className="text-text">{event.end}</dd>
+          </div>
+          <div className="flex gap-2.5">
+            <dt className="w-16 text-text/50">SPAN</dt>
+            <dd className="text-accent">{formatSpan(weekdaysInside, clipped)}</dd>
+          </div>
+        </dl>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+const EventBandTooltip = memo(EventBandTooltipComponent);
 
 function CycleWidgetComponent() {
   const { lists, activeListId } = useNameStore(
@@ -162,21 +225,11 @@ function CycleWidgetComponent() {
               )}
             </div>
           ))}
-          {overlaps.map((overlap) => (
-            <div
-              key={overlap.event.id}
-              data-testid="cycle-event-band"
-              data-holiday={Boolean(overlap.event.isHoliday)}
-              title={`${overlap.event.name} · ${overlap.event.start} → ${overlap.event.end}`}
-              className={cn(
-                'pointer-events-auto absolute -top-1 bottom-[-4px] border-x-2',
-                overlap.event.isHoliday
-                  ? 'border-dashed border-white/30 bg-white/8 backdrop-grayscale'
-                  : 'border-accent bg-accent/25'
-              )}
-              style={{ left: `${overlap.leftPercent}%`, width: `${overlap.widthPercent}%` }}
-            />
-          ))}
+          <TooltipProvider delayDuration={200}>
+            {overlaps.map((overlap) => (
+              <EventBandTooltip key={overlap.event.id} overlap={overlap} />
+            ))}
+          </TooltipProvider>
         </div>
         <div className="flex gap-0.5 text-[10px] tracking-[0.12em]">
           {weekSlots.map((slot) => (

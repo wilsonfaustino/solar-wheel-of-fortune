@@ -46,6 +46,7 @@ export function getEventOverlaps(cycle: Cycle, events: SpecialEvent[]): EventOve
         // An event on a trailing weekend sits past the last weekday, so pull it back into the bar.
         leftPercent: Math.min((weekdaysBefore / totalWeekdays) * 100, 100 - widthPercent),
         widthPercent,
+        weekdaysInside,
         clipped: event.start < cycle.start || event.end > cycle.end,
       };
     });

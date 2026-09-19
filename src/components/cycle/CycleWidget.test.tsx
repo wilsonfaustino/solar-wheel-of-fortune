@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { useNameStore } from '../../stores/useNameStore';
 import { CycleWidget } from './CycleWidget';
 
@@ -38,6 +38,7 @@ describe('CycleWidget', () => {
   });
 
   afterEach(() => {
+    cleanup();
     vi.useRealTimers();
     useNameStore.setState((current) => ({
       lists: current.lists.map((list) => ({ ...list, cycles: [], events: [] })),
@@ -151,7 +152,52 @@ describe('CycleWidget', () => {
 
     const bands = screen.getAllByTestId('cycle-event-band');
     expect(bands).toHaveLength(1);
-    expect(bands[0]).toHaveAttribute('title', 'Launch Day · 2026-09-01 → 2026-09-03');
+    expect(bands[0]).toHaveAttribute('aria-label', 'Launch Day');
+  });
+  it('opens a tooltip with the event dates and weekday span on focus', () => {
+    vi.setSystemTime(new Date('2026-09-01T12:00:00Z'));
+    seedCycle();
+    useNameStore.setState((current) => ({
+      lists: current.lists.map((list) => ({
+        ...list,
+        events: [
+          { id: 'e1', name: 'Launch Day', start: '2026-09-01', end: '2026-09-03', isHoliday: true },
+        ],
+      })),
+    }));
+
+    render(<CycleWidget />);
+    fireEvent.focus(screen.getByTestId('cycle-event-band'));
+
+    const tooltip = screen.getByRole('tooltip');
+    expect(tooltip).toHaveTextContent('LAUNCH DAY');
+    expect(tooltip).toHaveTextContent('HOLIDAY');
+    expect(tooltip).toHaveTextContent('2026-09-01');
+    expect(tooltip).toHaveTextContent('2026-09-03');
+    expect(tooltip).toHaveTextContent('3 WEEKDAYS');
+  });
+  it('labels a weekend-only event as weekend only and a clipped one as in cycle', () => {
+    vi.setSystemTime(new Date('2026-09-01T12:00:00Z'));
+    seedCycle();
+    useNameStore.setState((current) => ({
+      lists: current.lists.map((list) => ({
+        ...list,
+        events: [
+          { id: 'e1', name: 'Weekend Only', start: '2026-09-05', end: '2026-09-06' },
+          { id: 'e2', name: 'Spills Over', start: '2026-08-01', end: '2026-09-04' },
+        ],
+      })),
+    }));
+
+    render(<CycleWidget />);
+    const bands = screen.getAllByTestId('cycle-event-band');
+
+    fireEvent.focus(bands[0]);
+    expect(screen.getByRole('tooltip')).toHaveTextContent('WEEKEND ONLY');
+
+    fireEvent.blur(bands[0]);
+    fireEvent.focus(bands[1]);
+    expect(screen.getByRole('tooltip')).toHaveTextContent('WEEKDAYS IN CYCLE');
   });
   it('grays out a holiday band and keeps a normal event accented', () => {
     vi.setSystemTime(new Date('2026-09-01T12:00:00Z'));

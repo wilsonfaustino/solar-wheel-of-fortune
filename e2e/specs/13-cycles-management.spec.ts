@@ -117,4 +117,19 @@ test.describe('Cycles management', () => {
     await page.getByRole('button', { name: 'Edit Independence' }).click();
     await expect(cyclesPage.holidaySwitch).toBeChecked();
   });
+  test('should show the event details in a tooltip on hover', async ({ cyclesPage }) => {
+    await cyclesPage.switchToCyclesTab();
+    await cyclesPage.addCycle('Cycle 2', isoDayOffset(-7), isoDayOffset(21), 1);
+    await cyclesPage.addEvent('Independence', isoDayOffset(1), isoDayOffset(2), true);
+
+    await expect(cyclesPage.eventTooltip).toHaveCount(0);
+
+    await cyclesPage.hoverEventBand('Independence');
+
+    await expect(cyclesPage.eventTooltip).toBeVisible();
+    await expect(cyclesPage.eventTooltip).toContainText('INDEPENDENCE');
+    await expect(cyclesPage.eventTooltip).toContainText('HOLIDAY');
+    await expect(cyclesPage.eventTooltip).toContainText(isoDayOffset(1));
+    await expect(cyclesPage.eventTooltip).toContainText(isoDayOffset(2));
+  });
 });
