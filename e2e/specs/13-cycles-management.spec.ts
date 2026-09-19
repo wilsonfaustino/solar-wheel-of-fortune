@@ -6,19 +6,40 @@ function isoDayOffset(days: number): string {
   return date.toISOString().slice(0, 10);
 }
 
+/**
+ * Week blocks follow the calendar, so a cycle opening on a Monday two weeks back spans exactly
+ * five whole weeks whichever day the suite runs on, and today always lands in week 3.
+ */
+function mondayAnchoredCycle(): { start: string; end: string } {
+  const monday = new Date();
+  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7) - 14);
+  const end = new Date(monday);
+  end.setDate(end.getDate() + 34);
+  return { start: monday.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10) };
+}
+
 test.describe('Cycles management', () => {
   test('should add a cycle and show the widget with the current position', async ({
     cyclesPage,
   }) => {
+    const { start, end } = mondayAnchoredCycle();
     await cyclesPage.switchToCyclesTab();
-    await cyclesPage.addCycle('Cycle 2', isoDayOffset(-14), isoDayOffset(20), 2);
+    await cyclesPage.addCycle('Cycle 2', start, end, 2);
 
     await expect(cyclesPage.widget).toBeVisible();
     await expect(cyclesPage.widget).toContainText('IN CYCLE');
     await expect(cyclesPage.widget).toContainText('WEEK 3');
     await expect(cyclesPage.widget).toContainText('TO COOLDOWN');
-    await expect(cyclesPage.widget).toContainText('7 DAYS');
-    await expect(cyclesPage.widget).toContainText('20 DAYS');
+  });
+
+  test('should divide the bar into weeks of five weekdays', async ({ cyclesPage }) => {
+    const { start, end } = mondayAnchoredCycle();
+    await cyclesPage.switchToCyclesTab();
+    await cyclesPage.addCycle('Cycle 2', start, end, 2);
+
+    await expect(cyclesPage.weekLabels).toHaveCount(5);
+    await expect(cyclesPage.weekBlocks).toHaveCount(5);
+    await expect(cyclesPage.weekdayCount).toContainText('/ 25');
   });
 
   test('should show the cooldown state and the next cycle countdown', async ({ cyclesPage }) => {
