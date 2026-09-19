@@ -1,7 +1,10 @@
 import { WHEEL_CONFIG } from '../../constants/defaults';
 
+// ponytail: 32-bit draw, so index selection is biased by ~namesLength / 2^32. Rejection-sample if that ever matters.
+const randomFloat = () => crypto.getRandomValues(new Uint32Array(1))[0] / 2 ** 32;
+
 const calculateSpinsValue = () =>
-  WHEEL_CONFIG.minSpins + Math.random() * (WHEEL_CONFIG.maxSpins - WHEEL_CONFIG.minSpins);
+  WHEEL_CONFIG.minSpins + randomFloat() * (WHEEL_CONFIG.maxSpins - WHEEL_CONFIG.minSpins);
 
 /**
  * Calculates the target rotation for a wheel spin that lands a randomly selected name
@@ -61,7 +64,7 @@ export const calculateTargetRotation = (
   namesLength: number
 ): { targetRotation: number; finalIndex: number } => {
   const spins = calculateSpinsValue();
-  const finalIndex = Math.floor(Math.random() * namesLength);
+  const finalIndex = Math.floor(randomFloat() * namesLength);
   const degreesPerName = 360 / namesLength;
 
   // Name at finalIndex starts at: -90 + finalIndex * degreesPerName

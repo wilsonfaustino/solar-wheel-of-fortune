@@ -1,29 +1,26 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { WHEEL_CONFIG } from '../../constants/defaults';
 import { calculateTargetRotation } from './wheel.utils';
 
 describe('calculateTargetRotation', () => {
-  let originalRandom: () => number;
-
-  beforeEach(() => {
-    originalRandom = Math.random;
-  });
-
   afterEach(() => {
-    Math.random = originalRandom;
+    vi.restoreAllMocks();
   });
 
   /**
-   * Helper function to mock Math.random with a specific sequence of values.
+   * Helper function to mock the random source with a specific sequence of values in [0, 1).
    * Used to control spins and finalIndex selection.
    */
   const mockRandomSequence = (values: number[]) => {
     let callIndex = 0;
-    Math.random = vi.fn(() => {
-      const value = values[callIndex % values.length];
-      callIndex++;
-      return value;
-    });
+    vi.spyOn(crypto, 'getRandomValues').mockImplementation(
+      <T extends ArrayBufferView | null>(target: T): T => {
+        const value = values[callIndex % values.length];
+        callIndex++;
+        (target as unknown as Uint32Array)[0] = value * 2 ** 32;
+        return target;
+      }
+    );
   };
 
   /**
@@ -176,7 +173,8 @@ describe('calculateTargetRotation', () => {
       const indices = [];
 
       for (let i = 0; i < 12; i++) {
-        mockRandomSequence([0.5, i / 12]);
+        // Mid-bucket value keeps the expected index stable despite the 32-bit random grid
+        mockRandomSequence([0.5, (i + 0.5) / 12]);
         const result = calculateTargetRotation(0, 12);
         indices.push(result.finalIndex);
       }
