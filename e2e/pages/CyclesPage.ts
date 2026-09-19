@@ -13,6 +13,12 @@ export class CyclesPage extends BasePage {
   readonly weekLabels: Locator;
   readonly weekBlocks: Locator;
   readonly weekdayCount: Locator;
+  readonly eventNameInput: Locator;
+  readonly eventStartInput: Locator;
+  readonly eventEndInput: Locator;
+  readonly holidaySwitch: Locator;
+  readonly addEventButton: Locator;
+  readonly eventBands: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -27,6 +33,12 @@ export class CyclesPage extends BasePage {
     this.weekLabels = page.getByTestId('cycle-week-label');
     this.weekBlocks = page.getByTestId('cycle-week-block');
     this.weekdayCount = page.getByTestId('cycle-weekday-count');
+    this.eventNameInput = page.getByLabel('Event name');
+    this.eventStartInput = page.getByLabel('Event start date');
+    this.eventEndInput = page.getByLabel('Event end date');
+    this.holidaySwitch = page.getByRole('switch', { name: 'Holiday' });
+    this.addEventButton = page.getByRole('button', { name: /add event/i });
+    this.eventBands = page.getByTestId('cycle-event-band');
   }
 
   async switchToCyclesTab() {
@@ -58,6 +70,14 @@ export class CyclesPage extends BasePage {
 
   async deleteCycle(name: string) {
     await this.page.getByRole('button', { name: `Delete ${name}` }).click();
+  }
+
+  async addEvent(name: string, start: string, end: string, isHoliday = false) {
+    await this.eventNameInput.fill(name);
+    await this.eventStartInput.fill(start);
+    await this.eventEndInput.fill(end);
+    if (isHoliday) await this.holidaySwitch.click();
+    await this.addEventButton.click();
   }
 
   async getCycleCount(): Promise<number> {

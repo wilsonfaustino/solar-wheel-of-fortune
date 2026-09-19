@@ -166,8 +166,14 @@ function CycleWidgetComponent() {
             <div
               key={overlap.event.id}
               data-testid="cycle-event-band"
+              data-holiday={Boolean(overlap.event.isHoliday)}
               title={`${overlap.event.name} · ${overlap.event.start} → ${overlap.event.end}`}
-              className="pointer-events-auto absolute -top-1 bottom-[-4px] border-x-2 border-accent bg-accent/25"
+              className={cn(
+                'pointer-events-auto absolute -top-1 bottom-[-4px] border-x-2',
+                overlap.event.isHoliday
+                  ? 'border-dashed border-white/30 bg-white/8 backdrop-grayscale'
+                  : 'border-accent bg-accent/25'
+              )}
               style={{ left: `${overlap.leftPercent}%`, width: `${overlap.widthPercent}%` }}
             />
           ))}

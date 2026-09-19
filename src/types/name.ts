@@ -69,6 +69,7 @@ export interface SpecialEvent {
   name: string;
   start: string;
   end: string;
+  isHoliday?: boolean;
 }
 
 export interface EventCountdown {

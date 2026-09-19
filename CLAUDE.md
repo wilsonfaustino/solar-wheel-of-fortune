@@ -98,6 +98,16 @@ bun hooks:uninstall # Remove git hooks
 - **pre-push**: Runs full type-check and test suite
 - **commit-msg**: Validates conventional commits format
 
+### bun.lockb in Orca worktrees
+
+`bun install`, and any `bun` command that resolves dependencies, rewrites `bun.lockb` in an Orca
+worktree even when no dependency changed. The file then shows as modified with an identical byte
+count and an empty diff.
+
+**Treat that as noise**: leave it out of commits and do not restore it unless asked. Report it if
+a command warns about a dirty tree, then continue. Commit `bun.lockb` only when the change is real,
+meaning `package.json` dependencies were added, removed, or bumped in the same session.
+
 ## CI/CD Pipeline
 
 ### GitHub Actions Workflow
