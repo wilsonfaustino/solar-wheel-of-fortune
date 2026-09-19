@@ -9,6 +9,45 @@ function formatDays(days: number): string {
   return `${days} ${days === 1 ? 'DAY' : 'DAYS'}`;
 }
 
+interface WeekSlot {
+  week: number;
+  weekdays: number;
+  buildWeekdays: number;
+  cooldownWeekdays: number;
+  buildFillPercent: number;
+  cooldownFillPercent: number;
+}
+
+function fillPercent(elapsed: number, total: number): number {
+  if (total <= 0) return 0;
+  return Math.min(100, Math.max(0, (elapsed / total) * 100));
+}
+
+/** One block per calendar week. The cooldown boundary may fall inside a block. */
+function buildWeekSlots(
+  weekdaysPerWeek: number[],
+  buildWeekdays: number,
+  elapsedWeekdays: number
+): WeekSlot[] {
+  const slots: WeekSlot[] = [];
+  let firstWeekday = 0;
+
+  for (const [index, weekdays] of weekdaysPerWeek.entries()) {
+    const build = Math.min(weekdays, Math.max(0, buildWeekdays - firstWeekday));
+    const elapsed = Math.min(weekdays, Math.max(0, elapsedWeekdays - firstWeekday));
+    slots.push({
+      week: index + 1,
+      weekdays,
+      buildWeekdays: build,
+      cooldownWeekdays: weekdays - build,
+      buildFillPercent: fillPercent(elapsed, build),
+      cooldownFillPercent: fillPercent(elapsed - build, weekdays - build),
+    });
+    firstWeekday += weekdays;
+  }
+  return slots;
+}
+
 function CycleWidgetComponent() {
   const { lists, activeListId } = useNameStore(
     useShallow((state) => ({ lists: state.lists, activeListId: state.activeListId }))
@@ -32,8 +71,12 @@ function CycleWidgetComponent() {
   if (!status) return null;
 
   const isCooldown = status.phase === 'cooldown';
-  const cooldownDays = status.cycle.cooldownWeeks * 7;
-  const buildDays = status.totalCycleWeeks * 7 - cooldownDays;
+  const { cooldownWeekdays, totalCycleWeekdays, weekdayOfCycle } = status;
+  const weekSlots = buildWeekSlots(
+    status.weekdaysPerWeek,
+    totalCycleWeekdays - cooldownWeekdays,
+    weekdayOfCycle
+  );
 
   return (
     <div
@@ -88,32 +131,37 @@ function CycleWidgetComponent() {
 
       <div className="flex flex-col gap-2">
         <div className="relative flex h-2.5 gap-0.5">
-          <div
-            className="flex border border-border-light bg-accent-10"
-            style={{ flexGrow: buildDays }}
-          >
+          {weekSlots.map((slot) => (
             <div
-              className="h-full bg-accent"
-              style={{
-                width: `${Math.min(100, (status.percentComplete / 100) * ((buildDays + cooldownDays) / buildDays) * 100)}%`,
-              }}
-            />
-          </div>
-          {cooldownDays > 0 && (
-            <div
-              className="flex border border-dashed border-white/25 bg-white/4"
-              style={{ flexGrow: cooldownDays }}
+              key={slot.week}
+              data-testid="cycle-week-block"
+              className="flex"
+              style={{ flexGrow: slot.weekdays }}
             >
-              {isCooldown && (
+              {slot.buildWeekdays > 0 && (
                 <div
-                  className="h-full bg-white/35"
-                  style={{
-                    width: `${Math.round((status.dayOfPhase / status.totalPhaseDays) * 100)}%`,
-                  }}
-                />
+                  className="flex border border-border-light bg-accent-10"
+                  style={{ flexGrow: slot.buildWeekdays }}
+                >
+                  <div
+                    className="h-full bg-accent"
+                    style={{ width: `${slot.buildFillPercent}%` }}
+                  />
+                </div>
+              )}
+              {slot.cooldownWeekdays > 0 && (
+                <div
+                  className="flex border border-dashed border-white/25 bg-white/4"
+                  style={{ flexGrow: slot.cooldownWeekdays }}
+                >
+                  <div
+                    className="h-full bg-white/35"
+                    style={{ width: `${slot.cooldownFillPercent}%` }}
+                  />
+                </div>
               )}
             </div>
-          )}
+          ))}
           {overlaps.map((overlap) => (
             <div
               key={overlap.event.id}
@@ -124,9 +172,24 @@ function CycleWidgetComponent() {
             />
           ))}
         </div>
+        <div className="flex gap-0.5 text-[10px] tracking-[0.12em]">
+          {weekSlots.map((slot) => (
+            <span
+              key={slot.week}
+              data-testid="cycle-week-label"
+              className={cn(
+                'text-center',
+                slot.week === status.weekOfCycle ? 'text-accent' : 'text-text/30'
+              )}
+              style={{ flexGrow: slot.weekdays }}
+            >
+              {slot.week}
+            </span>
+          ))}
+        </div>
         <div className="flex justify-between text-[10px] tracking-[0.18em] text-text/30">
           <span>START</span>
-          {cooldownDays > 0 && <span>COOLDOWN START</span>}
+          {cooldownWeekdays > 0 && <span>COOLDOWN START</span>}
           <span>CYCLE END</span>
         </div>
       </div>
@@ -155,6 +218,13 @@ function CycleWidgetComponent() {
             </div>
           </>
         )}
+
+        <div className="flex flex-col gap-1">
+          <span className="text-[10px] tracking-[0.2em] text-text/35">WEEKDAYS</span>
+          <span data-testid="cycle-weekday-count" className="text-lg font-medium text-text/60">
+            {weekdayOfCycle} / {totalCycleWeekdays}
+          </span>
+        </div>
 
         {isCooldown && status.nextCycle && (
           <div className="flex flex-col gap-1">

@@ -1,5 +1,12 @@
 import type { Cycle } from '../types/name';
-import { formatShortDay, getCooldownRange, getCycleStatus } from './cycle';
+import {
+  formatShortDay,
+  getCooldownRange,
+  getCycleStatus,
+  getWeekdaysPerWeek,
+  isWeekday,
+  weekdaysBetween,
+} from './cycle';
 
 /** Whole cycle: AUG 11 -> OCT 2, last 2 weeks (SEP 21 -> OCT 2) are cooldown. */
 const cycle: Cycle = {
@@ -37,10 +44,28 @@ describe('getCycleStatus', () => {
       totalPhaseDays: 39,
       weekOfCycle: 1,
       totalCycleWeeks: 8,
-      percentComplete: 2,
+      percentComplete: 3,
+      weekdayOfCycle: 1,
+      totalCycleWeekdays: 39,
+      cooldownWeekdays: 10,
       daysToCooldownStart: 39,
       daysToCycleEnd: 52,
     });
+  });
+
+  it('measures progress in weekdays, so a weekend adds nothing', () => {
+    const friday = getCycleStatus([cycle], '2026-09-18');
+    const saturday = getCycleStatus([cycle], '2026-09-19');
+    expect(friday?.weekdayOfCycle).toBe(29);
+    expect(saturday?.weekdayOfCycle).toBe(29);
+    expect(saturday?.percentComplete).toBe(friday?.percentComplete);
+  });
+
+  it('numbers weeks by the calendar, so a weekend closes a week', () => {
+    // The cycle opens on a Tuesday, so week 1 is the short AUG 11 -> AUG 14.
+    expect(getCycleStatus([cycle], '2026-08-14')?.weekOfCycle).toBe(1);
+    expect(getCycleStatus([cycle], '2026-08-17')?.weekOfCycle).toBe(2);
+    expect(getCycleStatus([cycle], '2026-10-02')?.weekOfCycle).toBe(8);
   });
 
   it('switches to cooldown on the first cooldown day', () => {
@@ -62,9 +87,14 @@ describe('getCycleStatus', () => {
     });
   });
 
+  it('reports no position for a cycle that holds no weekdays', () => {
+    const weekendOnly: Cycle = { ...cycle, start: '2026-09-05', end: '2026-09-06' };
+    expect(getCycleStatus([weekendOnly], '2026-09-05')).toBeNull();
+  });
+
   it('stays in the build phase when there is no cooldown', () => {
     const status = getCycleStatus([{ ...cycle, cooldownWeeks: 0 }], '2026-10-02');
-    expect(status).toMatchObject({ phase: 'cycle', daysToCooldownStart: 1 });
+    expect(status).toMatchObject({ phase: 'cycle', daysToCooldownStart: 1, cooldownWeekdays: 0 });
   });
 });
 
@@ -93,5 +123,41 @@ describe('formatShortDay', () => {
   it('renders a compact month and day label', () => {
     expect(formatShortDay('2026-08-11')).toBe('AUG 11');
     expect(formatShortDay('2026-01-02')).toBe('JAN 2');
+  });
+});
+
+describe('weekday counting', () => {
+  it('accepts monday through friday only', () => {
+    expect(isWeekday('2026-09-18')).toBe(true);
+    expect(isWeekday('2026-09-19')).toBe(false);
+    expect(isWeekday('2026-09-20')).toBe(false);
+    expect(isWeekday('2026-09-21')).toBe(true);
+  });
+
+  it('counts weekdays inclusively across a span', () => {
+    expect(weekdaysBetween('2026-09-14', '2026-09-18')).toBe(5);
+    expect(weekdaysBetween('2026-09-14', '2026-09-20')).toBe(5);
+    expect(weekdaysBetween('2026-09-19', '2026-09-20')).toBe(0);
+  });
+});
+
+describe('getWeekdaysPerWeek', () => {
+  it('gives one entry per calendar week, short at a mid-week start', () => {
+    // AUG 11 is a Tuesday, so the opening week carries four weekdays and the rest carry five.
+    expect(getWeekdaysPerWeek(cycle)).toEqual([4, 5, 5, 5, 5, 5, 5, 5]);
+  });
+
+  it('never lets a block hold more than one working week', () => {
+    expect(getWeekdaysPerWeek(cycle).every((weekdays) => weekdays <= 5)).toBe(true);
+  });
+
+  it('is short at a mid-week end too', () => {
+    expect(getWeekdaysPerWeek({ ...cycle, start: '2026-08-17', end: '2026-08-25' })).toEqual([
+      5, 2,
+    ]);
+  });
+
+  it('is empty for a span holding no weekdays', () => {
+    expect(getWeekdaysPerWeek({ ...cycle, start: '2026-09-05', end: '2026-09-06' })).toEqual([]);
   });
 });

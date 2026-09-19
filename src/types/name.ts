@@ -52,6 +52,12 @@ export interface CycleStatus {
   percentComplete: number;
   weekOfCycle: number;
   totalCycleWeeks: number;
+  /** Weekday-only axis: weekends take no space on the cycle timeline. */
+  weekdayOfCycle: number;
+  totalCycleWeekdays: number;
+  /** Weekdays in each calendar week the cycle covers; first and last may be short. */
+  weekdaysPerWeek: number[];
+  cooldownWeekdays: number;
   daysToCooldownStart: number;
   daysToCycleEnd: number;
   nextCycle: { cycle: Cycle; daysUntilStart: number } | null;

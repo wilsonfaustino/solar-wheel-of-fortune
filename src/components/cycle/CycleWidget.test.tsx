@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { useNameStore } from '../../stores/useNameStore';
 import { CycleWidget } from './CycleWidget';
 
-function seedCycle(cooldownWeeks = 2) {
+function seedCycle(cooldownWeeks = 2, end = '2026-10-02') {
   const state = useNameStore.getState();
   const listId = state.activeListId as string;
   useNameStore.setState((current) => ({
@@ -15,7 +15,7 @@ function seedCycle(cooldownWeeks = 2) {
                 id: 'c1',
                 name: 'Cycle 1',
                 start: '2026-08-11',
-                end: '2026-10-02',
+                end,
                 cooldownWeeks,
               },
               {
@@ -73,6 +73,65 @@ describe('CycleWidget', () => {
     expect(screen.getByText('DAY 12')).toBeInTheDocument();
     expect(screen.getByText('COOLDOWN LEFT')).toBeInTheDocument();
     expect(screen.getByText('STARTS IN 5 DAYS')).toBeInTheDocument();
+  });
+
+  it('splits the bar into one gapped block per week', () => {
+    vi.setSystemTime(new Date('2026-08-25T12:00:00Z'));
+    seedCycle();
+    render(<CycleWidget />);
+
+    expect(screen.getAllByTestId('cycle-week-block')).toHaveLength(8);
+    expect(screen.getAllByTestId('cycle-week-label').map((label) => label.textContent)).toEqual([
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+    ]);
+  });
+
+  it('keeps a whole-week cooldown on its own blocks', () => {
+    vi.setSystemTime(new Date('2026-08-25T12:00:00Z'));
+    seedCycle();
+    render(<CycleWidget />);
+
+    // 10 cooldown weekdays land on exactly the last two calendar weeks, so nothing is split.
+    const blocks = screen.getAllByTestId('cycle-week-block');
+    expect(blocks.map((block) => block.children.length)).toEqual([1, 1, 1, 1, 1, 1, 1, 1]);
+  });
+
+  it('cuts a mid-week cooldown boundary inside the block it falls in', () => {
+    vi.setSystemTime(new Date('2026-08-25T12:00:00Z'));
+    // Ending on a Wednesday puts the cooldown start on the Thursday before, mid calendar week.
+    seedCycle(1, '2026-09-30');
+    render(<CycleWidget />);
+
+    const blocks = screen.getAllByTestId('cycle-week-block');
+    expect(blocks[6].children).toHaveLength(2);
+    expect(blocks[7].children).toHaveLength(1);
+  });
+
+  it('counts elapsed weekdays rather than calendar days', () => {
+    vi.setSystemTime(new Date('2026-08-25T12:00:00Z'));
+    seedCycle();
+    render(<CycleWidget />);
+
+    expect(screen.getByTestId('cycle-weekday-count')).toHaveTextContent('11 / 39');
+  });
+
+  it('holds the weekday count steady across a weekend', () => {
+    vi.setSystemTime(new Date('2026-08-21T12:00:00Z'));
+    seedCycle();
+    const { unmount } = render(<CycleWidget />);
+    expect(screen.getByTestId('cycle-weekday-count')).toHaveTextContent('9 / 39');
+    unmount();
+
+    vi.setSystemTime(new Date('2026-08-23T12:00:00Z'));
+    render(<CycleWidget />);
+    expect(screen.getByTestId('cycle-weekday-count')).toHaveTextContent('9 / 39');
   });
 
   it('renders a band for each event overlapping the active cycle', () => {

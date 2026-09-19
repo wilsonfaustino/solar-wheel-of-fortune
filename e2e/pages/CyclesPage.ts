@@ -10,6 +10,9 @@ export class CyclesPage extends BasePage {
   readonly addCycleButton: Locator;
   readonly saveCycleButton: Locator;
   readonly widget: Locator;
+  readonly weekLabels: Locator;
+  readonly weekBlocks: Locator;
+  readonly weekdayCount: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -21,6 +24,9 @@ export class CyclesPage extends BasePage {
     this.addCycleButton = page.getByRole('button', { name: /add cycle/i });
     this.saveCycleButton = page.getByRole('button', { name: /save cycle/i });
     this.widget = page.getByTestId('cycle-widget');
+    this.weekLabels = page.getByTestId('cycle-week-label');
+    this.weekBlocks = page.getByTestId('cycle-week-block');
+    this.weekdayCount = page.getByTestId('cycle-weekday-count');
   }
 
   async switchToCyclesTab() {

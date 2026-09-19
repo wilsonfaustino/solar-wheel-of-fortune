@@ -4,7 +4,7 @@ import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import { useNameStore } from '../../stores/useNameStore';
 import type { Cycle } from '../../types/name';
-import { formatShortDay, getCooldownRange } from '../../utils/cycle';
+import { formatShortDay, getCooldownRange, weekdaysBetween } from '../../utils/cycle';
 import { Button } from '../ui/button';
 
 const INPUT_CLASS =
@@ -48,6 +48,10 @@ function CyclesPanelComponent() {
       }
       if (end < start) {
         setError('End date must be after start date');
+        return;
+      }
+      if (weekdaysBetween(start, end) === 0) {
+        setError('Cycle must include at least one weekday');
         return;
       }
       const totalDays = Math.round((Date.parse(end) - Date.parse(start)) / 86_400_000) + 1;

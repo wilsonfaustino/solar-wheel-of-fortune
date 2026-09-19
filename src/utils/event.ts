@@ -1,4 +1,5 @@
 import type { Cycle, EventCountdown, EventOverlap, SpecialEvent } from '../types/name';
+import { isWeekday, weekdaysBetween } from './cycle';
 
 const MS_PER_DAY = 86_400_000;
 
@@ -21,19 +22,30 @@ export function getEventCountdown(events: SpecialEvent[], todayISO: string): Eve
   };
 }
 
-/** Positions events on the cycle timeline as percentages, clamped to the cycle range. */
+const MIN_OVERLAP_PERCENT = 0.6;
+
+/**
+ * Positions events on the weekday-only cycle axis, clamped to the cycle range.
+ * A weekend-only event has no width there, so it keeps a hairline marker instead of vanishing.
+ */
 export function getEventOverlaps(cycle: Cycle, events: SpecialEvent[]): EventOverlap[] {
-  const totalDays = daysBetween(cycle.start, cycle.end) + 1;
+  const totalWeekdays = weekdaysBetween(cycle.start, cycle.end);
+  if (totalWeekdays === 0) return [];
 
   return events
     .filter((event) => event.end >= cycle.start && event.start <= cycle.end)
     .map((event) => {
-      const startDay = Math.max(0, daysBetween(cycle.start, event.start));
-      const endDay = Math.min(totalDays - 1, daysBetween(cycle.start, event.end));
+      const start = event.start > cycle.start ? event.start : cycle.start;
+      const end = event.end < cycle.end ? event.end : cycle.end;
+      const weekdaysUpToStart = weekdaysBetween(cycle.start, start);
+      const weekdaysBefore = isWeekday(start) ? weekdaysUpToStart - 1 : weekdaysUpToStart;
+      const weekdaysInside = weekdaysBetween(start, end);
+      const widthPercent = Math.max(MIN_OVERLAP_PERCENT, (weekdaysInside / totalWeekdays) * 100);
       return {
         event,
-        leftPercent: (startDay / totalDays) * 100,
-        widthPercent: ((endDay - startDay + 1) / totalDays) * 100,
+        // An event on a trailing weekend sits past the last weekday, so pull it back into the bar.
+        leftPercent: Math.min((weekdaysBefore / totalWeekdays) * 100, 100 - widthPercent),
+        widthPercent,
         clipped: event.start < cycle.start || event.end > cycle.end,
       };
     });
