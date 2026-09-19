@@ -15,7 +15,7 @@ function BulkActionsPanelComponent({
   hasSelections,
   onClearSelections,
   onResetList,
-}: BulkActionsPanelProps) {
+}: Readonly<BulkActionsPanelProps>) {
   return (
     <div className="px-4 py-4 flex gap-2 border-t border-t-white/10">
       <ActionButtons

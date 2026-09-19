@@ -42,11 +42,11 @@ describe('Footer', () => {
     // With GlitchText, there should be 3 spans: main + 2 glitch layers
     // Use queryAllByText since GlitchText renders 3 copies of the text
     const authorElements = screen.queryAllByText('Wilson Faustino');
-    expect(authorElements.length).toBe(3);
+    expect(authorElements).toHaveLength(3);
 
     // Check for aria-hidden glitch layers (2 out of 3 should be aria-hidden)
     const hiddenSpans = authorElements.filter((el) => el.getAttribute('aria-hidden') === 'true');
-    expect(hiddenSpans.length).toBe(2);
+    expect(hiddenSpans).toHaveLength(2);
 
     // The first (visible) span should not be aria-hidden
     expect(authorElements[0].getAttribute('aria-hidden')).toBeNull();

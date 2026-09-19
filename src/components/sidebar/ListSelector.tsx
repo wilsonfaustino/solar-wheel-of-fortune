@@ -23,7 +23,7 @@ function ListSelectorComponent({
   onCreateList,
   onDeleteList,
   onRenameList,
-}: ListSelectorProps) {
+}: Readonly<ListSelectorProps>) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{
     listId: string;

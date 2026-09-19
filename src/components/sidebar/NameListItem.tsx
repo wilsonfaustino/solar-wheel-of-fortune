@@ -18,7 +18,7 @@ function NameListItemComponent({
   onDelete,
   onToggleExclude,
   onVolunteer,
-}: NameListItemProps) {
+}: Readonly<NameListItemProps>) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(name.value);
   const inputRef = useRef<HTMLInputElement>(null);

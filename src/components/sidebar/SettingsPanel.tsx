@@ -19,7 +19,7 @@ function SwitchSettings({
   a11yLabel,
   title,
   description,
-}: SwitchSettingsProps) {
+}: Readonly<SwitchSettingsProps>) {
   return (
     <label className="flex items-start gap-3 cursor-pointer group" htmlFor={name}>
       <Switch

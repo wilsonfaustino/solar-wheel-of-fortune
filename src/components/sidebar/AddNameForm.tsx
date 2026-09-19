@@ -9,7 +9,7 @@ interface AddNameFormProps {
   onBulkImport: (names: string[]) => void;
 }
 
-function AddNameFormComponent({ onAddName, onBulkImport }: AddNameFormProps) {
+function AddNameFormComponent({ onAddName, onBulkImport }: Readonly<AddNameFormProps>) {
   const [inputValue, setInputValue] = useState('');
   const [showBulkImport, setShowBulkImport] = useState(false);
   const [bulkText, setBulkText] = useState('');

@@ -12,19 +12,13 @@ describe('SelectionToast', () => {
 
   const mockTimestamp = new Date('2025-12-15T10:30:45');
 
-  it('renders the selected name', () => {
+  it.each([
+    ['the selected name', 'Alice'],
+    ['the SELECTED label', 'SELECTED'],
+    ['the timestamp in 24-hour format', '10:30:45'],
+  ])('renders %s', (_case, expectedText) => {
     render(<SelectionToast name={mockName} timestamp={mockTimestamp} />);
-    expect(screen.getByText('Alice')).toBeInTheDocument();
-  });
-
-  it('displays the SELECTED label', () => {
-    render(<SelectionToast name={mockName} timestamp={mockTimestamp} />);
-    expect(screen.getByText('SELECTED')).toBeInTheDocument();
-  });
-
-  it('formats timestamp correctly (24-hour format)', () => {
-    render(<SelectionToast name={mockName} timestamp={mockTimestamp} />);
-    expect(screen.getByText('10:30:45')).toBeInTheDocument();
+    expect(screen.getByText(expectedText)).toBeInTheDocument();
   });
 
   it('shows selection count when name has been picked before', () => {

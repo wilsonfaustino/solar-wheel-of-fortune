@@ -7,7 +7,7 @@ interface CenterButtonProps {
   disabled?: boolean;
 }
 
-function CenterButtonComponent({ onClick, isSpinning, disabled }: CenterButtonProps) {
+function CenterButtonComponent({ onClick, isSpinning, disabled }: Readonly<CenterButtonProps>) {
   return (
     <button
       type="button"

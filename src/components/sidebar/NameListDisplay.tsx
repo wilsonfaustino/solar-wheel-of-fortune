@@ -16,7 +16,7 @@ function NameListDisplayComponent({
   onDelete,
   onToggleExclude,
   onVolunteer,
-}: NameListDisplayProps) {
+}: Readonly<NameListDisplayProps>) {
   const activeNames = names.filter((n) => !n.isExcluded);
   const excludedNames = names.filter((n) => n.isExcluded);
 

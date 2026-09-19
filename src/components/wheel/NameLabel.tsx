@@ -9,7 +9,7 @@ interface NameLabelProps {
   isSelected: boolean;
 }
 
-function NameLabelComponent({ name, index, totalNames, isSelected }: NameLabelProps) {
+function NameLabelComponent({ name, index, totalNames, isSelected }: Readonly<NameLabelProps>) {
   const angleStep = (2 * Math.PI) / totalNames;
   const angle = index * angleStep - Math.PI / 2;
   const positionX = WHEEL_CONFIG.centerOffset + Math.cos(angle) * WHEEL_CONFIG.circleRadius;

@@ -5,7 +5,7 @@ interface MobileHeaderProps {
   onToggleSidebar: () => void;
 }
 
-function MobileHeaderComponent({ onToggleSidebar }: MobileHeaderProps) {
+function MobileHeaderComponent({ onToggleSidebar }: Readonly<MobileHeaderProps>) {
   return (
     <div
       className="flex items-center justify-between px-4 h-15 border-b"

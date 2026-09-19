@@ -5,7 +5,7 @@ interface RadialLineProps {
   isSelected: boolean;
 }
 
-function RadialLineComponent({ isSelected }: RadialLineProps) {
+function RadialLineComponent({ isSelected }: Readonly<RadialLineProps>) {
   return (
     <line
       x1="0"

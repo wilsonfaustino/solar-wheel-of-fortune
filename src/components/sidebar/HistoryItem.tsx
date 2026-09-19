@@ -9,7 +9,7 @@ interface HistoryItemProps {
   onDelete: (recordId: string) => void;
 }
 
-function HistoryItemComponent({ record, onDelete }: HistoryItemProps) {
+function HistoryItemComponent({ record, onDelete }: Readonly<HistoryItemProps>) {
   return (
     <div className="px-4 py-3 last:border-b-0 transition-colors group flex items-center justify-between border-b border-b-white/5 bg-transparent hover:bg-white/5">
       <div className="flex-1 min-w-0">

@@ -22,7 +22,7 @@ interface NameManagementSidebarProps {
 function NameManagementSidebarComponent({
   className = '',
   isMobile = false,
-}: NameManagementSidebarProps) {
+}: Readonly<NameManagementSidebarProps>) {
   const [activeTab, setActiveTab] = useState<'names' | 'history' | 'cycles' | 'settings'>('names');
 
   // Select store state

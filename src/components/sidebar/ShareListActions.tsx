@@ -10,7 +10,7 @@ interface ShareListActionsProps {
   activeList: NameList | undefined;
 }
 
-function ShareListActionsComponent({ activeList }: ShareListActionsProps) {
+function ShareListActionsComponent({ activeList }: Readonly<ShareListActionsProps>) {
   const importList = useNameStore((state) => state.importList);
   const history = useNameStore((state) => state.history);
   const fileInputRef = useRef<HTMLInputElement>(null);
