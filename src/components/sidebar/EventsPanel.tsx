@@ -6,6 +6,7 @@ import { useNameStore } from '../../stores/useNameStore';
 import type { SpecialEvent } from '../../types/name';
 import { formatShortDay } from '../../utils/cycle';
 import { Button } from '../ui/button';
+import { Switch } from '../ui/switch';
 
 const INPUT_CLASS =
   'w-full px-3 py-2 h-10 font-mono text-sm text-text bg-black/50 border border-border-light focus:shadow-xs focus:shadow-accent focus:outline-none placeholder:text-white/30';
@@ -27,6 +28,7 @@ function EventsPanelComponent() {
   const [name, setName] = useState('');
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
+  const [isHoliday, setIsHoliday] = useState(false);
   const [error, setError] = useState('');
 
   const resetForm = useCallback(() => {
@@ -34,6 +36,7 @@ function EventsPanelComponent() {
     setName('');
     setStart('');
     setEnd('');
+    setIsHoliday(false);
     setError('');
   }, []);
 
@@ -53,6 +56,7 @@ function EventsPanelComponent() {
         name: name.trim() || `Event ${events.length + 1}`,
         start,
         end: resolvedEnd,
+        isHoliday,
       };
       if (editingId) {
         updateEvent(editingId, values);
@@ -61,7 +65,7 @@ function EventsPanelComponent() {
       }
       resetForm();
     },
-    [addEvent, editingId, end, events.length, name, resetForm, start, updateEvent]
+    [addEvent, editingId, end, events.length, isHoliday, name, resetForm, start, updateEvent]
   );
 
   const handleEdit = useCallback((specialEvent: SpecialEvent) => {
@@ -69,6 +73,7 @@ function EventsPanelComponent() {
     setName(specialEvent.name);
     setStart(specialEvent.start);
     setEnd(specialEvent.end);
+    setIsHoliday(Boolean(specialEvent.isHoliday));
     setError('');
   }, []);
 
@@ -111,6 +116,18 @@ function EventsPanelComponent() {
             onChange={(e) => setEnd(e.target.value)}
             className={cn(INPUT_CLASS, 'w-40 shrink-0')}
             aria-label="Event end date"
+          />
+        </label>
+        <label
+          htmlFor="event-holiday"
+          className="flex cursor-pointer items-center justify-between gap-3 whitespace-nowrap font-mono text-xs tracking-wider text-white/60"
+        >
+          <span>HOLIDAY</span>
+          <Switch
+            id="event-holiday"
+            checked={isHoliday}
+            onCheckedChange={setIsHoliday}
+            aria-label="Holiday"
           />
         </label>
         {error && <div className="text-xs text-red-400 font-mono">{error}</div>}
