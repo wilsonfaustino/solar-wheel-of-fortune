@@ -45,7 +45,7 @@ function App() {
   );
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', currentTheme);
+    document.documentElement.dataset.theme = currentTheme;
   }, [currentTheme]);
 
   const names = useMemo(() => {
