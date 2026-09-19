@@ -253,6 +253,7 @@ body {
   --normal-bg: transparent;
   --normal-border: transparent;
   --normal-text: inherit;
+  font-family: var(--font-mono);
 }
 
 [data-sonner-toaster][data-theme="light"] {
@@ -265,11 +266,6 @@ body {
   --normal-bg: transparent;
   --normal-border: transparent;
   --normal-text: inherit;
-}
-
-/* Toast container positioning and stacking */
-[data-sonner-toaster] {
-  font-family: var(--font-mono);
 }
 
 [data-sonner-toast] {
