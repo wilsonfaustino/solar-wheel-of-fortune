@@ -171,7 +171,7 @@ function CycleWidgetComponent() {
               className={cn(
                 'pointer-events-auto absolute -top-1 bottom-[-4px] border-x-2',
                 overlap.event.isHoliday
-                  ? 'border-dashed border-white/30 bg-white/12'
+                  ? 'border-dashed border-white/30 bg-white/8 backdrop-grayscale'
                   : 'border-accent bg-accent/25'
               )}
               style={{ left: `${overlap.leftPercent}%`, width: `${overlap.widthPercent}%` }}
