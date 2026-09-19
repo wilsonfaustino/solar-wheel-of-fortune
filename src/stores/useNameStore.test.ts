@@ -351,7 +351,7 @@ describe('useNameStore', () => {
       expect(useNameStore.getState().lists.find((l) => l.id === firstListId)?.names).toHaveLength(
         2
       );
-      expect(useNameStore.getState().lists.find((l) => l.id === secondListId)?.names.length).toBe(
+      expect(useNameStore.getState().lists.find((l) => l.id === secondListId)?.names).toHaveLength(
         1
       );
     });
