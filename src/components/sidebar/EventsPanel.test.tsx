@@ -124,4 +124,36 @@ describe('EventsPanel', () => {
     expect(screen.queryByRole('button', { name: /^cancel$/i })).not.toBeInTheDocument();
     expect(screen.getByLabelText('Event name')).toHaveValue('');
   });
+  it('marks an event as a holiday when the holiday switch is on', () => {
+    render(<EventsPanel />);
+
+    fireEvent.change(screen.getByLabelText('Event name'), { target: { value: 'Independence' } });
+    fireEvent.change(screen.getByLabelText('Event start date'), {
+      target: { value: '2026-09-07' },
+    });
+    fireEvent.click(screen.getByRole('switch', { name: /holiday/i }));
+    fireEvent.click(screen.getByRole('button', { name: /add event/i }));
+
+    expect(activeEvents()[0].isHoliday).toBe(true);
+  });
+
+  it('loads and clears the holiday flag through the edit form', () => {
+    render(<EventsPanel />);
+
+    fireEvent.change(screen.getByLabelText('Event name'), { target: { value: 'Independence' } });
+    fireEvent.change(screen.getByLabelText('Event start date'), {
+      target: { value: '2026-09-07' },
+    });
+    fireEvent.click(screen.getByRole('switch', { name: /holiday/i }));
+    fireEvent.click(screen.getByRole('button', { name: /add event/i }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit Independence' }));
+    expect(screen.getByRole('switch', { name: /holiday/i })).toBeChecked();
+
+    fireEvent.click(screen.getByRole('switch', { name: /holiday/i }));
+    fireEvent.click(screen.getByRole('button', { name: /save event/i }));
+
+    expect(activeEvents()[0].isHoliday).toBe(false);
+    expect(screen.getByRole('switch', { name: /holiday/i })).not.toBeChecked();
+  });
 });

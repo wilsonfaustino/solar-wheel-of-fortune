@@ -92,4 +92,29 @@ test.describe('Cycles management', () => {
     await expect(page.getByRole('button', { name: 'Delete Cycle 2 Revised' })).toBeVisible();
     await expect(cyclesPage.widget).toContainText('30 DAYS');
   });
+  test('should gray out a holiday event band and keep the flag across a reload', async ({
+    cyclesPage,
+    page,
+  }) => {
+    await cyclesPage.switchToCyclesTab();
+    await cyclesPage.addCycle('Cycle 2', isoDayOffset(-7), isoDayOffset(21), 1);
+    await cyclesPage.addEvent('Launch Day', isoDayOffset(1), isoDayOffset(2));
+    await cyclesPage.addEvent('Independence', isoDayOffset(5), isoDayOffset(5), true);
+
+    await expect(cyclesPage.eventBands).toHaveCount(2);
+    await expect(page.locator('[data-testid="cycle-event-band"][data-holiday="true"]')).toHaveCount(
+      1
+    );
+    await expect(
+      page.locator('[data-testid="cycle-event-band"][data-holiday="false"]')
+    ).toHaveCount(1);
+
+    await page.reload();
+    await cyclesPage.switchToCyclesTab();
+    await expect(page.locator('[data-testid="cycle-event-band"][data-holiday="true"]')).toHaveCount(
+      1
+    );
+    await page.getByRole('button', { name: 'Edit Independence' }).click();
+    await expect(cyclesPage.holidaySwitch).toBeChecked();
+  });
 });

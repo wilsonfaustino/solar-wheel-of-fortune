@@ -153,4 +153,31 @@ describe('CycleWidget', () => {
     expect(bands).toHaveLength(1);
     expect(bands[0]).toHaveAttribute('title', 'Launch Day · 2026-09-01 → 2026-09-03');
   });
+  it('grays out a holiday band and keeps a normal event accented', () => {
+    vi.setSystemTime(new Date('2026-09-01T12:00:00Z'));
+    seedCycle();
+    useNameStore.setState((current) => ({
+      lists: current.lists.map((list) => ({
+        ...list,
+        events: [
+          { id: 'e1', name: 'Launch Day', start: '2026-09-01', end: '2026-09-03' },
+          {
+            id: 'e2',
+            name: 'Independence',
+            start: '2026-09-07',
+            end: '2026-09-07',
+            isHoliday: true,
+          },
+        ],
+      })),
+    }));
+
+    render(<CycleWidget />);
+
+    const [launch, holiday] = screen.getAllByTestId('cycle-event-band');
+    expect(launch).toHaveAttribute('data-holiday', 'false');
+    expect(launch.className).toContain('border-accent');
+    expect(holiday).toHaveAttribute('data-holiday', 'true');
+    expect(holiday.className).toContain('border-dashed');
+  });
 });
