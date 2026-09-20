@@ -4,9 +4,12 @@ import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import { useNameStore } from '../../stores/useNameStore';
 import type { SpecialEvent } from '../../types/name';
-import { formatShortDay } from '../../utils/cycle';
+import { addDays, daysBetween, formatShortDay } from '../../utils/cycle';
 import { Button } from '../ui/button';
 import { Switch } from '../ui/switch';
+
+/** An event longer than a year is a data-entry mistake, not a highlight on a cycle. */
+const MAX_EVENT_DURATION_DAYS = 365;
 
 const INPUT_CLASS =
   'w-full px-3 py-2 h-10 font-mono text-sm text-text bg-black/50 border border-border-light focus:shadow-xs focus:shadow-accent focus:outline-none placeholder:text-white/30';
@@ -27,7 +30,7 @@ function EventsPanelComponent() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [start, setStart] = useState('');
-  const [end, setEnd] = useState('');
+  const [durationDays, setDurationDays] = useState('1');
   const [isHoliday, setIsHoliday] = useState(false);
   const [error, setError] = useState('');
 
@@ -35,7 +38,7 @@ function EventsPanelComponent() {
     setEditingId(null);
     setName('');
     setStart('');
-    setEnd('');
+    setDurationDays('1');
     setIsHoliday(false);
     setError('');
   }, []);
@@ -47,15 +50,19 @@ function EventsPanelComponent() {
         setError('Start date is required');
         return;
       }
-      const resolvedEnd = end || start;
-      if (resolvedEnd < start) {
-        setError('End date must be after start date');
+      const parsedDuration = Number(durationDays);
+      if (!Number.isInteger(parsedDuration) || parsedDuration < 1) {
+        setError('Duration must be a whole number of days, at least 1');
+        return;
+      }
+      if (parsedDuration > MAX_EVENT_DURATION_DAYS) {
+        setError(`Duration must be ${MAX_EVENT_DURATION_DAYS} days or fewer`);
         return;
       }
       const values = {
         name: name.trim() || `Event ${events.length + 1}`,
         start,
-        end: resolvedEnd,
+        end: addDays(start, parsedDuration - 1),
         isHoliday,
       };
       if (editingId) {
@@ -65,14 +72,25 @@ function EventsPanelComponent() {
       }
       resetForm();
     },
-    [addEvent, editingId, end, events.length, isHoliday, name, resetForm, start, updateEvent]
+    [
+      addEvent,
+      durationDays,
+      editingId,
+      events.length,
+      isHoliday,
+      name,
+      resetForm,
+      start,
+      updateEvent,
+    ]
   );
 
   const handleEdit = useCallback((specialEvent: SpecialEvent) => {
     setEditingId(specialEvent.id);
     setName(specialEvent.name);
     setStart(specialEvent.start);
-    setEnd(specialEvent.end);
+    const storedDuration = daysBetween(specialEvent.start, specialEvent.end) + 1;
+    setDurationDays(String(Number.isInteger(storedDuration) ? Math.max(1, storedDuration) : 1));
     setIsHoliday(Boolean(specialEvent.isHoliday));
     setError('');
   }, []);
@@ -109,14 +127,20 @@ function EventsPanelComponent() {
           />
         </label>
         <label className="flex items-center justify-between gap-3 whitespace-nowrap font-mono text-xs tracking-wider text-white/60">
-          <span>TO</span>
-          <input
-            type="date"
-            value={end}
-            onChange={(e) => setEnd(e.target.value)}
-            className={cn(INPUT_CLASS, 'w-40 shrink-0')}
-            aria-label="Event end date"
-          />
+          <span>DURATION</span>
+          <span className="flex shrink-0 items-center gap-2">
+            <input
+              type="number"
+              min={1}
+              max={MAX_EVENT_DURATION_DAYS}
+              value={durationDays}
+              onChange={(e) => setDurationDays(e.target.value)}
+              onWheel={(e) => e.currentTarget.blur()}
+              className={cn(INPUT_CLASS, 'w-20 shrink-0')}
+              aria-label="Event duration in days"
+            />
+            <span className="w-10">{Number(durationDays) === 1 ? 'DAY' : 'DAYS'}</span>
+          </span>
         </label>
         <label
           htmlFor="event-holiday"

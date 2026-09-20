@@ -21,7 +21,7 @@ describe('EventsPanel', () => {
     fireEvent.change(screen.getByLabelText('Event start date'), {
       target: { value: '2026-09-10' },
     });
-    fireEvent.change(screen.getByLabelText('Event end date'), { target: { value: '2026-09-12' } });
+    fireEvent.change(screen.getByLabelText('Event duration in days'), { target: { value: '3' } });
     fireEvent.click(screen.getByRole('button', { name: /add event/i }));
 
     expect(activeEvents()).toHaveLength(1);
@@ -29,7 +29,7 @@ describe('EventsPanel', () => {
     expect(screen.getByText('SEP 10 → SEP 12')).toBeInTheDocument();
   });
 
-  it('defaults the end date to the start date', () => {
+  it('defaults to a one-day event', () => {
     render(<EventsPanel />);
 
     fireEvent.change(screen.getByLabelText('Event start date'), {
@@ -39,6 +39,49 @@ describe('EventsPanel', () => {
 
     expect(activeEvents()[0].end).toBe('2026-09-10');
     expect(screen.getByText('SEP 10')).toBeInTheDocument();
+  });
+
+  it('rejects a duration the browser leaves empty', () => {
+    render(<EventsPanel />);
+
+    fireEvent.change(screen.getByLabelText('Event start date'), {
+      target: { value: '2026-09-10' },
+    });
+    fireEvent.change(screen.getByLabelText('Event duration in days'), { target: { value: '' } });
+    fireEvent.click(screen.getByRole('button', { name: /add event/i }));
+
+    expect(
+      screen.getByText('Duration must be a whole number of days, at least 1')
+    ).toBeInTheDocument();
+    expect(activeEvents()).toHaveLength(0);
+  });
+
+  it('rejects a duration beyond the one-year cap on a submit that skips native validation', () => {
+    const { container } = render(<EventsPanel />);
+
+    fireEvent.change(screen.getByLabelText('Event start date'), {
+      target: { value: '2026-09-10' },
+    });
+    fireEvent.change(screen.getByLabelText('Event duration in days'), {
+      target: { value: '999999999' },
+    });
+    // A direct submit event bypasses the max attribute the browser would enforce on a click.
+    fireEvent.submit(container.querySelector('form') as HTMLFormElement);
+
+    expect(screen.getByText('Duration must be 365 days or fewer')).toBeInTheDocument();
+    expect(activeEvents()).toHaveLength(0);
+  });
+
+  it('blurs the duration input on wheel so scrolling cannot change it', () => {
+    render(<EventsPanel />);
+
+    const durationInput = screen.getByLabelText('Event duration in days');
+    durationInput.focus();
+    expect(document.activeElement).toBe(durationInput);
+
+    fireEvent.wheel(durationInput);
+
+    expect(document.activeElement).not.toBe(durationInput);
   });
 
   it('rejects a submit without a start date', () => {
@@ -71,15 +114,17 @@ describe('EventsPanel', () => {
     fireEvent.change(screen.getByLabelText('Event start date'), {
       target: { value: '2026-09-10' },
     });
+    fireEvent.change(screen.getByLabelText('Event duration in days'), { target: { value: '3' } });
     fireEvent.click(screen.getByRole('button', { name: /add event/i }));
 
     fireEvent.click(screen.getByRole('button', { name: 'Edit Launch Day' }));
 
     expect(screen.getByLabelText('Event name')).toHaveValue('Launch Day');
     expect(screen.getByLabelText('Event start date')).toHaveValue('2026-09-10');
+    expect(screen.getByLabelText('Event duration in days')).toHaveValue(3);
 
     fireEvent.change(screen.getByLabelText('Event name'), { target: { value: 'Launch Week' } });
-    fireEvent.change(screen.getByLabelText('Event end date'), { target: { value: '2026-09-14' } });
+    fireEvent.change(screen.getByLabelText('Event duration in days'), { target: { value: '5' } });
     fireEvent.click(screen.getByRole('button', { name: /save event/i }));
 
     const events = activeEvents();

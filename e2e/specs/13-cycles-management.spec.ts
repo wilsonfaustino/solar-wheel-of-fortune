@@ -98,8 +98,8 @@ test.describe('Cycles management', () => {
   }) => {
     await cyclesPage.switchToCyclesTab();
     await cyclesPage.addCycle('Cycle 2', isoDayOffset(-7), isoDayOffset(21), 1);
-    await cyclesPage.addEvent('Launch Day', isoDayOffset(1), isoDayOffset(2));
-    await cyclesPage.addEvent('Independence', isoDayOffset(5), isoDayOffset(5), true);
+    await cyclesPage.addEvent('Launch Day', isoDayOffset(1), 2);
+    await cyclesPage.addEvent('Independence', isoDayOffset(5), 1, true);
 
     await expect(cyclesPage.eventBands).toHaveCount(2);
     await expect(page.locator('[data-testid="cycle-event-band"][data-holiday="true"]')).toHaveCount(
@@ -117,10 +117,24 @@ test.describe('Cycles management', () => {
     await page.getByRole('button', { name: 'Edit Independence' }).click();
     await expect(cyclesPage.holidaySwitch).toBeChecked();
   });
+  test('should span the duration in days and reload it into the edit form', async ({
+    cyclesPage,
+    page,
+  }) => {
+    await cyclesPage.switchToCyclesTab();
+    await cyclesPage.addCycle('Cycle 2', isoDayOffset(-7), isoDayOffset(21), 1);
+    await cyclesPage.addEvent('Launch Week', isoDayOffset(1), 3);
+
+    await page.reload();
+    await cyclesPage.switchToCyclesTab();
+    await page.getByRole('button', { name: 'Edit Launch Week' }).click();
+    await expect(cyclesPage.eventStartInput).toHaveValue(isoDayOffset(1));
+    await expect(cyclesPage.eventDurationInput).toHaveValue('3');
+  });
   test('should show the event details in a tooltip on hover', async ({ cyclesPage }) => {
     await cyclesPage.switchToCyclesTab();
     await cyclesPage.addCycle('Cycle 2', isoDayOffset(-7), isoDayOffset(21), 1);
-    await cyclesPage.addEvent('Independence', isoDayOffset(1), isoDayOffset(2), true);
+    await cyclesPage.addEvent('Independence', isoDayOffset(1), 2, true);
 
     await expect(cyclesPage.eventTooltip).toHaveCount(0);
 

@@ -1,11 +1,5 @@
 import type { Cycle, EventCountdown, EventOverlap, SpecialEvent } from '../types/name';
-import { isWeekday, weekdaysBetween } from './cycle';
-
-const MS_PER_DAY = 86_400_000;
-
-function daysBetween(fromISO: string, toISO: string): number {
-  return Math.round((Date.parse(toISO) - Date.parse(fromISO)) / MS_PER_DAY);
-}
+import { daysBetween, isWeekday, weekdaysBetween } from './cycle';
 
 /** Active event wins over upcoming ones; otherwise the nearest future event. */
 export function getEventCountdown(events: SpecialEvent[], todayISO: string): EventCountdown | null {

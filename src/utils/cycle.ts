@@ -21,11 +21,11 @@ export function toISODay(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-function daysBetween(fromISO: string, toISO: string): number {
+export function daysBetween(fromISO: string, toISO: string): number {
   return Math.round((Date.parse(toISO) - Date.parse(fromISO)) / MS_PER_DAY);
 }
 
-function addDays(isoDay: string, days: number): string {
+export function addDays(isoDay: string, days: number): string {
   return toISODay(new Date(Date.parse(isoDay) + days * MS_PER_DAY));
 }
 
