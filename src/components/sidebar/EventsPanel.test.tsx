@@ -56,6 +56,34 @@ describe('EventsPanel', () => {
     expect(activeEvents()).toHaveLength(0);
   });
 
+  it('rejects a duration beyond the one-year cap on a submit that skips native validation', () => {
+    const { container } = render(<EventsPanel />);
+
+    fireEvent.change(screen.getByLabelText('Event start date'), {
+      target: { value: '2026-09-10' },
+    });
+    fireEvent.change(screen.getByLabelText('Event duration in days'), {
+      target: { value: '999999999' },
+    });
+    // A direct submit event bypasses the max attribute the browser would enforce on a click.
+    fireEvent.submit(container.querySelector('form') as HTMLFormElement);
+
+    expect(screen.getByText('Duration must be 365 days or fewer')).toBeInTheDocument();
+    expect(activeEvents()).toHaveLength(0);
+  });
+
+  it('blurs the duration input on wheel so scrolling cannot change it', () => {
+    render(<EventsPanel />);
+
+    const durationInput = screen.getByLabelText('Event duration in days');
+    durationInput.focus();
+    expect(document.activeElement).toBe(durationInput);
+
+    fireEvent.wheel(durationInput);
+
+    expect(document.activeElement).not.toBe(durationInput);
+  });
+
   it('rejects a submit without a start date', () => {
     render(<EventsPanel />);
 
