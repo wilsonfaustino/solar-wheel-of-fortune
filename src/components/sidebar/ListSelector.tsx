@@ -3,6 +3,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { ChevronDown, Edit2, Plus, Trash2 } from 'lucide-react';
 import { memo, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { selectActiveList } from '../../stores/useNameStore';
 import type { NameList } from '../../types/name';
 import { ConfirmDialog } from '../shared';
 import { Button } from '../ui/button';
@@ -32,7 +33,7 @@ function ListSelectorComponent({
   } | null>(null);
   const [createTitle, setCreateTitle] = useState<string | null>(null);
 
-  const activeList = lists.find((list) => list.id === activeListId);
+  const activeList = selectActiveList({ lists, activeListId });
   const deleteNameLabel = deleteConfirm?.nameCount === 1 ? 'name' : 'names';
 
   const handleCreateSubmit = (event: React.FormEvent) => {

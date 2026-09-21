@@ -482,6 +482,14 @@ export const useNameStore = create<NameStore>()(
   )
 );
 
+export type ActiveListSlice = Pick<NameState, 'lists' | 'activeListId'>;
+
+export const selectActiveList = (state: ActiveListSlice): NameList | undefined =>
+  state.lists.find((list) => list.id === state.activeListId);
+
+export const selectActiveNames = (state: ActiveListSlice): Name[] =>
+  selectActiveList(state)?.names.filter((name) => !name.isExcluded) ?? [];
+
 export const selectHistoryStats = (
   state: NameStore
 ): { total: number; unique: number; lastSelection: Date | null } => {

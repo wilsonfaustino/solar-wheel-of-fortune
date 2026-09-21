@@ -2,7 +2,7 @@ import { CalendarClock } from 'lucide-react';
 import { memo, useMemo } from 'react';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
-import { useNameStore } from '../../stores/useNameStore';
+import { selectActiveList, useNameStore } from '../../stores/useNameStore';
 import { toISODay } from '../../utils/cycle';
 import { getEventCountdown } from '../../utils/event';
 
@@ -16,7 +16,7 @@ function EventCountdownBadgeComponent() {
   );
 
   const countdown = useMemo(() => {
-    const events = lists.find((list) => list.id === activeListId)?.events ?? [];
+    const events = selectActiveList({ lists, activeListId })?.events ?? [];
     return getEventCountdown(events, toISODay(new Date()));
   }, [lists, activeListId]);
 
