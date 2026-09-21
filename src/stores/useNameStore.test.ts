@@ -337,6 +337,15 @@ describe('useNameStore', () => {
 
       expect(useNameStore.getState().lists[0].names).toHaveLength(initialLength);
     });
+
+    it('should enforce the length limit after uppercasing', () => {
+      const initialLength = useNameStore.getState().lists[0].names.length;
+
+      // 'ß'.toUpperCase() is 'SS', so 99 characters become 198
+      useNameStore.getState().bulkAddNames(['ß'.repeat(99)]);
+
+      expect(useNameStore.getState().lists[0].names).toHaveLength(initialLength);
+    });
   });
 
   describe('multi-list scenarios', () => {
