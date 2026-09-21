@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
-import { useNameStore } from '../../stores/useNameStore';
+import { selectActiveList, useNameStore } from '../../stores/useNameStore';
 import { AddNameForm } from './AddNameForm';
 import { BulkActionsPanel } from './BulkActionsPanel';
 import { CyclesPanel } from './CyclesPanel';
@@ -49,7 +49,7 @@ function NameManagementSidebarComponent({
 
   // Get active list
   const activeList = useMemo(
-    () => lists.find((list) => list.id === activeListId),
+    () => selectActiveList({ lists, activeListId }),
     [lists, activeListId]
   );
 

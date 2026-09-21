@@ -2,7 +2,7 @@ import { Edit2, Plus, Trash2 } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
-import { useNameStore } from '../../stores/useNameStore';
+import { selectActiveList, useNameStore } from '../../stores/useNameStore';
 import type { SpecialEvent } from '../../types/name';
 import { addDays, daysBetween, formatShortDay } from '../../utils/cycle';
 import { Button } from '../ui/button';
@@ -23,7 +23,7 @@ function EventsPanelComponent() {
   const deleteEvent = useNameStore((state) => state.deleteEvent);
 
   const events = useMemo(
-    () => lists.find((list) => list.id === activeListId)?.events ?? [],
+    () => selectActiveList({ lists, activeListId })?.events ?? [],
     [lists, activeListId]
   );
 

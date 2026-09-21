@@ -2,7 +2,7 @@ import { Edit2, Plus, Trash2 } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
-import { useNameStore } from '../../stores/useNameStore';
+import { selectActiveList, useNameStore } from '../../stores/useNameStore';
 import type { Cycle } from '../../types/name';
 import { formatShortDay, getCooldownRange, weekdaysBetween } from '../../utils/cycle';
 import { Button } from '../ui/button';
@@ -19,7 +19,7 @@ function CyclesPanelComponent() {
   const deleteCycle = useNameStore((state) => state.deleteCycle);
 
   const cycles = useMemo(
-    () => lists.find((list) => list.id === activeListId)?.cycles ?? [],
+    () => selectActiveList({ lists, activeListId })?.cycles ?? [],
     [lists, activeListId]
   );
 

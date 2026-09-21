@@ -12,6 +12,7 @@ import type {
   SpecialEvent,
 } from '../types/name';
 import type { Theme } from '../types/theme';
+import { filterValidNames } from '../utils/name';
 import type { ParsedSharedList } from '../utils/shareList';
 
 function generateId(): string {
@@ -391,9 +392,7 @@ export const useNameStore = create<NameStore>()(
         set((draft) => {
           const activeList = draft.lists.find((list) => list.id === draft.activeListId);
           if (activeList) {
-            const validNames = names
-              .map((n) => n.trim().toUpperCase())
-              .filter((n) => n.length > 0 && n.length <= 100);
+            const validNames = filterValidNames(names.map((name) => name.toUpperCase()));
 
             validNames.forEach((nameValue) => {
               activeList.names.push(createName(nameValue));
@@ -482,6 +481,14 @@ export const useNameStore = create<NameStore>()(
     }
   )
 );
+
+export type ActiveListSlice = Pick<NameState, 'lists' | 'activeListId'>;
+
+export const selectActiveList = (state: ActiveListSlice): NameList | undefined =>
+  state.lists.find((list) => list.id === state.activeListId);
+
+export const selectActiveNames = (state: ActiveListSlice): Name[] =>
+  selectActiveList(state)?.names.filter((name) => !name.isExcluded) ?? [];
 
 export const selectHistoryStats = (
   state: NameStore

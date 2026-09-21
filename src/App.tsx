@@ -9,7 +9,7 @@ import { showSelectionToast, Toaster } from './components/toast';
 import { GlitchText } from './components/ui/GlitchText';
 import { RadialWheel, type RadialWheelRef } from './components/wheel';
 import { useKeyboardShortcuts, useMediaQuery } from './hooks';
-import { useNameStore } from './stores/useNameStore';
+import { selectActiveNames, useNameStore } from './stores/useNameStore';
 import { useSettingsStore } from './stores/useSettingsStore';
 import type { Name } from './types/name';
 
@@ -48,11 +48,7 @@ function App() {
     document.documentElement.dataset.theme = currentTheme;
   }, [currentTheme]);
 
-  const names = useMemo(() => {
-    const activeList = lists.find((list) => list.id === activeListId);
-    if (!activeList) return [];
-    return activeList.names.filter((name) => !name.isExcluded);
-  }, [lists, activeListId]);
+  const names = useMemo(() => selectActiveNames({ lists, activeListId }), [lists, activeListId]);
 
   const handleSelect = useCallback(
     (name: Name) => {
@@ -62,11 +58,7 @@ function App() {
       // Auto-exclude after 2 seconds (only if setting is enabled and not the last name)
       if (autoExcludeEnabled) {
         setTimeout(() => {
-          const state = useNameStore.getState();
-          const activeList = state.lists.find((list) => list.id === state.activeListId);
-          if (!activeList) return;
-
-          const activeNames = activeList.names.filter((n) => !n.isExcluded);
+          const activeNames = selectActiveNames(useNameStore.getState());
 
           // Only auto-exclude if more than 1 active name remains
           if (activeNames.length > 1) {

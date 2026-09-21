@@ -2,6 +2,8 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Plus, Upload } from 'lucide-react';
 import { memo, useCallback, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { MAX_NAME_LENGTH } from '../../constants/defaults';
+import { filterValidNames } from '../../utils/name';
 import { Button } from '../ui/button';
 
 interface AddNameFormProps {
@@ -24,8 +26,8 @@ function AddNameFormComponent({ onAddName, onBulkImport }: Readonly<AddNameFormP
         setError('Name cannot be empty');
         return;
       }
-      if (trimmed.length > 100) {
-        setError('Name must be 100 characters or less');
+      if (trimmed.length > MAX_NAME_LENGTH) {
+        setError(`Name must be ${MAX_NAME_LENGTH} characters or less`);
         return;
       }
 
@@ -37,10 +39,7 @@ function AddNameFormComponent({ onAddName, onBulkImport }: Readonly<AddNameFormP
   );
 
   const handleBulkImport = useCallback(() => {
-    const names = bulkText
-      .split('\n')
-      .map((n) => n.trim())
-      .filter((n) => n.length > 0 && n.length <= 100);
+    const names = filterValidNames(bulkText.split('\n'));
 
     if (names.length === 0) {
       setError('No valid names to import');
@@ -70,16 +69,16 @@ function AddNameFormComponent({ onAddName, onBulkImport }: Readonly<AddNameFormP
             }}
             placeholder="Enter name..."
             className="w-full px-3 py-3 h-11 font-mono text-sm text-text bg-black/50 border border-border-light shadow-none focus:shadow-xs focus:shadow-accent focus:outline-none placeholder:text-white/30 "
-            maxLength={100}
+            maxLength={MAX_NAME_LENGTH}
           />
           {showCharCount && (
             <div
               className={cn(
                 'text-xs font-mono mt-1',
-                charCount >= 100 ? 'text-red-400' : 'text-white/50'
+                charCount >= MAX_NAME_LENGTH ? 'text-red-400' : 'text-white/50'
               )}
             >
-              {charCount}/100
+              {charCount}/{MAX_NAME_LENGTH}
             </div>
           )}
           {error && <div className="text-xs text-red-400 font-mono mt-1">{error}</div>}

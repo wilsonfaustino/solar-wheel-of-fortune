@@ -1,8 +1,8 @@
 import type { Cycle, Name, NameList, SelectionRecord, SpecialEvent } from '../types/name';
 import { downloadFile } from './export';
+import { isValidNameLength } from './name';
 
 const SHARE_FORMAT_V1 = 'name-list-v1';
-const MAX_NAME_LENGTH = 100;
 const SHARE_FORMAT_V2 = 'name-list-v2';
 
 /** History entries key on the name value: ids are rebuilt by the importing store. */
@@ -145,7 +145,7 @@ export function parseSharedList(fileContent: string): ParsedSharedList {
     names: parsed.list.names
       .filter((entry) => typeof entry === 'string' || typeof entry?.value === 'string')
       .map(parseName)
-      .filter((name) => name.value.length > 0 && name.value.length <= MAX_NAME_LENGTH),
+      .filter((name) => isValidNameLength(name.value)),
     cycles: (parsed.list.cycles ?? []).map(({ id: _id, ...cycle }) => cycle),
     events: (parsed.list.events ?? []).map(({ id: _id, ...event }) => event),
     history: Array.isArray(parsed.list.history) ? parsed.list.history : [],
