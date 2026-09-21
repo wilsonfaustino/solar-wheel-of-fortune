@@ -1,5 +1,10 @@
 import { mockInitialState } from '@/test/test-data';
-import { selectHistoryStats, useNameStore } from './useNameStore';
+import {
+  selectActiveList,
+  selectActiveNames,
+  selectHistoryStats,
+  useNameStore,
+} from './useNameStore';
 
 describe('useNameStore', () => {
   beforeEach(() => {
@@ -521,6 +526,32 @@ describe('useNameStore', () => {
       expect(stats.total).toBe(0);
       expect(stats.unique).toBe(0);
       expect(stats.lastSelection).toBeNull();
+    });
+  });
+
+  describe('active list selectors', () => {
+    it('should return the list matching activeListId', () => {
+      const state = useNameStore.getState();
+
+      expect(selectActiveList(state)?.id).toBe(state.activeListId);
+    });
+
+    it('should exclude names flagged as excluded', () => {
+      const state = useNameStore.getState();
+      const excludedId = state.lists[0].names[0].id;
+      state.toggleNameExclusion(excludedId);
+
+      const activeNames = selectActiveNames(useNameStore.getState());
+
+      expect(activeNames.some((name) => name.id === excludedId)).toBe(false);
+    });
+
+    it('should fall back when activeListId matches no list', () => {
+      useNameStore.setState({ activeListId: 'missing-list' });
+      const state = useNameStore.getState();
+
+      expect(selectActiveList(state)).toBeUndefined();
+      expect(selectActiveNames(state)).toEqual([]);
     });
   });
 
