@@ -9,7 +9,7 @@ import { showSelectionToast, Toaster } from './components/toast';
 import { GlitchText } from './components/ui/GlitchText';
 import { RadialWheel, type RadialWheelRef } from './components/wheel';
 import { useKeyboardShortcuts, useMediaQuery } from './hooks';
-import { selectActiveList, selectActiveNames, useNameStore } from './stores/useNameStore';
+import { selectActiveNames, useNameStore } from './stores/useNameStore';
 import { useSettingsStore } from './stores/useSettingsStore';
 import type { Name } from './types/name';
 
@@ -58,10 +58,7 @@ function App() {
       // Auto-exclude after 2 seconds (only if setting is enabled and not the last name)
       if (autoExcludeEnabled) {
         setTimeout(() => {
-          const state = useNameStore.getState();
-          if (!selectActiveList(state)) return;
-
-          const activeNames = selectActiveNames(state);
+          const activeNames = selectActiveNames(useNameStore.getState());
 
           // Only auto-exclude if more than 1 active name remains
           if (activeNames.length > 1) {
