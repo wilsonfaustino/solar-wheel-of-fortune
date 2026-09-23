@@ -1,7 +1,8 @@
-import { Edit2, Eye, EyeOff, Hand, Trash2 } from 'lucide-react';
+import { Edit2, Eye, EyeOff, Hand, Trash2, UserCheck, UserX } from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { Name } from '../../types/name';
+import { isUnavailableToday } from '../../utils/name';
 import { Button } from '../ui/button';
 
 interface NameListItemProps {
@@ -10,6 +11,33 @@ interface NameListItemProps {
   onDelete: (nameId: string) => void;
   onToggleExclude: (nameId: string) => void;
   onVolunteer: (nameId: string) => void;
+  onToggleUnavailable: (nameId: string) => void;
+}
+
+interface UnavailableToggleProps {
+  nameValue: string;
+  isUnavailable: boolean;
+  onToggle: () => void;
+}
+
+function UnavailableToggle({
+  nameValue,
+  isUnavailable,
+  onToggle,
+}: Readonly<UnavailableToggleProps>) {
+  return (
+    <Button
+      type="button"
+      onClick={onToggle}
+      variant="tech-ghost"
+      size="icon-sm"
+      className={isUnavailable ? 'opacity-30' : 'text-accent opacity-70'}
+      aria-label={`Mark ${nameValue} ${isUnavailable ? 'available' : 'unavailable'} today`}
+      title={isUnavailable ? 'Available today' : 'Unavailable today'}
+    >
+      {isUnavailable ? <UserX className="size-4" /> : <UserCheck className="size-4" />}
+    </Button>
+  );
 }
 
 function NameListItemComponent({
@@ -18,10 +46,12 @@ function NameListItemComponent({
   onDelete,
   onToggleExclude,
   onVolunteer,
+  onToggleUnavailable,
 }: Readonly<NameListItemProps>) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(name.value);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isUnavailable = isUnavailableToday(name);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -48,7 +78,7 @@ function NameListItemComponent({
       data-testid={`name-item-${name.id}`}
       className={cn(
         'px-4 py-3 last:border-b-0 transition-colors group bg-transparent border-b border-b-white/5 hover:bg-white/5',
-        name.isExcluded ? 'opacity-50' : 'opacity-100'
+        name.isExcluded || isUnavailable ? 'opacity-50' : 'opacity-100'
       )}
     >
       {isEditing ? (
@@ -83,7 +113,7 @@ function NameListItemComponent({
           </button>
 
           <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            {!name.isExcluded && (
+            {!name.isExcluded && !isUnavailable && (
               <Button
                 type="button"
                 onClick={() => onVolunteer(name.id)}
@@ -96,6 +126,11 @@ function NameListItemComponent({
                 <Hand className="size-4" />
               </Button>
             )}
+            <UnavailableToggle
+              nameValue={name.value}
+              isUnavailable={isUnavailable}
+              onToggle={() => onToggleUnavailable(name.id)}
+            />
             <Button
               type="button"
               onClick={() => onToggleExclude(name.id)}

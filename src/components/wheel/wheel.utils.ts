@@ -21,6 +21,8 @@ const calculateSpinsValue = () =>
  *   accumulates (e.g., -1080 after 3 full rotations).
  * @param {number} namesLength - The total number of names on the wheel. Used to calculate
  *   degrees per name segment (360 / namesLength) and to randomly select a final index.
+ * @param {number[]} [selectableIndices] - Indices allowed to win. Defaults to every index.
+ *   Unavailable names stay on the wheel for geometry but are left out of this list.
  *
  * @returns {Object} An object containing:
  *   @returns {number} targetRotation - The new rotation value to set. Always negative
@@ -61,10 +63,13 @@ const calculateSpinsValue = () =>
  */
 export const calculateTargetRotation = (
   rotation: number,
-  namesLength: number
+  namesLength: number,
+  selectableIndices?: number[]
 ): { targetRotation: number; finalIndex: number } => {
   const spins = calculateSpinsValue();
-  const finalIndex = Math.floor(randomFloat() * namesLength);
+  const finalIndex = selectableIndices
+    ? selectableIndices[Math.floor(randomFloat() * selectableIndices.length)]
+    : Math.floor(randomFloat() * namesLength);
   const degreesPerName = 360 / namesLength;
 
   // Name at finalIndex starts at: -90 + finalIndex * degreesPerName

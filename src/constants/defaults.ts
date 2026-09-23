@@ -31,6 +31,7 @@ export const LABEL_CONFIG = {
   selectedFontSize: 24,
   defaultFontSize: 13,
   defaultOpacity: 0.85,
+  unavailableOpacity: 0.2,
 } as const;
 
 export const ANIMATION_CONFIG = {

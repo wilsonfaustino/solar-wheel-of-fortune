@@ -4,6 +4,7 @@ import { m, useReducedMotion } from 'motion/react';
 import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import type { Name } from '../../types/name';
+import { toLocalISODay } from '../../utils/name';
 import { RadialWheel, type RadialWheelRef } from './RadialWheel';
 
 vi.mock('motion/react', async (importOriginal) => {
@@ -212,5 +213,121 @@ describe('RadialWheel', () => {
     // After animation completes, spinning state is cleared and button re-enables
     const spinButton = screen.getByRole('button', { name: /randomize selection/i });
     expect(spinButton).not.toBeDisabled();
+  });
+
+  describe('unavailable names', () => {
+    const markUnavailable = (name: Name): Name => ({
+      ...name,
+      unavailableOn: toLocalISODay(new Date()),
+    });
+
+    const completeAnimation = () => {
+      const mockDiv = vi.mocked(m.div);
+      const lastCallProps = mockDiv.mock.calls[mockDiv.mock.calls.length - 1][0];
+      act(() => {
+        (lastCallProps.onAnimationComplete as () => void)();
+      });
+    };
+
+    it('should render unavailable names greyed out', () => {
+      const names = [markUnavailable(MOCK_NAMES[0]), MOCK_NAMES[1]];
+      render(<RadialWheel names={names} onSelect={vi.fn()} />);
+
+      expect(screen.getByText('Alice')).toHaveAttribute('data-unavailable', 'true');
+      expect(screen.getByText('Bob')).not.toHaveAttribute('data-unavailable');
+    });
+
+    it('should disable spin when every name is unavailable', () => {
+      const onSelect = vi.fn();
+      const wheelRef = createRef<RadialWheelRef>();
+      render(
+        <RadialWheel ref={wheelRef} names={MOCK_NAMES.map(markUnavailable)} onSelect={onSelect} />
+      );
+
+      act(() => {
+        wheelRef.current?.spin();
+      });
+
+      expect(screen.getByRole('button', { name: /randomize selection/i })).toBeDisabled();
+      expect(onSelect).not.toHaveBeenCalled();
+    });
+
+    it('should never select an unavailable name', () => {
+      for (let spinRound = 0; spinRound < 10; spinRound++) {
+        const onSelect = vi.fn();
+        const wheelRef = createRef<RadialWheelRef>();
+        const { unmount } = render(
+          <RadialWheel
+            ref={wheelRef}
+            names={[markUnavailable(MOCK_NAMES[0]), MOCK_NAMES[1]]}
+            onSelect={onSelect}
+          />
+        );
+
+        act(() => {
+          wheelRef.current?.spin();
+        });
+        completeAnimation();
+
+        expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ id: '2' }));
+        unmount();
+      }
+    });
+
+    it('should read today at spin time so yesterday unavailable names can win', () => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(new Date(2026, 8, 23, 18));
+      const onSelect = vi.fn();
+      const wheelRef = createRef<RadialWheelRef>();
+      render(
+        <RadialWheel ref={wheelRef} names={[markUnavailable(MOCK_NAMES[0])]} onSelect={onSelect} />
+      );
+
+      vi.setSystemTime(new Date(2026, 8, 24, 8));
+      act(() => {
+        wheelRef.current?.spin();
+      });
+      completeAnimation();
+      vi.useRealTimers();
+
+      expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ id: '1' }));
+    });
+
+    it('should drop the selected highlight when the picked name becomes unavailable', () => {
+      const wheelRef = createRef<RadialWheelRef>();
+      const { rerender } = render(
+        <RadialWheel ref={wheelRef} names={[MOCK_NAMES[0]]} onSelect={vi.fn()} />
+      );
+      act(() => {
+        wheelRef.current?.spin();
+      });
+      completeAnimation();
+      expect(screen.getByText('Alice')).toHaveAttribute('fill', 'var(--color-accent)');
+
+      rerender(
+        <RadialWheel ref={wheelRef} names={[markUnavailable(MOCK_NAMES[0])]} onSelect={vi.fn()} />
+      );
+
+      expect(screen.getByText('Alice')).toHaveAttribute('fill', 'var(--color-text)');
+      expect(screen.getByText('Alice')).toHaveAttribute('data-unavailable', 'true');
+    });
+
+    it('should not select a name marked unavailable during the spin', () => {
+      const onSelect = vi.fn();
+      const wheelRef = createRef<RadialWheelRef>();
+      const { rerender } = render(
+        <RadialWheel ref={wheelRef} names={[MOCK_NAMES[0]]} onSelect={onSelect} />
+      );
+
+      act(() => {
+        wheelRef.current?.spin();
+      });
+      rerender(
+        <RadialWheel ref={wheelRef} names={[markUnavailable(MOCK_NAMES[0])]} onSelect={onSelect} />
+      );
+      completeAnimation();
+
+      expect(onSelect).not.toHaveBeenCalled();
+    });
   });
 });

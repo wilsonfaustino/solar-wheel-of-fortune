@@ -4,6 +4,7 @@ import { ANIMATION_CONFIG, WHEEL_CONFIG } from '../../constants/defaults';
 import { useSpinSound } from '../../hooks';
 import { useNameStore } from '../../stores/useNameStore';
 import type { Name } from '../../types/name';
+import { isUnavailableToday } from '../../utils/name';
 import { CenterButton } from './CenterButton';
 import { NameLabel } from './NameLabel';
 import { calculateTargetRotation } from './wheel.utils';
@@ -28,14 +29,24 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
     const shouldReduceMotion = useReducedMotion();
     const { playSpinSound } = useSpinSound();
 
+    const hasSelectableNames = names.some((name) => !isUnavailableToday(name));
+
     const handleSpin = useCallback(() => {
-      if (isSpinning || names.length === 0) return;
+      // Read today at spin time so a tab left open overnight drops yesterday's marks
+      const selectableIndices = names.flatMap((name, index) =>
+        isUnavailableToday(name) ? [] : [index]
+      );
+      if (isSpinning || selectableIndices.length === 0) return;
 
       playSpinSound();
       setIsSpinning(true);
       setSelectedIndex(null);
 
-      const { targetRotation, finalIndex } = calculateTargetRotation(rotation, names.length);
+      const { targetRotation, finalIndex } = calculateTargetRotation(
+        rotation,
+        names.length,
+        selectableIndices
+      );
 
       setPendingSelectionIndex(finalIndex);
       setRotation(targetRotation);
@@ -70,10 +81,12 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
             if (pendingSelectionIndex !== null) {
               const selectedName = names[pendingSelectionIndex];
               setIsSpinning(false);
+              setPendingSelectionIndex(null);
+              // Marked unavailable from the sidebar while the wheel was spinning
+              if (isUnavailableToday(selectedName)) return;
               setSelectedIndex(pendingSelectionIndex);
               onSelect(selectedName);
               recordSelection(selectedName.value, selectedName.id, 'wheel');
-              setPendingSelectionIndex(null);
             }
           }}
         >
@@ -91,20 +104,24 @@ export const RadialWheel = forwardRef<RadialWheelRef, RadialWheelProps>(
               strokeWidth="0.5"
             />
             <g id="names-container">
-              {names.map((name, index) => (
-                <NameLabel
-                  key={name.id}
-                  name={name.value}
-                  index={index}
-                  totalNames={names.length}
-                  isSelected={selectedIndex === index}
-                />
-              ))}
+              {names.map((name, index) => {
+                const isUnavailable = isUnavailableToday(name);
+                return (
+                  <NameLabel
+                    key={name.id}
+                    name={name.value}
+                    index={index}
+                    totalNames={names.length}
+                    isSelected={selectedIndex === index && !isUnavailable}
+                    isUnavailable={isUnavailable}
+                  />
+                );
+              })}
             </g>
           </svg>
         </m.div>
 
-        <CenterButton onClick={handleSpin} isSpinning={isSpinning} disabled={names.length === 0} />
+        <CenterButton onClick={handleSpin} isSpinning={isSpinning} disabled={!hasSelectableNames} />
       </div>
     );
   }

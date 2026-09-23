@@ -214,6 +214,25 @@ describe('App - Auto-Exclusion Logic', () => {
     expect(name2?.isExcluded).toBe(false);
   });
 
+  test('should NOT auto-exclude the last name that is still available today', async () => {
+    const state = useNameStore.getState();
+    state.toggleUnavailableToday('name-2');
+    state.toggleUnavailableToday('name-3');
+
+    render(<App />);
+
+    await act(async () => {
+      screen.getByTestId('wheel').click();
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+
+    const name = useNameStore.getState().lists[0].names.find((n) => n.id === 'name-1');
+    expect(name?.isExcluded).toBe(false);
+  });
+
   test('should queue multiple exclusions independently', async () => {
     render(<App />);
 
