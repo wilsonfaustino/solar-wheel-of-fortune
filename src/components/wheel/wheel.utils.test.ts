@@ -288,4 +288,22 @@ describe('calculateTargetRotation', () => {
       expect(magnitude).toBeLessThanOrEqual((WHEEL_CONFIG.maxSpins + 1) * 360);
     });
   });
+
+  describe('Selectable indices', () => {
+    it('should only return an index from the selectable list', () => {
+      for (const randomValue of [0, 0.25, 0.5, 0.75, 0.999]) {
+        mockRandomSequence([0.5, randomValue]);
+        const { finalIndex } = calculateTargetRotation(0, 12, [2, 7]);
+        expect([2, 7]).toContain(finalIndex);
+      }
+    });
+
+    it('should land the selected name using all rendered names for geometry', () => {
+      mockRandomSequence([0.5, 0.999]);
+      const { targetRotation, finalIndex } = calculateTargetRotation(0, 12, [2, 7]);
+
+      expect(finalIndex).toBe(7);
+      verifyNameLandsAt0Degrees(finalIndex, 12, targetRotation);
+    });
+  });
 });

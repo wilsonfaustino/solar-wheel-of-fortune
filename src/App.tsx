@@ -14,6 +14,7 @@ import { selectActiveNames, useNameStore } from './stores/useNameStore';
 import { useSettingsStore } from './stores/useSettingsStore';
 import type { Name } from './types/name';
 import { buildFaviconHref } from './utils/favicon';
+import { isUnavailableToday } from './utils/name';
 
 const instructionText = 'CLICK CENTER TO RANDOMIZE';
 
@@ -63,10 +64,12 @@ function App() {
       // Auto-exclude after 2 seconds (only if setting is enabled and not the last name)
       if (autoExcludeEnabled) {
         setTimeout(() => {
-          const activeNames = selectActiveNames(useNameStore.getState());
+          const selectableNames = selectActiveNames(useNameStore.getState()).filter(
+            (activeName) => !isUnavailableToday(activeName)
+          );
 
-          // Only auto-exclude if more than 1 active name remains
-          if (activeNames.length > 1) {
+          // Only auto-exclude if more than 1 selectable name remains
+          if (selectableNames.length > 1) {
             toggleNameExclusion(name.id);
 
             // Clear selection if setting is enabled

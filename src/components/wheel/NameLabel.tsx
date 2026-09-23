@@ -7,9 +7,16 @@ interface NameLabelProps {
   index: number;
   totalNames: number;
   isSelected: boolean;
+  isUnavailable?: boolean;
 }
 
-function NameLabelComponent({ name, index, totalNames, isSelected }: Readonly<NameLabelProps>) {
+function NameLabelComponent({
+  name,
+  index,
+  totalNames,
+  isSelected,
+  isUnavailable,
+}: Readonly<NameLabelProps>) {
   const angleStep = (2 * Math.PI) / totalNames;
   const angle = index * angleStep - Math.PI / 2;
   const positionX = WHEEL_CONFIG.centerOffset + Math.cos(angle) * WHEEL_CONFIG.circleRadius;
@@ -29,7 +36,14 @@ function NameLabelComponent({ name, index, totalNames, isSelected }: Readonly<Na
         fontSize={isSelected ? LABEL_CONFIG.selectedFontSize : LABEL_CONFIG.defaultFontSize}
         fontWeight={isSelected ? '600' : '300'}
         fill={isSelected ? 'var(--color-accent)' : 'var(--color-text)'}
-        opacity={isSelected ? 1 : LABEL_CONFIG.defaultOpacity}
+        opacity={
+          isSelected
+            ? 1
+            : isUnavailable
+              ? LABEL_CONFIG.unavailableOpacity
+              : LABEL_CONFIG.defaultOpacity
+        }
+        data-unavailable={isUnavailable || undefined}
         letterSpacing="2"
         style={{
           transition: 'opacity 0.3s ease, fill 0.3s ease, font-size 0.3s ease',
