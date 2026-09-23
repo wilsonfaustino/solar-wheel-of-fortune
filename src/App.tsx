@@ -8,10 +8,12 @@ import { NameManagementSidebar } from './components/sidebar';
 import { showSelectionToast, Toaster } from './components/toast';
 import { GlitchText } from './components/ui/GlitchText';
 import { RadialWheel, type RadialWheelRef } from './components/wheel';
+import { THEMES } from './constants/themes';
 import { useKeyboardShortcuts, useMediaQuery } from './hooks';
 import { selectActiveNames, useNameStore } from './stores/useNameStore';
 import { useSettingsStore } from './stores/useSettingsStore';
 import type { Name } from './types/name';
+import { buildFaviconHref } from './utils/favicon';
 
 const instructionText = 'CLICK CENTER TO RANDOMIZE';
 
@@ -46,6 +48,9 @@ function App() {
 
   useEffect(() => {
     document.documentElement.dataset.theme = currentTheme;
+    document
+      .querySelector('link[rel="icon"]')
+      ?.setAttribute('href', buildFaviconHref(THEMES[currentTheme].colors.accent));
   }, [currentTheme]);
 
   const names = useMemo(() => selectActiveNames({ lists, activeListId }), [lists, activeListId]);
