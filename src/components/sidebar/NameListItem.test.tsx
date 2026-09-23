@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import type { Name } from '../../types/name';
+import { toLocalISODay } from '../../utils/name';
 import { NameListItem } from './NameListItem';
 
 const mockName: Name = {
@@ -21,6 +22,7 @@ const defaultProps = {
   onDelete: vi.fn(),
   onToggleExclude: vi.fn(),
   onVolunteer: vi.fn(),
+  onToggleUnavailable: vi.fn(),
 };
 
 describe('NameListItem', () => {
@@ -45,5 +47,34 @@ describe('NameListItem', () => {
     await user.click(screen.getByRole('button', { name: /volunteer alice/i }));
 
     expect(onVolunteer).toHaveBeenCalledWith(mockName.id);
+  });
+
+  describe('unavailable today', () => {
+    const unavailableName: Name = { ...mockName, unavailableOn: toLocalISODay(new Date()) };
+
+    it('should call onToggleUnavailable with name id', async () => {
+      const onToggleUnavailable = vi.fn();
+      const user = userEvent.setup();
+      render(<NameListItem {...defaultProps} onToggleUnavailable={onToggleUnavailable} />);
+
+      await user.click(screen.getByRole('button', { name: /mark alice unavailable today/i }));
+
+      expect(onToggleUnavailable).toHaveBeenCalledWith(mockName.id);
+    });
+
+    it('should offer to mark an unavailable name available', () => {
+      render(<NameListItem {...defaultProps} name={unavailableName} />);
+
+      expect(
+        screen.getByRole('button', { name: /mark alice available today/i })
+      ).toBeInTheDocument();
+    });
+
+    it('should grey out an unavailable name and hide the volunteer button', () => {
+      render(<NameListItem {...defaultProps} name={unavailableName} />);
+
+      expect(screen.getByTestId('name-item-name-1')).toHaveClass('opacity-50');
+      expect(screen.queryByRole('button', { name: /volunteer alice/i })).not.toBeInTheDocument();
+    });
   });
 });

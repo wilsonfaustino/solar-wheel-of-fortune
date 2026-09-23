@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import type { Name } from '../../types/name';
+import { isUnavailableToday } from '../../utils/name';
 import { NameListItem } from './NameListItem';
 
 interface NameListDisplayProps {
@@ -8,6 +9,7 @@ interface NameListDisplayProps {
   onDelete: (nameId: string) => void;
   onToggleExclude: (nameId: string) => void;
   onVolunteer: (nameId: string) => void;
+  onToggleUnavailable: (nameId: string) => void;
 }
 
 function NameListDisplayComponent({
@@ -16,9 +18,16 @@ function NameListDisplayComponent({
   onDelete,
   onToggleExclude,
   onVolunteer,
+  onToggleUnavailable,
 }: Readonly<NameListDisplayProps>) {
   const activeNames = names.filter((n) => !n.isExcluded);
   const excludedNames = names.filter((n) => n.isExcluded);
+  const unavailableCount = activeNames.filter((n) => isUnavailableToday(n)).length;
+  const countSegments = [
+    `${activeNames.length - unavailableCount} ACTIVE`,
+    unavailableCount > 0 && `${unavailableCount} UNAVAILABLE`,
+    excludedNames.length > 0 && `${excludedNames.length} EXCLUDED`,
+  ].filter((segment): segment is string => Boolean(segment));
 
   if (names.length === 0) {
     return (
@@ -35,9 +44,16 @@ function NameListDisplayComponent({
     <div className="flex-1 overflow-y-auto scrollbar-themed">
       {/* Name Count Header */}
       <div className="px-4 py-3 sticky top-0 bg-black/90 border-b border-b-white/10">
-        <div className="text-xs font-mono tracking-wider text-text/50">
-          {activeNames.length} ACTIVE
-          {excludedNames.length > 0 && ` · ${excludedNames.length} EXCLUDED`}
+        <div
+          data-testid="name-count-header"
+          className="flex flex-wrap gap-x-[1ch] text-xs font-mono tracking-wider text-text/50"
+        >
+          {countSegments.map((segment, index) => (
+            <span key={segment} className="whitespace-nowrap">
+              {index > 0 && '· '}
+              {segment}
+            </span>
+          ))}
         </div>
       </div>
 
@@ -50,6 +66,7 @@ function NameListDisplayComponent({
           onDelete={onDelete}
           onToggleExclude={onToggleExclude}
           onVolunteer={onVolunteer}
+          onToggleUnavailable={onToggleUnavailable}
         />
       ))}
 
@@ -67,6 +84,7 @@ function NameListDisplayComponent({
               onDelete={onDelete}
               onToggleExclude={onToggleExclude}
               onVolunteer={onVolunteer}
+              onToggleUnavailable={onToggleUnavailable}
             />
           ))}
         </>
