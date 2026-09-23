@@ -57,6 +57,14 @@ export class SidebarPage extends BasePage {
     await excludeButton.click();
   }
 
+  async toggleUnavailable(name: string) {
+    const item = this.nameItems.filter({ hasText: name });
+    const unavailableButton = item.getByRole('button', {
+      name: new RegExp(`mark ${name} (un)?available today`, 'i'),
+    });
+    await unavailableButton.click();
+  }
+
   async clickVolunteer(name: string) {
     const item = this.nameItems.filter({ hasText: name });
     await item.hover();
