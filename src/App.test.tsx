@@ -394,3 +394,28 @@ describe('App - Instruction Text Glitch Effect', () => {
     expect(instructionElements[0].getAttribute('aria-hidden')).toBeNull();
   });
 });
+
+describe('App - Theme Favicon', () => {
+  let faviconLink: HTMLLinkElement;
+
+  beforeEach(() => {
+    faviconLink = document.createElement('link');
+    faviconLink.rel = 'icon';
+    document.head.appendChild(faviconLink);
+    useNameStore.setState({ currentTheme: 'cyan' });
+  });
+
+  afterEach(() => {
+    faviconLink.remove();
+  });
+
+  test('paints the favicon with the current theme accent and follows theme changes', () => {
+    render(<App />);
+    expect(decodeURIComponent(faviconLink.href)).toContain('fill="#00FFFF"');
+
+    act(() => {
+      useNameStore.setState({ currentTheme: 'sunset' });
+    });
+    expect(decodeURIComponent(faviconLink.href)).toContain('fill="#FF6B35"');
+  });
+});
