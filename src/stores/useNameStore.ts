@@ -12,7 +12,7 @@ import type {
   SpecialEvent,
 } from '../types/name';
 import type { Theme } from '../types/theme';
-import { filterValidNames } from '../utils/name';
+import { filterValidNames, isUnavailableToday, toLocalISODay } from '../utils/name';
 import type { ParsedSharedList } from '../utils/shareList';
 
 function generateId(): string {
@@ -77,6 +77,7 @@ interface NameActions {
   deleteList: (listId: string) => void;
   updateListTitle: (listId: string, title: string) => void;
   toggleNameExclusion: (nameId: string) => void;
+  toggleUnavailableToday: (nameId: string) => void;
   clearSelections: () => void;
   resetList: () => void;
   bulkAddNames: (names: string[]) => void;
@@ -361,6 +362,17 @@ export const useNameStore = create<NameStore>()(
         });
       },
 
+      toggleUnavailableToday: (nameId: string) => {
+        set((draft) => {
+          const activeList = draft.lists.find((list) => list.id === draft.activeListId);
+          const name = activeList?.names.find((n) => n.id === nameId);
+          if (!activeList || !name) return;
+
+          name.unavailableOn = isUnavailableToday(name) ? undefined : toLocalISODay(new Date());
+          activeList.updatedAt = new Date();
+        });
+      },
+
       clearSelections: () => {
         set((draft) => {
           const activeList = draft.lists.find((list) => list.id === draft.activeListId);
@@ -382,6 +394,7 @@ export const useNameStore = create<NameStore>()(
               name.lastSelectedAt = null;
               name.selectionCount = 0;
               name.isExcluded = false;
+              name.unavailableOn = undefined;
             });
             activeList.updatedAt = new Date();
           }
@@ -428,7 +441,7 @@ export const useNameStore = create<NameStore>()(
           if (!activeList) return;
 
           const name = activeList.names.find((n) => n.id === nameId);
-          if (!name || name.isExcluded) return;
+          if (!name || name.isExcluded || isUnavailableToday(name)) return;
 
           name.selectionCount += 1;
           name.lastSelectedAt = new Date();
