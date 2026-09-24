@@ -9,7 +9,8 @@ interface NameListDisplayProps {
   onDelete: (nameId: string) => void;
   onToggleExclude: (nameId: string) => void;
   onVolunteer: (nameId: string) => void;
-  onToggleUnavailable: (nameId: string) => void;
+  onSetUnavailability: (nameId: string, from: string, until: string) => void;
+  onClearUnavailability: (nameId: string) => void;
 }
 
 function NameListDisplayComponent({
@@ -18,7 +19,8 @@ function NameListDisplayComponent({
   onDelete,
   onToggleExclude,
   onVolunteer,
-  onToggleUnavailable,
+  onSetUnavailability,
+  onClearUnavailability,
 }: Readonly<NameListDisplayProps>) {
   const activeNames = names.filter((n) => !n.isExcluded);
   const excludedNames = names.filter((n) => n.isExcluded);
@@ -66,7 +68,8 @@ function NameListDisplayComponent({
           onDelete={onDelete}
           onToggleExclude={onToggleExclude}
           onVolunteer={onVolunteer}
-          onToggleUnavailable={onToggleUnavailable}
+          onSetUnavailability={onSetUnavailability}
+          onClearUnavailability={onClearUnavailability}
         />
       ))}
 
@@ -84,7 +87,8 @@ function NameListDisplayComponent({
               onDelete={onDelete}
               onToggleExclude={onToggleExclude}
               onVolunteer={onVolunteer}
-              onToggleUnavailable={onToggleUnavailable}
+              onSetUnavailability={onSetUnavailability}
+              onClearUnavailability={onClearUnavailability}
             />
           ))}
         </>

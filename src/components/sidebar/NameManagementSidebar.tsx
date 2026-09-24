@@ -2,7 +2,6 @@ import { memo, useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import { selectActiveList, useNameStore } from '../../stores/useNameStore';
-import { isUnavailableToday, toLocalISODay } from '../../utils/name';
 import { AddNameForm } from './AddNameForm';
 import { BulkActionsPanel } from './BulkActionsPanel';
 import { CyclesPanel } from './CyclesPanel';
@@ -54,19 +53,6 @@ function NameManagementSidebarComponent({
   const activeList = useMemo(
     () => selectActiveList({ lists, activeListId }),
     [lists, activeListId]
-  );
-
-  const toggleUnavailableToday = useCallback(
-    (nameId: string) => {
-      const name = activeList?.names.find((listName) => listName.id === nameId);
-      if (name && isUnavailableToday(name)) {
-        clearUnavailability(nameId);
-        return;
-      }
-      const today = toLocalISODay(new Date());
-      setUnavailability(nameId, today, today);
-    },
-    [activeList, clearUnavailability, setUnavailability]
   );
 
   // Check if list has selections
@@ -146,7 +132,8 @@ function NameManagementSidebarComponent({
             onDelete={deleteName}
             onToggleExclude={toggleNameExclusion}
             onVolunteer={volunteerName}
-            onToggleUnavailable={toggleUnavailableToday}
+            onSetUnavailability={setUnavailability}
+            onClearUnavailability={clearUnavailability}
           />
 
           {/* Bulk Actions */}

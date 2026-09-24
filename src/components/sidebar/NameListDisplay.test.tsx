@@ -9,7 +9,8 @@ const handlers = {
   onDelete: vi.fn(),
   onToggleExclude: vi.fn(),
   onVolunteer: vi.fn(),
-  onToggleUnavailable: vi.fn(),
+  onSetUnavailability: vi.fn(),
+  onClearUnavailability: vi.fn(),
 };
 
 describe('NameListDisplay', () => {

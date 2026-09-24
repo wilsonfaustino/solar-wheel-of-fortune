@@ -41,3 +41,10 @@ export function validateUnavailabilityRange(
   }
   return null;
 }
+
+/** Short month and day after the range ends, in the browser locale unless one is given. */
+export function formatReturnDay(unavailableUntil: string, locale?: string): string {
+  const [year, month, day] = unavailableUntil.split('-').map(Number);
+  const returnDay = new Date(year, month - 1, day + 1);
+  return returnDay.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
+}

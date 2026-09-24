@@ -2,6 +2,7 @@ import { MAX_NAME_LENGTH } from '../constants/defaults';
 import type { Name } from '../types/name';
 import {
   filterValidNames,
+  formatReturnDay,
   isUnavailableToday,
   isValidNameLength,
   toLocalISODay,
@@ -116,5 +117,15 @@ describe('validateUnavailabilityRange', () => {
 
   it('rejects an empty date', () => {
     expect(validateUnavailabilityRange('', '2026-09-23', today)).toBe('SELECT BOTH DATES');
+  });
+});
+
+describe('formatReturnDay', () => {
+  it('formats the day after the range ends in the given locale', () => {
+    expect(formatReturnDay('2026-09-30', 'en-US')).toBe('Oct 1');
+  });
+
+  it('rolls over the year', () => {
+    expect(formatReturnDay('2026-12-31', 'en-US')).toBe('Jan 1');
   });
 });
