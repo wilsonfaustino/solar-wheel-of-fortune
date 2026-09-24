@@ -235,7 +235,7 @@ bun test:ui     # Debug with Vitest UI
 - Store actions: addName, deleteName, updateName, markSelected, setActiveList, createList, deleteList, updateListTitle, toggleNameExclusion, clearSelections, resetList, bulkAddNames, setUnavailability, clearUnavailability
 
 **Keyboard Shortcuts** (Session 3, Session 15)
-- Space: Spin the wheel (via `useKeyboardShortcuts` hook, suppressed when typing in input/textarea fields)
+- Space: Spin the wheel (via `useKeyboardShortcuts` hook, suppressed when typing in input/textarea fields or when focus is inside a dialog)
 - Escape: Close bulk import modal and list selector dropdown
 - Input field detection: Automatically prevents shortcuts during text entry to allow typing compound names
 

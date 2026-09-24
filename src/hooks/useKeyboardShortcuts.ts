@@ -17,7 +17,8 @@ export function useKeyboardShortcuts({ onSpinTrigger, onEscapePress }: KeyboardS
         target.isContentEditable;
 
       // Space on a dialog button must press that button, not spin the wheel
-      const isInsideDialog = target instanceof Element && target.closest('[role="dialog"]');
+      const isInsideDialog =
+        target instanceof Element && target.closest('[role="dialog"], [role="alertdialog"]');
 
       // Space: Spin the wheel (but NOT when typing in input fields or inside a dialog)
       if (event.code === 'Space' && !isInputField && !isInsideDialog) {

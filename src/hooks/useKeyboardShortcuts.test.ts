@@ -58,6 +58,23 @@ describe('useKeyboardShortcuts', () => {
 
       document.body.removeChild(dialog);
     });
+
+    it('should NOT trigger onSpinTrigger when Space pressed in an alert dialog', () => {
+      const onSpinTrigger = vi.fn();
+      renderHook(() => useKeyboardShortcuts({ onSpinTrigger }));
+
+      const alertDialog = document.createElement('div');
+      alertDialog.setAttribute('role', 'alertdialog');
+      const button = document.createElement('button');
+      alertDialog.appendChild(button);
+      document.body.appendChild(alertDialog);
+
+      fireEvent.keyDown(button, { code: 'Space' });
+
+      expect(onSpinTrigger).not.toHaveBeenCalled();
+
+      document.body.removeChild(alertDialog);
+    });
   });
 
   describe('Space key in input fields', () => {
