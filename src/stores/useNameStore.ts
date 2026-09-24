@@ -12,7 +12,7 @@ import type {
   SpecialEvent,
 } from '../types/name';
 import type { Theme } from '../types/theme';
-import { filterValidNames, isUnavailableToday, toLocalISODay } from '../utils/name';
+import { filterValidNames, isUnavailableToday } from '../utils/name';
 import type { ParsedSharedList } from '../utils/shareList';
 
 function generateId(): string {
@@ -77,7 +77,8 @@ interface NameActions {
   deleteList: (listId: string) => void;
   updateListTitle: (listId: string, title: string) => void;
   toggleNameExclusion: (nameId: string) => void;
-  toggleUnavailableToday: (nameId: string) => void;
+  setUnavailability: (nameId: string, from: string, until: string) => void;
+  clearUnavailability: (nameId: string) => void;
   clearSelections: () => void;
   resetList: () => void;
   bulkAddNames: (names: string[]) => void;
@@ -362,13 +363,26 @@ export const useNameStore = create<NameStore>()(
         });
       },
 
-      toggleUnavailableToday: (nameId: string) => {
+      setUnavailability: (nameId: string, from: string, until: string) => {
         set((draft) => {
           const activeList = draft.lists.find((list) => list.id === draft.activeListId);
           const name = activeList?.names.find((n) => n.id === nameId);
           if (!activeList || !name) return;
 
-          name.unavailableOn = isUnavailableToday(name) ? undefined : toLocalISODay(new Date());
+          name.unavailableFrom = from;
+          name.unavailableUntil = until;
+          activeList.updatedAt = new Date();
+        });
+      },
+
+      clearUnavailability: (nameId: string) => {
+        set((draft) => {
+          const activeList = draft.lists.find((list) => list.id === draft.activeListId);
+          const name = activeList?.names.find((n) => n.id === nameId);
+          if (!activeList || !name) return;
+
+          name.unavailableFrom = undefined;
+          name.unavailableUntil = undefined;
           activeList.updatedAt = new Date();
         });
       },
@@ -394,7 +408,8 @@ export const useNameStore = create<NameStore>()(
               name.lastSelectedAt = null;
               name.selectionCount = 0;
               name.isExcluded = false;
-              name.unavailableOn = undefined;
+              name.unavailableFrom = undefined;
+              name.unavailableUntil = undefined;
             });
             activeList.updatedAt = new Date();
           }

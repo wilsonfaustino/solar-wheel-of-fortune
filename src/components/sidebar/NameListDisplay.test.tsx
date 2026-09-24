@@ -9,15 +9,16 @@ const handlers = {
   onDelete: vi.fn(),
   onToggleExclude: vi.fn(),
   onVolunteer: vi.fn(),
-  onToggleUnavailable: vi.fn(),
+  onSetUnavailability: vi.fn(),
+  onClearUnavailability: vi.fn(),
 };
 
 describe('NameListDisplay', () => {
   it('should count unavailable names apart from active ones', () => {
     const today = toLocalISODay(new Date());
     const names = [
-      { ...sampleNames[0], unavailableOn: today },
-      { ...sampleNames[1], unavailableOn: today },
+      { ...sampleNames[0], unavailableFrom: today, unavailableUntil: today },
+      { ...sampleNames[1], unavailableFrom: today, unavailableUntil: today },
       { ...sampleNames[2], isExcluded: true },
       sampleNames[3],
       sampleNames[4],
@@ -30,7 +31,8 @@ describe('NameListDisplay', () => {
   });
 
   it('should keep each count whole so the header only wraps at a separator', () => {
-    const names = [{ ...sampleNames[0], unavailableOn: toLocalISODay(new Date()) }];
+    const today = toLocalISODay(new Date());
+    const names = [{ ...sampleNames[0], unavailableFrom: today, unavailableUntil: today }];
     render(<NameListDisplay names={names} {...handlers} />);
 
     expect(screen.getByText('0 ACTIVE')).toHaveClass('whitespace-nowrap');

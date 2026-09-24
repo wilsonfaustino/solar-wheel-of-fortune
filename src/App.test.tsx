@@ -4,6 +4,7 @@ import App from './App';
 import { useNameStore } from './stores/useNameStore';
 import { useSettingsStore } from './stores/useSettingsStore';
 import type { Name } from './types/name';
+import { toLocalISODay } from './utils/name';
 
 // Mock components to isolate App logic
 vi.mock('./components/sidebar', () => ({
@@ -216,8 +217,9 @@ describe('App - Auto-Exclusion Logic', () => {
 
   test('should NOT auto-exclude the last name that is still available today', async () => {
     const state = useNameStore.getState();
-    state.toggleUnavailableToday('name-2');
-    state.toggleUnavailableToday('name-3');
+    const today = toLocalISODay(new Date());
+    state.setUnavailability('name-2', today, today);
+    state.setUnavailability('name-3', today, today);
 
     render(<App />);
 

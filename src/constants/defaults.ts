@@ -1,6 +1,7 @@
 export const AUTHOR_NAME = 'Wilson Faustino';
 
 export const MAX_NAME_LENGTH = 100;
+export const MAX_UNAVAILABILITY_DAYS = 30;
 
 export const DEFAULT_NAMES = [
   'ALEX',

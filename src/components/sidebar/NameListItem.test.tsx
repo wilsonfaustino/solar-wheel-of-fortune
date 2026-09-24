@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import type { Name } from '../../types/name';
-import { toLocalISODay } from '../../utils/name';
+import { formatReturnDay, toLocalISODay } from '../../utils/name';
 import { NameListItem } from './NameListItem';
 
 const mockName: Name = {
@@ -22,7 +22,8 @@ const defaultProps = {
   onDelete: vi.fn(),
   onToggleExclude: vi.fn(),
   onVolunteer: vi.fn(),
-  onToggleUnavailable: vi.fn(),
+  onSetUnavailability: vi.fn(),
+  onClearUnavailability: vi.fn(),
 };
 
 describe('NameListItem', () => {
@@ -49,25 +50,81 @@ describe('NameListItem', () => {
     expect(onVolunteer).toHaveBeenCalledWith(mockName.id);
   });
 
-  describe('unavailable today', () => {
-    const unavailableName: Name = { ...mockName, unavailableOn: toLocalISODay(new Date()) };
+  describe('unavailability', () => {
+    const today = toLocalISODay(new Date());
+    const unavailableName: Name = { ...mockName, unavailableFrom: today, unavailableUntil: today };
 
-    it('should call onToggleUnavailable with name id', async () => {
-      const onToggleUnavailable = vi.fn();
+    it('should open the availability dialog from the row icon', async () => {
       const user = userEvent.setup();
-      render(<NameListItem {...defaultProps} onToggleUnavailable={onToggleUnavailable} />);
+      render(<NameListItem {...defaultProps} />);
 
-      await user.click(screen.getByRole('button', { name: /mark alice unavailable today/i }));
+      await user.click(screen.getByRole('button', { name: /set availability for alice/i }));
 
-      expect(onToggleUnavailable).toHaveBeenCalledWith(mockName.id);
+      expect(screen.getByRole('dialog', { name: /alice availability/i })).toBeInTheDocument();
     });
 
-    it('should offer to mark an unavailable name available', () => {
+    it('should call onSetUnavailability with the name id and range', async () => {
+      const onSetUnavailability = vi.fn();
+      const user = userEvent.setup();
+      render(<NameListItem {...defaultProps} onSetUnavailability={onSetUnavailability} />);
+
+      await user.click(screen.getByRole('button', { name: /set availability for alice/i }));
+      await user.click(screen.getByRole('button', { name: /today only/i }));
+
+      expect(onSetUnavailability).toHaveBeenCalledWith(mockName.id, today, today);
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('should call onClearUnavailability with the name id', async () => {
+      const onClearUnavailability = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <NameListItem
+          {...defaultProps}
+          name={unavailableName}
+          onClearUnavailability={onClearUnavailability}
+        />
+      );
+
+      await user.click(screen.getByRole('button', { name: /set availability for alice/i }));
+      await user.click(screen.getByRole('button', { name: /mark available/i }));
+
+      expect(onClearUnavailability).toHaveBeenCalledWith(mockName.id);
+    });
+
+    it('should show BACK TOMORROW when the range ends today', () => {
       render(<NameListItem {...defaultProps} name={unavailableName} />);
 
-      expect(
-        screen.getByRole('button', { name: /mark alice available today/i })
-      ).toBeInTheDocument();
+      expect(screen.getByText('BACK TOMORROW')).toBeInTheDocument();
+    });
+
+    it('should show the return day when the range ends later', () => {
+      const laterDay = new Date();
+      laterDay.setDate(laterDay.getDate() + 3);
+      const laterISO = toLocalISODay(laterDay);
+      render(
+        <NameListItem
+          {...defaultProps}
+          name={{ ...mockName, unavailableFrom: today, unavailableUntil: laterISO }}
+        />
+      );
+
+      expect(screen.getByText(`BACK ${formatReturnDay(laterISO)}`)).toBeInTheDocument();
+    });
+
+    it('should not show a badge for a future range', () => {
+      const futureDay = new Date();
+      futureDay.setDate(futureDay.getDate() + 3);
+      const futureISO = toLocalISODay(futureDay);
+      render(
+        <NameListItem
+          {...defaultProps}
+          name={{ ...mockName, unavailableFrom: futureISO, unavailableUntil: futureISO }}
+        />
+      );
+
+      expect(screen.queryByText(/^BACK /)).not.toBeInTheDocument();
+      expect(screen.getByTestId('name-item-name-1')).toHaveClass('opacity-100');
     });
 
     it('should grey out an unavailable name and hide the volunteer button', () => {

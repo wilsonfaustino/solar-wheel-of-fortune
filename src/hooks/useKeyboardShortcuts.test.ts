@@ -40,6 +40,43 @@ describe('useKeyboardShortcuts', () => {
     });
   });
 
+  describe('Space key inside dialogs', () => {
+    it('should NOT trigger onSpinTrigger or block the button when Space pressed in a dialog', () => {
+      const onSpinTrigger = vi.fn();
+      renderHook(() => useKeyboardShortcuts({ onSpinTrigger }));
+
+      const dialog = document.createElement('div');
+      dialog.setAttribute('role', 'dialog');
+      const button = document.createElement('button');
+      dialog.appendChild(button);
+      document.body.appendChild(dialog);
+
+      const wasNotCancelled = fireEvent.keyDown(button, { code: 'Space' });
+
+      expect(onSpinTrigger).not.toHaveBeenCalled();
+      expect(wasNotCancelled).toBe(true);
+
+      document.body.removeChild(dialog);
+    });
+
+    it('should NOT trigger onSpinTrigger when Space pressed in an alert dialog', () => {
+      const onSpinTrigger = vi.fn();
+      renderHook(() => useKeyboardShortcuts({ onSpinTrigger }));
+
+      const alertDialog = document.createElement('div');
+      alertDialog.setAttribute('role', 'alertdialog');
+      const button = document.createElement('button');
+      alertDialog.appendChild(button);
+      document.body.appendChild(alertDialog);
+
+      fireEvent.keyDown(button, { code: 'Space' });
+
+      expect(onSpinTrigger).not.toHaveBeenCalled();
+
+      document.body.removeChild(alertDialog);
+    });
+  });
+
   describe('Space key in input fields', () => {
     it('should NOT trigger onSpinTrigger when Space pressed in input element', () => {
       const onSpinTrigger = vi.fn();

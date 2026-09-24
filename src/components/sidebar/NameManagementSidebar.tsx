@@ -46,7 +46,8 @@ function NameManagementSidebarComponent({
   const resetList = useNameStore((state) => state.resetList);
   const bulkAddNames = useNameStore((state) => state.bulkAddNames);
   const volunteerName = useNameStore((state) => state.volunteerName);
-  const toggleUnavailableToday = useNameStore((state) => state.toggleUnavailableToday);
+  const setUnavailability = useNameStore((state) => state.setUnavailability);
+  const clearUnavailability = useNameStore((state) => state.clearUnavailability);
 
   // Get active list
   const activeList = useMemo(
@@ -131,7 +132,8 @@ function NameManagementSidebarComponent({
             onDelete={deleteName}
             onToggleExclude={toggleNameExclusion}
             onVolunteer={volunteerName}
-            onToggleUnavailable={toggleUnavailableToday}
+            onSetUnavailability={setUnavailability}
+            onClearUnavailability={clearUnavailability}
           />
 
           {/* Bulk Actions */}

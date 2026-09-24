@@ -2,8 +2,9 @@ import { Edit2, Eye, EyeOff, Hand, Trash2, UserCheck, UserX } from 'lucide-react
 import { memo, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { Name } from '../../types/name';
-import { isUnavailableToday } from '../../utils/name';
+import { formatReturnDay, isUnavailableToday, toLocalISODay } from '../../utils/name';
 import { Button } from '../ui/button';
+import { UnavailabilityDialog } from './UnavailabilityDialog';
 
 interface NameListItemProps {
   name: Name;
@@ -11,32 +12,44 @@ interface NameListItemProps {
   onDelete: (nameId: string) => void;
   onToggleExclude: (nameId: string) => void;
   onVolunteer: (nameId: string) => void;
-  onToggleUnavailable: (nameId: string) => void;
+  onSetUnavailability: (nameId: string, from: string, until: string) => void;
+  onClearUnavailability: (nameId: string) => void;
 }
 
-interface UnavailableToggleProps {
+interface UnavailabilityButtonProps {
   nameValue: string;
   isUnavailable: boolean;
-  onToggle: () => void;
+  onOpen: () => void;
 }
 
-function UnavailableToggle({
+function UnavailabilityButton({
   nameValue,
   isUnavailable,
-  onToggle,
-}: Readonly<UnavailableToggleProps>) {
+  onOpen,
+}: Readonly<UnavailabilityButtonProps>) {
   return (
     <Button
       type="button"
-      onClick={onToggle}
+      onClick={onOpen}
       variant="tech-ghost"
       size="icon-sm"
       className={isUnavailable ? 'opacity-30' : 'text-accent opacity-70'}
-      aria-label={`Mark ${nameValue} ${isUnavailable ? 'available' : 'unavailable'} today`}
-      title={isUnavailable ? 'Available today' : 'Unavailable today'}
+      aria-label={`Set availability for ${nameValue}`}
+      title="Set availability"
     >
       {isUnavailable ? <UserX className="size-4" /> : <UserCheck className="size-4" />}
     </Button>
+  );
+}
+
+function ReturnDayLabel({ name }: Readonly<{ name: Name }>) {
+  if (!name.unavailableUntil || !isUnavailableToday(name)) return null;
+
+  const endsToday = name.unavailableUntil === toLocalISODay(new Date());
+  return (
+    <span className="font-mono text-[10px] tracking-wider text-text/70">
+      BACK {endsToday ? 'TOMORROW' : formatReturnDay(name.unavailableUntil)}
+    </span>
   );
 }
 
@@ -46,9 +59,11 @@ function NameListItemComponent({
   onDelete,
   onToggleExclude,
   onVolunteer,
-  onToggleUnavailable,
+  onSetUnavailability,
+  onClearUnavailability,
 }: Readonly<NameListItemProps>) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isAvailabilityOpen, setIsAvailabilityOpen] = useState(false);
   const [editValue, setEditValue] = useState(name.value);
   const inputRef = useRef<HTMLInputElement>(null);
   const isUnavailable = isUnavailableToday(name);
@@ -100,16 +115,21 @@ function NameListItemComponent({
           <button
             type="button"
             onDoubleClick={() => setIsEditing(true)}
-            className="flex-1 text-left flex items-center gap-2"
+            className="flex-1 text-left flex flex-col items-start gap-0.5"
           >
-            <span className={cn('font-mono text-sm text-text', name.isExcluded && 'line-through')}>
-              {name.value}
-            </span>
-            {name.selectionCount > 0 && (
-              <span className="px-2 py-0.5 text-xs font-mono rounded text-accent bg-accent-20">
-                {name.selectionCount}x
+            <span className="flex items-center gap-2">
+              <span
+                className={cn('font-mono text-sm text-text', name.isExcluded && 'line-through')}
+              >
+                {name.value}
               </span>
-            )}
+              {name.selectionCount > 0 && (
+                <span className="px-2 py-0.5 text-xs font-mono rounded text-accent bg-accent-20">
+                  {name.selectionCount}x
+                </span>
+              )}
+            </span>
+            <ReturnDayLabel name={name} />
           </button>
 
           <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -126,10 +146,10 @@ function NameListItemComponent({
                 <Hand className="size-4" />
               </Button>
             )}
-            <UnavailableToggle
+            <UnavailabilityButton
               nameValue={name.value}
               isUnavailable={isUnavailable}
-              onToggle={() => onToggleUnavailable(name.id)}
+              onOpen={() => setIsAvailabilityOpen(true)}
             />
             <Button
               type="button"
@@ -163,6 +183,14 @@ function NameListItemComponent({
             </Button>
           </div>
         </div>
+      )}
+      {isAvailabilityOpen && (
+        <UnavailabilityDialog
+          name={name}
+          onSave={(from, until) => onSetUnavailability(name.id, from, until)}
+          onClear={() => onClearUnavailability(name.id)}
+          onClose={() => setIsAvailabilityOpen(false)}
+        />
       )}
     </div>
   );

@@ -10,6 +10,11 @@ interface NameLabelProps {
   isUnavailable?: boolean;
 }
 
+function getLabelOpacity(isSelected: boolean, isUnavailable?: boolean): number {
+  if (isSelected) return 1;
+  return isUnavailable ? LABEL_CONFIG.unavailableOpacity : LABEL_CONFIG.defaultOpacity;
+}
+
 function NameLabelComponent({
   name,
   index,
@@ -36,13 +41,7 @@ function NameLabelComponent({
         fontSize={isSelected ? LABEL_CONFIG.selectedFontSize : LABEL_CONFIG.defaultFontSize}
         fontWeight={isSelected ? '600' : '300'}
         fill={isSelected ? 'var(--color-accent)' : 'var(--color-text)'}
-        opacity={
-          isSelected
-            ? 1
-            : isUnavailable
-              ? LABEL_CONFIG.unavailableOpacity
-              : LABEL_CONFIG.defaultOpacity
-        }
+        opacity={getLabelOpacity(isSelected, isUnavailable)}
         data-unavailable={isUnavailable || undefined}
         letterSpacing="2"
         style={{

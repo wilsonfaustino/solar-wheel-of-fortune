@@ -218,7 +218,8 @@ describe('RadialWheel', () => {
   describe('unavailable names', () => {
     const markUnavailable = (name: Name): Name => ({
       ...name,
-      unavailableOn: toLocalISODay(new Date()),
+      unavailableFrom: toLocalISODay(new Date()),
+      unavailableUntil: toLocalISODay(new Date()),
     });
 
     const completeAnimation = () => {
