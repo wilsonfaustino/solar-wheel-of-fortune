@@ -2,7 +2,7 @@ import { Edit2, Eye, EyeOff, Hand, Trash2, UserCheck, UserX } from 'lucide-react
 import { memo, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { Name } from '../../types/name';
-import { formatReturnDay, isUnavailableToday } from '../../utils/name';
+import { formatReturnDay, isUnavailableToday, toLocalISODay } from '../../utils/name';
 import { Button } from '../ui/button';
 import { UnavailabilityDialog } from './UnavailabilityDialog';
 
@@ -42,12 +42,13 @@ function UnavailabilityButton({
   );
 }
 
-function ReturnDayBadge({ name }: Readonly<{ name: Name }>) {
+function ReturnDayLabel({ name }: Readonly<{ name: Name }>) {
   if (!name.unavailableUntil || !isUnavailableToday(name)) return null;
 
+  const endsToday = name.unavailableUntil === toLocalISODay(new Date());
   return (
-    <span className="px-2 py-0.5 text-xs font-mono rounded text-text bg-white/10">
-      BACK {formatReturnDay(name.unavailableUntil)}
+    <span className="font-mono text-[10px] tracking-wider text-text/70">
+      BACK {endsToday ? 'TOMORROW' : formatReturnDay(name.unavailableUntil)}
     </span>
   );
 }
@@ -114,17 +115,21 @@ function NameListItemComponent({
           <button
             type="button"
             onDoubleClick={() => setIsEditing(true)}
-            className="flex-1 text-left flex items-center gap-2"
+            className="flex-1 text-left flex flex-col items-start gap-0.5"
           >
-            <span className={cn('font-mono text-sm text-text', name.isExcluded && 'line-through')}>
-              {name.value}
-            </span>
-            {name.selectionCount > 0 && (
-              <span className="px-2 py-0.5 text-xs font-mono rounded text-accent bg-accent-20">
-                {name.selectionCount}x
+            <span className="flex items-center gap-2">
+              <span
+                className={cn('font-mono text-sm text-text', name.isExcluded && 'line-through')}
+              >
+                {name.value}
               </span>
-            )}
-            <ReturnDayBadge name={name} />
+              {name.selectionCount > 0 && (
+                <span className="px-2 py-0.5 text-xs font-mono rounded text-accent bg-accent-20">
+                  {name.selectionCount}x
+                </span>
+              )}
+            </span>
+            <ReturnDayLabel name={name} />
           </button>
 
           <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

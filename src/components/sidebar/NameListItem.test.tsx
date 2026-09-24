@@ -92,10 +92,24 @@ describe('NameListItem', () => {
       expect(onClearUnavailability).toHaveBeenCalledWith(mockName.id);
     });
 
-    it('should show the return day while unavailable', () => {
+    it('should show BACK TOMORROW when the range ends today', () => {
       render(<NameListItem {...defaultProps} name={unavailableName} />);
 
-      expect(screen.getByText(`BACK ${formatReturnDay(today)}`)).toBeInTheDocument();
+      expect(screen.getByText('BACK TOMORROW')).toBeInTheDocument();
+    });
+
+    it('should show the return day when the range ends later', () => {
+      const laterDay = new Date();
+      laterDay.setDate(laterDay.getDate() + 3);
+      const laterISO = toLocalISODay(laterDay);
+      render(
+        <NameListItem
+          {...defaultProps}
+          name={{ ...mockName, unavailableFrom: today, unavailableUntil: laterISO }}
+        />
+      );
+
+      expect(screen.getByText(`BACK ${formatReturnDay(laterISO)}`)).toBeInTheDocument();
     });
 
     it('should not show a badge for a future range', () => {
