@@ -614,51 +614,38 @@ describe('useNameStore', () => {
     });
   });
 
-  describe('toggleUnavailableToday', () => {
-    afterEach(() => {
-      vi.useRealTimers();
-    });
-
+  describe('setUnavailability / clearUnavailability', () => {
     const getFirstName = () => useNameStore.getState().lists[0].names[0];
+    const today = () => toLocalISODay(new Date());
 
-    it('should mark a name unavailable for today', () => {
-      useNameStore.getState().toggleUnavailableToday(getFirstName().id);
+    it('should store the range on the name', () => {
+      useNameStore.getState().setUnavailability(getFirstName().id, '2026-10-01', '2026-10-05');
 
-      expect(getFirstName().unavailableOn).toBe(toLocalISODay(new Date()));
-      expect(isUnavailableToday(getFirstName())).toBe(true);
+      expect(getFirstName().unavailableFrom).toBe('2026-10-01');
+      expect(getFirstName().unavailableUntil).toBe('2026-10-05');
     });
 
-    it('should make the name available again on a second toggle', () => {
+    it('should replace an existing range', () => {
       const state = useNameStore.getState();
-      state.toggleUnavailableToday(getFirstName().id);
-      state.toggleUnavailableToday(getFirstName().id);
+      state.setUnavailability(getFirstName().id, '2026-10-01', '2026-10-05');
+      state.setUnavailability(getFirstName().id, today(), today());
 
-      expect(isUnavailableToday(getFirstName())).toBe(false);
+      expect(getFirstName().unavailableFrom).toBe(today());
+      expect(getFirstName().unavailableUntil).toBe(today());
     });
 
-    it('should expire on the next day', () => {
-      vi.useFakeTimers();
-      vi.setSystemTime(new Date(2026, 8, 23, 18));
-      useNameStore.getState().toggleUnavailableToday(getFirstName().id);
-      expect(isUnavailableToday(getFirstName())).toBe(true);
+    it('should make the name available again when cleared', () => {
+      const state = useNameStore.getState();
+      state.setUnavailability(getFirstName().id, today(), today());
+      state.clearUnavailability(getFirstName().id);
 
-      vi.setSystemTime(new Date(2026, 8, 24, 8));
+      expect(getFirstName().unavailableFrom).toBeUndefined();
+      expect(getFirstName().unavailableUntil).toBeUndefined();
       expect(isUnavailableToday(getFirstName())).toBe(false);
-    });
-
-    it('should mark an expired name unavailable again instead of clearing it', () => {
-      vi.useFakeTimers();
-      vi.setSystemTime(new Date(2026, 8, 23, 18));
-      useNameStore.getState().toggleUnavailableToday(getFirstName().id);
-
-      vi.setSystemTime(new Date(2026, 8, 24, 8));
-      useNameStore.getState().toggleUnavailableToday(getFirstName().id);
-
-      expect(isUnavailableToday(getFirstName())).toBe(true);
     });
 
     it('should keep unavailable names in selectActiveNames so the wheel can show them', () => {
-      useNameStore.getState().toggleUnavailableToday(getFirstName().id);
+      useNameStore.getState().setUnavailability(getFirstName().id, today(), today());
 
       expect(selectActiveNames(useNameStore.getState())).toContainEqual(
         expect.objectContaining({ id: getFirstName().id })
@@ -667,17 +654,18 @@ describe('useNameStore', () => {
 
     it('should be cleared by resetList', () => {
       const state = useNameStore.getState();
-      state.toggleUnavailableToday(getFirstName().id);
+      state.setUnavailability(getFirstName().id, today(), today());
 
       state.resetList();
 
-      expect(isUnavailableToday(getFirstName())).toBe(false);
+      expect(getFirstName().unavailableFrom).toBeUndefined();
+      expect(getFirstName().unavailableUntil).toBeUndefined();
     });
 
     it('should block volunteerName for an unavailable name', () => {
       const state = useNameStore.getState();
       const nameId = getFirstName().id;
-      state.toggleUnavailableToday(nameId);
+      state.setUnavailability(nameId, today(), today());
 
       state.volunteerName(nameId);
 

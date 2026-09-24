@@ -6,8 +6,9 @@ export interface Name {
   lastSelectedAt: Date | null;
   selectionCount: number;
   isExcluded: boolean;
-  /** Local ISO day (YYYY-MM-DD) the person is out; expires on its own the next day. */
-  unavailableOn?: string;
+  /** Local ISO days (YYYY-MM-DD), both inclusive; the range expires on its own after the end day. */
+  unavailableFrom?: string;
+  unavailableUntil?: string;
   categoryId: string | null;
 }
 

@@ -50,7 +50,8 @@ describe('NameListItem', () => {
   });
 
   describe('unavailable today', () => {
-    const unavailableName: Name = { ...mockName, unavailableOn: toLocalISODay(new Date()) };
+    const today = toLocalISODay(new Date());
+    const unavailableName: Name = { ...mockName, unavailableFrom: today, unavailableUntil: today };
 
     it('should call onToggleUnavailable with name id', async () => {
       const onToggleUnavailable = vi.fn();
