@@ -6,6 +6,10 @@ Quick navigation for ongoing development sessions.
 
 ## Current Session Tasks
 
+### Session 35: Vacation Unavailability (Complete ✅)
+**Summary**: [sessions/session-35-vacation-unavailability.md](./sessions/session-35-vacation-unavailability.md) - Mark a person unavailable for a date range (max 30 days) from a row dialog; replaces the today-only toggle
+**Status**: Tests ✅ | E2E ✅
+
 ### Session 34: Spin Sound Setting (Complete ✅)
 **Summary**: [sessions/session-34-sound-setting.md](./sessions/session-34-sound-setting.md) - Persisted `soundEnabled` setting replaces the `?ff=sound` URL flag, with an AUDIO toggle in Settings
 **Status**: Tests ✅ | E2E ✅

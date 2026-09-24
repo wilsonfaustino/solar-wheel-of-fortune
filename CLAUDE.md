@@ -232,7 +232,7 @@ bun test:ui     # Debug with Vitest UI
 - Immer middleware provides draft-style mutations (simpler than spread operators)
 - Use `useShallow` hook when selecting multiple state values to prevent re-renders
 - Derived data (filtered names) should use `useMemo` to avoid infinite loops
-- Store actions: addName, deleteName, updateName, markSelected, setActiveList, createList, deleteList, updateListTitle, toggleNameExclusion, clearSelections, resetList, bulkAddNames
+- Store actions: addName, deleteName, updateName, markSelected, setActiveList, createList, deleteList, updateListTitle, toggleNameExclusion, clearSelections, resetList, bulkAddNames, setUnavailability, clearUnavailability
 
 **Keyboard Shortcuts** (Session 3, Session 15)
 - Space: Spin the wheel (via `useKeyboardShortcuts` hook, suppressed when typing in input/textarea fields)
@@ -941,6 +941,13 @@ Install Playwright extension: `ms-playwright.playwright`
 - [x] Add AUDIO section with spin sound toggle to SettingsPanel
 - [x] Rename generic `SwitchSettings` props to `checked` / `onCheckedChange`
 - [x] Unit tests for store, hook, and panel; E2E persistence test
+
+### Session 35: Vacation Unavailability (Completed)
+- [x] Replace `unavailableOn` with `unavailableFrom` / `unavailableUntil` (inclusive local ISO days)
+- [x] `setUnavailability` / `clearUnavailability` store actions, 30-day cap via `validateUnavailabilityRange`
+- [x] Row icon opens `UnavailabilityDialog` (TODAY ONLY, FROM/TO, MARK AVAILABLE), `BACK <day>` badge
+- [x] Space shortcut ignored inside dialogs
+- [x] Unit tests for util, store, dialog, row; E2E range spec
 
 ### Session 5: Selection History & Export (Planned)
 - [ ] Create selection history store (extend useNameStore)
