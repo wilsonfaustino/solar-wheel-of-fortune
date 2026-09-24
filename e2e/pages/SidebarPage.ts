@@ -57,12 +57,29 @@ export class SidebarPage extends BasePage {
     await excludeButton.click();
   }
 
-  async toggleUnavailable(name: string) {
+  async openAvailability(name: string) {
     const item = this.nameItems.filter({ hasText: name });
-    const unavailableButton = item.getByRole('button', {
-      name: new RegExp(`mark ${name} (un)?available today`, 'i'),
-    });
-    await unavailableButton.click();
+    await item
+      .getByRole('button', { name: new RegExp(`set availability for ${name}`, 'i') })
+      .click();
+    return this.page.getByRole('dialog', { name: new RegExp(`${name} availability`, 'i') });
+  }
+
+  async markUnavailableToday(name: string) {
+    const dialog = await this.openAvailability(name);
+    await dialog.getByRole('button', { name: /today only/i }).click();
+  }
+
+  async setUnavailability(name: string, from: string, until: string) {
+    const dialog = await this.openAvailability(name);
+    await dialog.getByLabel('Unavailable from').fill(from);
+    await dialog.getByLabel('Unavailable until').fill(until);
+    await dialog.getByRole('button', { name: /^save$/i }).click();
+  }
+
+  async markAvailable(name: string) {
+    const dialog = await this.openAvailability(name);
+    await dialog.getByRole('button', { name: /mark available/i }).click();
   }
 
   async clickVolunteer(name: string) {
