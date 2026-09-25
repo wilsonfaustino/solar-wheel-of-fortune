@@ -27,7 +27,11 @@
         "noStaticElementInteractions": "warn",
         "useKeyWithClickEvents": "warn",
         "noSvgWithoutTitle": "warn",
-        "noAutofocus": "warn"
+        "noAutofocus": "warn",
+        "noLabelWithoutControl": {
+          "level": "error",
+          "options": { "inputComponents": ["DatePicker"] }
+        }
       },
       "complexity": {
         "recommended": true,
