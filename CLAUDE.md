@@ -95,7 +95,7 @@ bun hooks:uninstall # Remove git hooks
 
 **Git Hooks (via Lefthook)**:
 - **pre-commit**: Runs Biome check on staged files, auto-stages fixes
-- **pre-push**: Runs full type-check and test suite
+- **pre-push**: Runs full type-check and test suite with coverage thresholds
 - **commit-msg**: Validates conventional commits format
 
 ### bun.lockb in Orca worktrees
@@ -118,7 +118,7 @@ meaning `package.json` dependencies were added, removed, or bumped in the same s
 **Quality Gates** (6 jobs):
 1. **Lint (Biome)** - `bun run ci` (fails on issues)
 2. **Type Check (TypeScript)** - `bun run tsc -b` (strict mode)
-3. **Test & Coverage (Vitest)** - `bun test:coverage` (323 tests, ~92% threshold)
+3. **Test & Coverage (Vitest)** - `bun test:coverage` (323 tests, ~95% threshold)
 4. **Build (Vite)** - `bun run build` (production bundle)
 5. **E2E Tests (Playwright)** - `bun run test:e2e` (38 tests, Chromium only)
 6. **SonarQube Analysis** - Code quality + quality gate
@@ -143,7 +143,7 @@ bun test:coverage:ui  # Coverage with Vitest UI
 - `coverage/lcov.info` - SonarQube format (gitignored)
 - `coverage/index.html` - HTML report for local review (gitignored)
 
-**Thresholds**: lines 92, functions 92, statements 91, branches 80 (ratcheted to actual minus ~1 point of headroom)
+**Thresholds**: lines 95, functions 95, statements 95, branches 80 (lines, functions, statements at the 95% target; branches unchanged)
 
 **Coverage Provider**: v8 (modern, fast, accurate)
 
@@ -354,7 +354,7 @@ The application uses a centralized Button component (`src/components/ui/button.t
 - **Configuration**: `lefthook.yml` at project root
 - **Automatic Installation**: Runs on `bun install`
 - **Pre-commit Hook**: Biome check on staged files, auto-stages fixes
-- **Pre-push Hook**: Full type-check + test suite (prevents broken pushes)
+- **Pre-push Hook**: Full type-check + test suite with coverage thresholds (prevents broken pushes)
 - **Commit-msg Hook**: Validates conventional commits format
 
 **Commit Message Validation**:

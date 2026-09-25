@@ -16,7 +16,7 @@ pre-push:
       run: bun run tsc -b
 
     test:
-      run: bun test:run
+      run: bun test:coverage
 
 commit-msg:
   commands:
