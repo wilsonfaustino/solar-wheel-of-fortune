@@ -72,8 +72,8 @@ export class SidebarPage extends BasePage {
 
   async setUnavailability(name: string, from: string, until: string) {
     const dialog = await this.openAvailability(name);
-    await dialog.getByLabel('Unavailable from').fill(from);
-    await dialog.getByLabel('Unavailable until').fill(until);
+    await this.pickDate(dialog.getByLabel('Unavailable from'), from);
+    await this.pickDate(dialog.getByLabel('Unavailable until'), until);
     await dialog.getByRole('button', { name: /^save$/i }).click();
   }
 

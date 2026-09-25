@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { pickDate } from '../../test/pickDate';
 import { sampleNames } from '../../test/test-data';
 import type { Name } from '../../types/name';
 import { toLocalISODay } from '../../utils/name';
@@ -27,8 +28,8 @@ describe('UnavailabilityDialog', () => {
   it('should prefill today for a name without a range', () => {
     renderDialog();
 
-    expect(fromInput()).toHaveValue(today);
-    expect(toInput()).toHaveValue(today);
+    expect(fromInput()).toHaveTextContent(today);
+    expect(toInput()).toHaveTextContent(today);
     expect(screen.queryByRole('button', { name: /mark available/i })).not.toBeInTheDocument();
   });
 
@@ -39,8 +40,8 @@ describe('UnavailabilityDialog', () => {
       unavailableUntil: daysFromToday(3),
     });
 
-    expect(fromInput()).toHaveValue(daysFromToday(-2));
-    expect(toInput()).toHaveValue(daysFromToday(3));
+    expect(fromInput()).toHaveTextContent(daysFromToday(-2));
+    expect(toInput()).toHaveTextContent(daysFromToday(3));
     expect(screen.getByRole('button', { name: /mark available/i })).toBeInTheDocument();
   });
 
@@ -61,8 +62,8 @@ describe('UnavailabilityDialog', () => {
       unavailableUntil: daysFromToday(-1),
     });
 
-    expect(fromInput()).toHaveValue(today);
-    expect(toInput()).toHaveValue(today);
+    expect(fromInput()).toHaveTextContent(today);
+    expect(toInput()).toHaveTextContent(today);
     expect(screen.queryByRole('button', { name: /mark available/i })).not.toBeInTheDocument();
   });
 
@@ -80,8 +81,8 @@ describe('UnavailabilityDialog', () => {
     const user = userEvent.setup();
     const { onSave, onClose } = renderDialog();
 
-    fireEvent.change(fromInput(), { target: { value: daysFromToday(1) } });
-    fireEvent.change(toInput(), { target: { value: daysFromToday(4) } });
+    pickDate('Unavailable from', daysFromToday(1));
+    pickDate('Unavailable until', daysFromToday(4));
     await user.click(screen.getByRole('button', { name: /^save$/i }));
 
     expect(onSave).toHaveBeenCalledWith(daysFromToday(1), daysFromToday(4));
@@ -105,17 +106,33 @@ describe('UnavailabilityDialog', () => {
   it('should disable save and show the reason for an invalid range', () => {
     renderDialog();
 
-    fireEvent.change(fromInput(), { target: { value: daysFromToday(3) } });
-    fireEvent.change(toInput(), { target: { value: daysFromToday(1) } });
+    // TO blocks days before FROM, so an inverted range needs TO picked first
+    pickDate('Unavailable until', daysFromToday(1));
+    pickDate('Unavailable from', daysFromToday(3));
 
     expect(screen.getByRole('button', { name: /^save$/i })).toBeDisabled();
     expect(screen.getByText('END DATE IS BEFORE START DATE')).toBeInTheDocument();
   });
 
+  it('should block TO days before FROM', () => {
+    renderDialog();
+    const dayBeforeFrom = daysFromToday(2);
+    const [year, month] = dayBeforeFrom.split('-').map(Number);
+
+    pickDate('Unavailable from', daysFromToday(3));
+    fireEvent.click(toInput());
+    fireEvent.change(screen.getByLabelText('Choose the Year'), { target: { value: String(year) } });
+    fireEvent.change(screen.getByLabelText('Choose the Month'), {
+      target: { value: String(month - 1) },
+    });
+
+    expect(document.querySelector(`[data-day="${dayBeforeFrom}"] button`)).toBeDisabled();
+  });
+
   it('should disable save for a range longer than 30 days', () => {
     renderDialog();
 
-    fireEvent.change(toInput(), { target: { value: daysFromToday(30) } });
+    pickDate('Unavailable until', daysFromToday(30));
 
     expect(screen.getByRole('button', { name: /^save$/i })).toBeDisabled();
     expect(screen.getByText('RANGE IS LONGER THAN 30 DAYS')).toBeInTheDocument();

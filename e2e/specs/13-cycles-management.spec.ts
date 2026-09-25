@@ -128,7 +128,7 @@ test.describe('Cycles management', () => {
     await page.reload();
     await cyclesPage.switchToCyclesTab();
     await page.getByRole('button', { name: 'Edit Launch Week' }).click();
-    await expect(cyclesPage.eventStartInput).toHaveValue(isoDayOffset(1));
+    await expect(cyclesPage.eventStartInput).toHaveText(isoDayOffset(1));
     await expect(cyclesPage.eventDurationInput).toHaveValue('3');
   });
   test('should show the event details in a tooltip on hover', async ({ cyclesPage }) => {

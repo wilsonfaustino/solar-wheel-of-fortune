@@ -6,6 +6,7 @@ import { selectActiveList, useNameStore } from '../../stores/useNameStore';
 import type { Cycle } from '../../types/name';
 import { formatShortDay, getCooldownRange, weekdaysBetween } from '../../utils/cycle';
 import { Button } from '../ui/button';
+import { DatePicker } from '../ui/date-picker';
 
 const INPUT_CLASS =
   'w-full px-3 py-2 h-10 font-mono text-sm text-text bg-black/50 border border-border-light focus:shadow-xs focus:shadow-accent focus:outline-none placeholder:text-white/30';
@@ -107,23 +108,11 @@ function CyclesPanelComponent() {
         />
         <label className="flex items-center justify-between gap-3 whitespace-nowrap font-mono text-xs tracking-wider text-white/60">
           <span>FROM</span>
-          <input
-            type="date"
-            value={start}
-            onChange={(e) => setStart(e.target.value)}
-            className={cn(INPUT_CLASS, 'w-40 shrink-0')}
-            aria-label="Cycle start date"
-          />
+          <DatePicker value={start} onChange={setStart} aria-label="Cycle start date" />
         </label>
         <label className="flex items-center justify-between gap-3 whitespace-nowrap font-mono text-xs tracking-wider text-white/60">
           <span>TO</span>
-          <input
-            type="date"
-            value={end}
-            onChange={(e) => setEnd(e.target.value)}
-            className={cn(INPUT_CLASS, 'w-40 shrink-0')}
-            aria-label="Cycle end date"
-          />
+          <DatePicker value={end} onChange={setEnd} aria-label="Cycle end date" />
         </label>
         <label className="flex items-center justify-between gap-3 whitespace-nowrap font-mono text-xs tracking-wider text-white/60">
           <span>COOLDOWN WEEKS</span>

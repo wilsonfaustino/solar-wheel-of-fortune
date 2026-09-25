@@ -4,9 +4,7 @@ import { memo, useState } from 'react';
 import type { Name } from '../../types/name';
 import { toLocalISODay, validateUnavailabilityRange } from '../../utils/name';
 import { Button } from '../ui/button';
-
-const INPUT_CLASS =
-  'w-40 px-3 py-2 h-10 font-mono text-sm text-text bg-black/50 border border-border-light focus:shadow-xs focus:shadow-accent focus:outline-none';
+import { DatePicker } from '../ui/date-picker';
 
 const LABEL_CLASS =
   'flex items-center justify-between gap-3 font-mono text-xs tracking-wider text-white/60';
@@ -81,22 +79,14 @@ function UnavailabilityDialogComponent({
           <div className="flex flex-col gap-2 mb-2">
             <label className={LABEL_CLASS}>
               <span>FROM</span>
-              <input
-                type="date"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-                className={INPUT_CLASS}
-                aria-label="Unavailable from"
-              />
+              <DatePicker value={from} onChange={setFrom} aria-label="Unavailable from" />
             </label>
             <label className={LABEL_CLASS}>
               <span>TO</span>
-              <input
-                type="date"
+              <DatePicker
                 value={until}
                 min={from > today ? from : today}
-                onChange={(e) => setUntil(e.target.value)}
-                className={INPUT_CLASS}
+                onChange={setUntil}
                 aria-label="Unavailable until"
               />
             </label>
