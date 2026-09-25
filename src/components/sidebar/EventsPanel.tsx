@@ -6,6 +6,7 @@ import { selectActiveList, useNameStore } from '../../stores/useNameStore';
 import type { SpecialEvent } from '../../types/name';
 import { addDays, daysBetween, formatShortDay } from '../../utils/cycle';
 import { Button } from '../ui/button';
+import { DatePicker } from '../ui/date-picker';
 import { Switch } from '../ui/switch';
 
 /** An event longer than a year is a data-entry mistake, not a highlight on a cycle. */
@@ -118,13 +119,7 @@ function EventsPanelComponent() {
         />
         <label className="flex items-center justify-between gap-3 whitespace-nowrap font-mono text-xs tracking-wider text-white/60">
           <span>FROM</span>
-          <input
-            type="date"
-            value={start}
-            onChange={(e) => setStart(e.target.value)}
-            className={cn(INPUT_CLASS, 'w-40 shrink-0')}
-            aria-label="Event start date"
-          />
+          <DatePicker value={start} onChange={setStart} aria-label="Event start date" />
         </label>
         <label className="flex items-center justify-between gap-3 whitespace-nowrap font-mono text-xs tracking-wider text-white/60">
           <span>DURATION</span>

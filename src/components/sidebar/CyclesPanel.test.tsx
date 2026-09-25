@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useNameStore } from '../../stores/useNameStore';
+import { pickDate } from '../../test/pickDate';
 import { CyclesPanel } from './CyclesPanel';
 
 function getActiveCycles() {
@@ -9,8 +10,8 @@ function getActiveCycles() {
 }
 
 function fillDates(start: string, end: string) {
-  fireEvent.change(screen.getByLabelText('Cycle start date'), { target: { value: start } });
-  fireEvent.change(screen.getByLabelText('Cycle end date'), { target: { value: end } });
+  pickDate('Cycle start date', start);
+  pickDate('Cycle end date', end);
 }
 
 describe('CyclesPanel', () => {
@@ -99,8 +100,8 @@ describe('CyclesPanel', () => {
     await user.click(screen.getByRole('button', { name: 'Edit Cycle 2' }));
 
     expect(screen.getByLabelText('Cycle name')).toHaveValue('Cycle 2');
-    expect(screen.getByLabelText('Cycle start date')).toHaveValue('2026-08-11');
-    expect(screen.getByLabelText('Cycle end date')).toHaveValue('2026-10-02');
+    expect(screen.getByLabelText('Cycle start date')).toHaveTextContent('2026-08-11');
+    expect(screen.getByLabelText('Cycle end date')).toHaveTextContent('2026-10-02');
 
     await user.clear(screen.getByLabelText('Cycle name'));
     await user.type(screen.getByLabelText('Cycle name'), 'Cycle 2 revised');

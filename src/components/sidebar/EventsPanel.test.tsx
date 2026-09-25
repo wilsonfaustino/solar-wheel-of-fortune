@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useNameStore } from '../../stores/useNameStore';
+import { pickDate } from '../../test/pickDate';
 import { EventsPanel } from './EventsPanel';
 
 function activeEvents() {
@@ -18,9 +19,7 @@ describe('EventsPanel', () => {
     render(<EventsPanel />);
 
     fireEvent.change(screen.getByLabelText('Event name'), { target: { value: 'Launch Day' } });
-    fireEvent.change(screen.getByLabelText('Event start date'), {
-      target: { value: '2026-09-10' },
-    });
+    pickDate('Event start date', '2026-09-10');
     fireEvent.change(screen.getByLabelText('Event duration in days'), { target: { value: '3' } });
     fireEvent.click(screen.getByRole('button', { name: /add event/i }));
 
@@ -32,9 +31,7 @@ describe('EventsPanel', () => {
   it('defaults to a one-day event', () => {
     render(<EventsPanel />);
 
-    fireEvent.change(screen.getByLabelText('Event start date'), {
-      target: { value: '2026-09-10' },
-    });
+    pickDate('Event start date', '2026-09-10');
     fireEvent.click(screen.getByRole('button', { name: /add event/i }));
 
     expect(activeEvents()[0].end).toBe('2026-09-10');
@@ -44,9 +41,7 @@ describe('EventsPanel', () => {
   it('rejects a duration the browser leaves empty', () => {
     render(<EventsPanel />);
 
-    fireEvent.change(screen.getByLabelText('Event start date'), {
-      target: { value: '2026-09-10' },
-    });
+    pickDate('Event start date', '2026-09-10');
     fireEvent.change(screen.getByLabelText('Event duration in days'), { target: { value: '' } });
     fireEvent.click(screen.getByRole('button', { name: /add event/i }));
 
@@ -59,9 +54,7 @@ describe('EventsPanel', () => {
   it('rejects a duration beyond the one-year cap on a submit that skips native validation', () => {
     const { container } = render(<EventsPanel />);
 
-    fireEvent.change(screen.getByLabelText('Event start date'), {
-      target: { value: '2026-09-10' },
-    });
+    pickDate('Event start date', '2026-09-10');
     fireEvent.change(screen.getByLabelText('Event duration in days'), {
       target: { value: '999999999' },
     });
@@ -97,9 +90,7 @@ describe('EventsPanel', () => {
     render(<EventsPanel />);
 
     fireEvent.change(screen.getByLabelText('Event name'), { target: { value: 'Demo' } });
-    fireEvent.change(screen.getByLabelText('Event start date'), {
-      target: { value: '2026-09-10' },
-    });
+    pickDate('Event start date', '2026-09-10');
     fireEvent.click(screen.getByRole('button', { name: /add event/i }));
     fireEvent.click(screen.getByRole('button', { name: 'Delete Demo' }));
 
@@ -111,16 +102,14 @@ describe('EventsPanel', () => {
     render(<EventsPanel />);
 
     fireEvent.change(screen.getByLabelText('Event name'), { target: { value: 'Launch Day' } });
-    fireEvent.change(screen.getByLabelText('Event start date'), {
-      target: { value: '2026-09-10' },
-    });
+    pickDate('Event start date', '2026-09-10');
     fireEvent.change(screen.getByLabelText('Event duration in days'), { target: { value: '3' } });
     fireEvent.click(screen.getByRole('button', { name: /add event/i }));
 
     fireEvent.click(screen.getByRole('button', { name: 'Edit Launch Day' }));
 
     expect(screen.getByLabelText('Event name')).toHaveValue('Launch Day');
-    expect(screen.getByLabelText('Event start date')).toHaveValue('2026-09-10');
+    expect(screen.getByLabelText('Event start date')).toHaveTextContent('2026-09-10');
     expect(screen.getByLabelText('Event duration in days')).toHaveValue(3);
 
     fireEvent.change(screen.getByLabelText('Event name'), { target: { value: 'Launch Week' } });
@@ -139,9 +128,7 @@ describe('EventsPanel', () => {
     render(<EventsPanel />);
 
     fireEvent.change(screen.getByLabelText('Event name'), { target: { value: 'Demo' } });
-    fireEvent.change(screen.getByLabelText('Event start date'), {
-      target: { value: '2026-09-10' },
-    });
+    pickDate('Event start date', '2026-09-10');
     fireEvent.click(screen.getByRole('button', { name: /add event/i }));
 
     fireEvent.click(screen.getByRole('button', { name: 'Edit Demo' }));
@@ -157,9 +144,7 @@ describe('EventsPanel', () => {
     render(<EventsPanel />);
 
     fireEvent.change(screen.getByLabelText('Event name'), { target: { value: 'Demo' } });
-    fireEvent.change(screen.getByLabelText('Event start date'), {
-      target: { value: '2026-09-10' },
-    });
+    pickDate('Event start date', '2026-09-10');
     fireEvent.click(screen.getByRole('button', { name: /add event/i }));
 
     fireEvent.click(screen.getByRole('button', { name: 'Edit Demo' }));
@@ -173,9 +158,7 @@ describe('EventsPanel', () => {
     render(<EventsPanel />);
 
     fireEvent.change(screen.getByLabelText('Event name'), { target: { value: 'Independence' } });
-    fireEvent.change(screen.getByLabelText('Event start date'), {
-      target: { value: '2026-09-07' },
-    });
+    pickDate('Event start date', '2026-09-07');
     fireEvent.click(screen.getByRole('switch', { name: /holiday/i }));
     fireEvent.click(screen.getByRole('button', { name: /add event/i }));
 
@@ -186,9 +169,7 @@ describe('EventsPanel', () => {
     render(<EventsPanel />);
 
     fireEvent.change(screen.getByLabelText('Event name'), { target: { value: 'Independence' } });
-    fireEvent.change(screen.getByLabelText('Event start date'), {
-      target: { value: '2026-09-07' },
-    });
+    pickDate('Event start date', '2026-09-07');
     fireEvent.click(screen.getByRole('switch', { name: /holiday/i }));
     fireEvent.click(screen.getByRole('button', { name: /add event/i }));
 

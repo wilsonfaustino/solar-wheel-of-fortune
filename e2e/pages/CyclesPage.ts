@@ -49,8 +49,8 @@ export class CyclesPage extends BasePage {
 
   async addCycle(name: string, start: string, end: string, cooldownWeeks = 1) {
     await this.nameInput.fill(name);
-    await this.startInput.fill(start);
-    await this.endInput.fill(end);
+    await this.pickDate(this.startInput, start);
+    await this.pickDate(this.endInput, end);
     await this.cooldownWeeksInput.fill(String(cooldownWeeks));
     await this.addCycleButton.click();
   }
@@ -65,8 +65,8 @@ export class CyclesPage extends BasePage {
   async editCycle(name: string, updates: { name?: string; start?: string; end?: string }) {
     await this.page.getByRole('button', { name: `Edit ${name}` }).click();
     if (updates.name !== undefined) await this.nameInput.fill(updates.name);
-    if (updates.start !== undefined) await this.startInput.fill(updates.start);
-    if (updates.end !== undefined) await this.endInput.fill(updates.end);
+    if (updates.start !== undefined) await this.pickDate(this.startInput, updates.start);
+    if (updates.end !== undefined) await this.pickDate(this.endInput, updates.end);
     await this.saveCycleButton.click();
   }
 
@@ -76,7 +76,7 @@ export class CyclesPage extends BasePage {
 
   async addEvent(name: string, start: string, durationDays = 1, isHoliday = false) {
     await this.eventNameInput.fill(name);
-    await this.eventStartInput.fill(start);
+    await this.pickDate(this.eventStartInput, start);
     await this.eventDurationInput.fill(String(durationDays));
     if (isHoliday) await this.holidaySwitch.click();
     await this.addEventButton.click();
