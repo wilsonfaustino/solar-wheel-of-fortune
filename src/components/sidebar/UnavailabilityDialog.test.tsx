@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { pickDate } from '../../test/pickDate';
@@ -112,6 +112,21 @@ describe('UnavailabilityDialog', () => {
 
     expect(screen.getByRole('button', { name: /^save$/i })).toBeDisabled();
     expect(screen.getByText('END DATE IS BEFORE START DATE')).toBeInTheDocument();
+  });
+
+  it('should block TO days before FROM', () => {
+    renderDialog();
+    const dayBeforeFrom = daysFromToday(2);
+    const [year, month] = dayBeforeFrom.split('-').map(Number);
+
+    pickDate('Unavailable from', daysFromToday(3));
+    fireEvent.click(toInput());
+    fireEvent.change(screen.getByLabelText('Choose the Year'), { target: { value: String(year) } });
+    fireEvent.change(screen.getByLabelText('Choose the Month'), {
+      target: { value: String(month - 1) },
+    });
+
+    expect(document.querySelector(`[data-day="${dayBeforeFrom}"] button`)).toBeDisabled();
   });
 
   it('should disable save for a range longer than 30 days', () => {
