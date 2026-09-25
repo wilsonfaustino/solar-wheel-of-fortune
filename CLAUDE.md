@@ -95,7 +95,7 @@ bun hooks:uninstall # Remove git hooks
 
 **Git Hooks (via Lefthook)**:
 - **pre-commit**: Runs Biome check on staged files, auto-stages fixes
-- **pre-push**: Runs full type-check and test suite
+- **pre-push**: Runs full type-check and test suite with coverage thresholds
 - **commit-msg**: Validates conventional commits format
 
 ### bun.lockb in Orca worktrees
@@ -354,7 +354,7 @@ The application uses a centralized Button component (`src/components/ui/button.t
 - **Configuration**: `lefthook.yml` at project root
 - **Automatic Installation**: Runs on `bun install`
 - **Pre-commit Hook**: Biome check on staged files, auto-stages fixes
-- **Pre-push Hook**: Full type-check + test suite (prevents broken pushes)
+- **Pre-push Hook**: Full type-check + test suite with coverage thresholds (prevents broken pushes)
 - **Commit-msg Hook**: Validates conventional commits format
 
 **Commit Message Validation**:
