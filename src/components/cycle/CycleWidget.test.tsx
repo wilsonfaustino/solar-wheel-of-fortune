@@ -94,6 +94,38 @@ describe('CycleWidget', () => {
     ]);
   });
 
+  it('draws the current week 50% wider and taller than the others', () => {
+    vi.setSystemTime(new Date('2026-08-25T12:00:00Z'));
+    seedCycle();
+    render(<CycleWidget />);
+
+    const blocks = screen.getAllByTestId('cycle-week-block');
+    const labels = screen.getAllByTestId('cycle-week-label');
+    expect(blocks[2]).toHaveStyle({ flexGrow: '7.5' });
+    expect(labels[2]).toHaveStyle({ flexGrow: '7.5' });
+    expect(blocks[2].className).toContain('h-3.75');
+    expect(blocks[1]).toHaveStyle({ flexGrow: '5' });
+    expect(blocks[1].className).toContain('h-2.5');
+  });
+
+  it('shifts event bands to match the wider current week', () => {
+    vi.setSystemTime(new Date('2026-08-25T12:00:00Z'));
+    seedCycle();
+    useNameStore.setState((current) => ({
+      lists: current.lists.map((list) => ({
+        ...list,
+        events: [{ id: 'e1', name: 'Launch Day', start: '2026-09-01', end: '2026-09-03' }],
+      })),
+    }));
+    render(<CycleWidget />);
+
+    // Weeks hold 4,5,5,... weekdays and week 3 counts 1.5x, so the bar spans 41.5 weekday units.
+    // The event starts after 15 weekdays (17.5 units) and covers 3 weekdays.
+    const band = screen.getByTestId('cycle-event-band');
+    expect(Number.parseFloat(band.style.left)).toBeCloseTo((17.5 / 41.5) * 100);
+    expect(Number.parseFloat(band.style.width)).toBeCloseTo((3 / 41.5) * 100);
+  });
+
   it('keeps a whole-week cooldown on its own blocks', () => {
     vi.setSystemTime(new Date('2026-08-25T12:00:00Z'));
     seedCycle();
