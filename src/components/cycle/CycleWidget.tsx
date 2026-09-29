@@ -11,9 +11,12 @@ function formatDays(days: number): string {
   return `${days} ${days === 1 ? 'DAY' : 'DAYS'}`;
 }
 
+const CURRENT_WEEK_SCALE = 1.5;
+
 interface WeekSlot {
   week: number;
   weekdays: number;
+  scale: number;
   buildWeekdays: number;
   cooldownWeekdays: number;
   buildFillPercent: number;
@@ -29,7 +32,8 @@ function fillPercent(elapsed: number, total: number): number {
 function buildWeekSlots(
   weekdaysPerWeek: number[],
   buildWeekdays: number,
-  elapsedWeekdays: number
+  elapsedWeekdays: number,
+  currentWeek: number
 ): WeekSlot[] {
   const slots: WeekSlot[] = [];
   let firstWeekday = 0;
@@ -40,6 +44,7 @@ function buildWeekSlots(
     slots.push({
       week: index + 1,
       weekdays,
+      scale: index + 1 === currentWeek ? CURRENT_WEEK_SCALE : 1,
       buildWeekdays: build,
       cooldownWeekdays: weekdays - build,
       buildFillPercent: fillPercent(elapsed, build),
@@ -48,6 +53,20 @@ function buildWeekSlots(
     firstWeekday += weekdays;
   }
   return slots;
+}
+
+/** Maps a percent of the weekday axis onto the bar, where each week is drawn at its own scale. */
+function toBarPercent(axisPercent: number, slots: WeekSlot[]): number {
+  const totalWeekdays = slots.reduce((sum, slot) => sum + slot.weekdays, 0);
+  const totalBarUnits = slots.reduce((sum, slot) => sum + slot.weekdays * slot.scale, 0);
+  let remainingWeekdays = (axisPercent / 100) * totalWeekdays;
+  let barUnits = 0;
+  for (const slot of slots) {
+    const coveredWeekdays = Math.min(remainingWeekdays, slot.weekdays);
+    barUnits += coveredWeekdays * slot.scale;
+    remainingWeekdays -= coveredWeekdays;
+  }
+  return (barUnits / totalBarUnits) * 100;
 }
 
 /** Weekdays are counted inside the cycle, so a clipped event spans more days than it shows here. */
@@ -138,7 +157,8 @@ function CycleWidgetComponent() {
   const weekSlots = buildWeekSlots(
     status.weekdaysPerWeek,
     totalCycleWeekdays - cooldownWeekdays,
-    weekdayOfCycle
+    weekdayOfCycle,
+    status.weekOfCycle
   );
 
   return (
@@ -193,13 +213,13 @@ function CycleWidgetComponent() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <div className="relative flex h-2.5 gap-0.5">
+        <div className="relative flex h-3.75 items-center gap-0.5">
           {weekSlots.map((slot) => (
             <div
               key={slot.week}
               data-testid="cycle-week-block"
-              className="flex"
-              style={{ flexGrow: slot.weekdays }}
+              className={cn('flex', slot.week === status.weekOfCycle ? 'h-3.75' : 'h-2.5')}
+              style={{ flexGrow: slot.weekdays * slot.scale }}
             >
               {slot.buildWeekdays > 0 && (
                 <div
@@ -226,9 +246,19 @@ function CycleWidgetComponent() {
             </div>
           ))}
           <TooltipProvider delayDuration={200}>
-            {overlaps.map((overlap) => (
-              <EventBandTooltip key={overlap.event.id} overlap={overlap} />
-            ))}
+            {overlaps.map((overlap) => {
+              const leftPercent = toBarPercent(overlap.leftPercent, weekSlots);
+              const rightPercent = toBarPercent(
+                overlap.leftPercent + overlap.widthPercent,
+                weekSlots
+              );
+              return (
+                <EventBandTooltip
+                  key={overlap.event.id}
+                  overlap={{ ...overlap, leftPercent, widthPercent: rightPercent - leftPercent }}
+                />
+              );
+            })}
           </TooltipProvider>
         </div>
         <div className="flex gap-0.5 text-[10px] tracking-[0.12em]">
@@ -240,7 +270,7 @@ function CycleWidgetComponent() {
                 'text-center',
                 slot.week === status.weekOfCycle ? 'text-accent' : 'text-text/30'
               )}
-              style={{ flexGrow: slot.weekdays }}
+              style={{ flexGrow: slot.weekdays * slot.scale }}
             >
               {slot.week}
             </span>
