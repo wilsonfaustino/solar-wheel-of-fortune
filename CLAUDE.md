@@ -17,6 +17,7 @@ The project has been migrated from a single-file POC to a React + TypeScript app
 - **Build Tool**: Vite 7
 - **Package Manager**: Bun
 - **State Management**: Zustand with persist middleware (localStorage)
+- **Live Rooms**: Supabase (Postgres functions + Realtime Broadcast), optional via env vars
 - **Styling**: Tailwind CSS v4 (via @tailwindcss/vite)
 - **Animations**: Framer Motion
 - **Linting & Formatting**: Biome 2 (unified linter + formatter, Rust-based)
@@ -55,6 +56,11 @@ src/
 │   └── index.ts               # Barrel exports
 ├── test/
 │   └── setup.ts               # Vitest setup with jest-dom matchers
+├── lib/
+│   ├── supabase.ts            # Supabase client, null without env vars
+│   ├── rooms.ts               # Room SQL function calls + Realtime channel
+│   ├── roomSync.ts            # Syncs the names store with the active live room
+│   └── roomSyncLoader.ts      # Loads roomSync (and supabase-js) only when needed
 ├── utils/
 │   └── cn.ts                  # Class name composition utility (clsx + tailwind-merge)
 ├── App.tsx                    # Main app component with keyboard shortcuts integration
@@ -233,6 +239,20 @@ bun test:ui     # Debug with Vitest UI
 - Use `useShallow` hook when selecting multiple state values to prevent re-renders
 - Derived data (filtered names) should use `useMemo` to avoid infinite loops
 - Store actions: addName, deleteName, updateName, markSelected, setActiveList, createList, deleteList, updateListTitle, toggleNameExclusion, clearSelections, resetList, bulkAddNames, setUnavailability, clearUnavailability
+- History cap is 100 records per list, not global, so a busy local list never trims a shared list
+
+**Live Rooms** (Session 36)
+- Setup: copy `.env.example` to `.env.local`, set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (publishable key only, never the secret key). Schema: `supabase/schema.sql`
+- No env vars: SHARE LIVE is hidden and the app is local-only. Vitest blanks both vars in `vitest.config.ts`
+- Room id in the URL hash is the only access key. RLS has no policies; access only through `create_room` / `get_room` / `save_room`
+- Lists with `roomId` sync; lists without it never leave the device. One room per device
+- Saves debounce 300ms with optimistic `version`; a stale save pulls the room (last write wins)
+- A failed save retries every 5s; reconnect or tab visible runs `catchUp` (pull, then save). Responses older than the applied version are ignored
+- `useRoomStore.activeRoomId` (not persisted) holds the live room apart from its lists; UI reads it first, then the cached list `roomId`
+- Broadcast carries only `{ version }`; receivers call `get_room`. Pull again on `SUBSCRIBED` and tab visible
+- Sync fingerprint is a store snapshot, never the server `jsonb` payload (key order differs, causes save loops)
+- Components import from `roomSyncLoader`, never `roomSync` or `supabase` directly, to keep supabase-js out of the main bundle
+- E2E `15-live-room.spec.ts` uses the real project from `.env.local` and skips without keys
 
 **Keyboard Shortcuts** (Session 3, Session 15)
 - Space: Spin the wheel (via `useKeyboardShortcuts` hook, suppressed when typing in input/textarea fields or when focus is inside a dialog)
@@ -948,6 +968,14 @@ Install Playwright extension: `ms-playwright.playwright`
 - [x] Row icon opens `UnavailabilityDialog` (TODAY ONLY, FROM/TO, MARK AVAILABLE), `BACK <day>` badge
 - [x] Space shortcut ignored inside dialogs
 - [x] Unit tests for util, store, dialog, row; E2E range spec
+
+### Session 36: Supabase Live Rooms (Completed)
+- [x] `rooms` table with RLS and room SQL functions (`supabase/schema.sql`)
+- [x] `roomSync`: share all lists into a room, join by URL hash, live sync over Realtime
+- [x] SHARE LIVE / COPY LINK in sidebar, `LIVE` badge in list selector
+- [x] supabase-js lazy-loaded; main bundle unchanged
+- [x] History cap per list; Supabase env vars blanked in unit tests
+- [x] Unit tests for client, rooms, sync, loader, components; two-browser E2E spec
 
 ### Session 5: Selection History & Export (Planned)
 - [ ] Create selection history store (extend useNameStore)

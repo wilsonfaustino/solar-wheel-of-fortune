@@ -102,6 +102,13 @@ describe('ListSelector', () => {
       expect(screen.getByText('No List')).toBeInTheDocument();
     });
 
+    it('should mark live room lists in the trigger and the menu, but not local lists', () => {
+      const lists = [{ ...mockLists[0], roomId: 'room-1' }, mockLists[1]];
+      render(<ListSelector {...defaultProps} lists={lists} />);
+
+      expect(screen.getAllByText('LIVE')).toHaveLength(2);
+    });
+
     it('should render all list titles', () => {
       render(<ListSelector {...defaultProps} />);
 

@@ -17,6 +17,17 @@ interface ListSelectorProps {
   onRenameList: (listId: string, newTitle: string) => void;
 }
 
+function LiveRoomBadge() {
+  return (
+    <span
+      title="Live room list: edits sync with everyone who has the link"
+      className="ml-2 px-1 text-[10px] tracking-wider font-mono border border-accent/50 text-accent"
+    >
+      LIVE
+    </span>
+  );
+}
+
 function ListSelectorComponent({
   lists,
   activeListId,
@@ -90,6 +101,7 @@ function ListSelectorComponent({
             <div className="text-xs tracking-wider mb-1 font-mono text-text/50">ACTIVE LIST</div>
             <div className="tracking-wider font-light font-mono text-accent">
               {activeList?.title ?? 'No List'}
+              {activeList?.roomId && <LiveRoomBadge />}
             </div>
           </div>
           <ChevronDown className="w-5 h-5 text-accent/50 transition-transform group-data-[state=open]:rotate-180" />
@@ -146,7 +158,10 @@ function ListSelectorComponent({
                       }}
                       className="flex-1 text-left"
                     >
-                      <div className="font-mono text-sm text-text">{list.title}</div>
+                      <div className="font-mono text-sm text-text">
+                        {list.title}
+                        {list.roomId && <LiveRoomBadge />}
+                      </div>
                       <div className="text-xs font-mono text-text/40">
                         {list.names.length} names
                       </div>

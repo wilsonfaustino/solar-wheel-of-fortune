@@ -19,6 +19,8 @@ export interface NameList {
   names: Name[];
   cycles?: Cycle[];
   events?: SpecialEvent[];
+  /** Set when the list lives in a shared room; lists without it never leave this device. */
+  roomId?: string;
   createdAt: Date;
   updatedAt: Date;
 }

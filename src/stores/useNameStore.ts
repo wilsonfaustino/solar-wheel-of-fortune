@@ -57,6 +57,19 @@ function createEmptyList(title: string, description?: string): NameList {
 
 const HISTORY_LIMIT = 100;
 
+/** Caps each list separately: a busy local list must not trim (and sync away) a shared list's records. */
+function trimHistoryPerList(history: SelectionRecord[]): SelectionRecord[] {
+  const keptByList = new Map<string, number>();
+  return [...history]
+    .reverse()
+    .filter((record) => {
+      const kept = keptByList.get(record.listId) ?? 0;
+      keptByList.set(record.listId, kept + 1);
+      return kept < HISTORY_LIMIT;
+    })
+    .reverse();
+}
+
 const initialList = createDefaultList();
 
 interface NameState {
@@ -297,9 +310,7 @@ export const useNameStore = create<NameStore>()(
             (first, second) =>
               new Date(first.timestamp).getTime() - new Date(second.timestamp).getTime()
           );
-          if (draft.history.length > HISTORY_LIMIT) {
-            draft.history = draft.history.slice(-HISTORY_LIMIT);
-          }
+          draft.history = trimHistoryPerList(draft.history);
 
           target.updatedAt = new Date();
           draft.activeListId = target.id;
@@ -443,10 +454,7 @@ export const useNameStore = create<NameStore>()(
             selectionMethod,
           };
           draft.history.push(record);
-          // Keep only last 100 records (FIFO)
-          if (draft.history.length > HISTORY_LIMIT) {
-            draft.history = draft.history.slice(-HISTORY_LIMIT);
-          }
+          draft.history = trimHistoryPerList(draft.history);
         });
       },
 
@@ -474,9 +482,7 @@ export const useNameStore = create<NameStore>()(
             selectionMethod: 'volunteer',
           };
           draft.history.push(record);
-          if (draft.history.length > HISTORY_LIMIT) {
-            draft.history = draft.history.slice(-HISTORY_LIMIT);
-          }
+          draft.history = trimHistoryPerList(draft.history);
         });
       },
 

@@ -450,6 +450,23 @@ describe('useNameStore', () => {
       expect(updatedState.history[0].nameValue).not.toBeUndefined();
     });
 
+    it('should cap history per list so a busy list keeps other lists records', () => {
+      const firstList = useNameStore.getState().lists[0];
+      const firstName = firstList.names[0];
+      useNameStore.getState().recordSelection(firstName.value, firstName.id, 'wheel');
+
+      useNameStore.getState().createList('Busy');
+      useNameStore.getState().addName('Busy Name');
+      const busyName = useNameStore.getState().lists[1].names[0];
+      for (let i = 0; i < 150; i++) {
+        useNameStore.getState().recordSelection(busyName.value, busyName.id, 'wheel');
+      }
+
+      const { history } = useNameStore.getState();
+      expect(history.filter((record) => record.listId === firstList.id)).toHaveLength(1);
+      expect(history.filter((record) => record.listId !== firstList.id)).toHaveLength(100);
+    });
+
     it('should generate unique IDs for each record', () => {
       const state = useNameStore.getState();
       const name = state.lists[0].names[0];
