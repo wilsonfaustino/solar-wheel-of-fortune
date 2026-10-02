@@ -37,7 +37,7 @@ function MemorialBannerComponent() {
   return (
     <div
       data-testid="memorial-banner"
-      className="pointer-events-auto flex items-stretch border border-accent bg-black/90 font-mono"
+      className="pointer-events-auto hidden items-stretch border border-accent bg-black/90 font-mono md:[@media(min-height:700px)]:flex"
     >
       <div className="flex flex-col items-center justify-center gap-0.5 border-r border-accent px-4 py-2.5">
         <span className="text-[44px] font-medium leading-none text-accent">
