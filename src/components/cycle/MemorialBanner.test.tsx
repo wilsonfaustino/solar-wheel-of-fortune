@@ -23,7 +23,12 @@ describe('MemorialBanner', () => {
   });
 
   it('picks the mascot at random', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.9);
+    vi.spyOn(crypto, 'getRandomValues').mockImplementation(
+      <T extends ArrayBufferView | null>(target: T): T => {
+        (target as unknown as Uint32Array)[0] = 1;
+        return target;
+      }
+    );
 
     render(<MemorialBanner />);
 

@@ -15,7 +15,9 @@ const MASCOTS = [
 function MemorialBannerComponent() {
   const memorialBannerEnabled = useSettingsStore((state) => state.memorialBannerEnabled);
   const setMemorialBannerEnabled = useSettingsStore((state) => state.setMemorialBannerEnabled);
-  const [mascot] = useState(() => MASCOTS[Math.floor(Math.random() * MASCOTS.length)]);
+  const [mascot] = useState(
+    () => MASCOTS[crypto.getRandomValues(new Uint32Array(1))[0] % MASCOTS.length]
+  );
 
   if (!memorialBannerEnabled) return null;
 
