@@ -48,7 +48,7 @@ function MemorialBannerComponent() {
       <div className="flex flex-col justify-center gap-1.5 px-3.5 py-2.5">
         <div className="flex items-center gap-2">
           <img src={mascot.src} alt={mascot.alt} className="size-7 object-contain" />
-          <span className="text-[10px] tracking-[0.2em] text-text/40">HAPPENING NOW</span>
+          <span className="text-[10px] tracking-[0.2em] text-text/40">MISSING</span>
         </div>
         <span className="text-sm tracking-[0.14em] text-text">WITHOUT CLAUDECODE</span>
         <span className="text-[10px] tracking-[0.12em] text-text/40">

@@ -18,6 +18,7 @@ describe('MemorialBanner', () => {
     render(<MemorialBanner />);
 
     expect(screen.getByText('02')).toBeInTheDocument();
+    expect(screen.getByText('MISSING')).toBeInTheDocument();
     expect(screen.getByText('WITHOUT CLAUDECODE')).toBeInTheDocument();
     expect(screen.getByText('SINCE 2026-09-30')).toBeInTheDocument();
   });
