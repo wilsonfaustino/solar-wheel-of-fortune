@@ -28,7 +28,7 @@ function EventCountdownBadgeComponent() {
     <div
       data-testid="event-countdown-badge"
       className={cn(
-        'pointer-events-none absolute bottom-16 right-4 z-10 flex items-center gap-3 border px-4 py-3 font-mono lg:bottom-20 lg:right-8',
+        'flex items-center gap-3 border px-4 py-3 font-mono',
         isActive ? 'border-accent bg-accent-10' : 'border-border-light bg-black/90'
       )}
     >
