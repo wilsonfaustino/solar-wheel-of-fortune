@@ -491,6 +491,40 @@ describe('roomSync', () => {
     expect(mocks.getRoom).toHaveBeenCalledTimes(2);
   });
 
+  it('retries a failed save after a pause', async () => {
+    const { useNameStore, shareRoom } = await loadModules();
+    mocks.createRoom.mockResolvedValue({ id: ROOM_ID, version: 1, data: {} });
+    await shareRoom();
+    mocks.saveRoom
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValue({ id: ROOM_ID, version: 2, data: {} });
+
+    useNameStore.getState().addName('Retry');
+    await vi.advanceTimersByTimeAsync(300);
+    expect(mocks.saveRoom).toHaveBeenCalledTimes(1);
+
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(mocks.saveRoom).toHaveBeenCalledTimes(2);
+    expect(mocks.announceSave).toHaveBeenCalledWith(2);
+  });
+
+  it('saves an unsaved edit right after reconnecting', async () => {
+    const { useNameStore, shareRoom } = await loadModules();
+    mocks.createRoom.mockResolvedValue({ id: ROOM_ID, version: 1, data: {} });
+    await shareRoom();
+    mocks.saveRoom
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValue({ id: ROOM_ID, version: 2, data: {} });
+    mocks.getRoom.mockResolvedValue({ id: ROOM_ID, version: 1, data: { lists: [], history: [] } });
+
+    useNameStore.getState().addName('Offline');
+    await vi.advanceTimersByTimeAsync(300);
+    channelHandlers.onSubscribed();
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(mocks.saveRoom).toHaveBeenCalledTimes(2);
+  });
+
   it('logs and keeps running when a save or pull fails', async () => {
     const { useNameStore, shareRoom } = await loadModules();
     mocks.createRoom.mockResolvedValue({ id: ROOM_ID, version: 1, data: {} });

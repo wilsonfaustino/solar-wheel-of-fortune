@@ -13,6 +13,8 @@ import { supabase } from './supabase';
 
 // Short enough to feel live, long enough to batch typing into one save
 const SAVE_DEBOUNCE_MS = 300;
+// Long enough not to hammer a down network, short enough to feel live after it returns
+const SAVE_RETRY_MS = 5000;
 const ROOM_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 type NameStoreState = ReturnType<typeof useNameStore.getState>;
@@ -135,6 +137,12 @@ async function pullRoom(room: ActiveRoom, announce: boolean) {
   }
 }
 
+/** Pull first so a stale local copy cannot overwrite newer data, then push any unsaved edit. */
+async function catchUp(room: ActiveRoom) {
+  await pullRoom(room, false);
+  await saveRoomNow(room);
+}
+
 async function saveRoomNow(room: ActiveRoom) {
   // A queued save of a room this device left would push an empty snapshot and wipe it
   if (activeRoom !== room) return;
@@ -163,6 +171,8 @@ async function saveRoomNow(room: ActiveRoom) {
     }
   } catch (error) {
     console.warn('[room] save failed', error);
+    // ponytail: fixed interval, so an offline device retries every 5s; add backoff if that shows up in logs
+    room.saveTimer = setTimeout(() => void saveRoomNow(room), SAVE_RETRY_MS);
   } finally {
     room.isSaving = false;
     if (room.hasPendingSave) {
@@ -207,7 +217,7 @@ function startRoom(roomId: string, version: number): ActiveRoom {
       onSaved: (savedVersion) => {
         if (savedVersion > room.version) void pullRoom(room, true);
       },
-      onSubscribed: () => void pullRoom(room, false),
+      onSubscribed: () => void catchUp(room),
     }),
     unsubscribeStore: useNameStore.subscribe(handleStoreChange),
   };
@@ -271,7 +281,7 @@ export function initRoomSync(): () => void {
     return true;
   };
   const catchUpWhenVisible = () => {
-    if (document.visibilityState === 'visible' && activeRoom) void pullRoom(activeRoom, false);
+    if (document.visibilityState === 'visible' && activeRoom) void catchUp(activeRoom);
   };
 
   window.addEventListener('hashchange', joinFromHash);
