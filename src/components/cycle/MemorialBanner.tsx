@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { memo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useSettingsStore } from '../../stores/useSettingsStore';
 import { daysBetween } from '../../utils/cycle';
@@ -18,10 +18,21 @@ function MemorialBannerComponent() {
   const [mascot] = useState(
     () => MASCOTS[crypto.getRandomValues(new Uint32Array(1))[0] % MASCOTS.length]
   );
+  const [today, setToday] = useState(() => toLocalISODay(new Date()));
+
+  useEffect(() => {
+    const nextMidnight = new Date(`${today}T00:00`);
+    nextMidnight.setDate(nextMidnight.getDate() + 1);
+    const timer = setTimeout(
+      () => setToday(toLocalISODay(new Date())),
+      nextMidnight.getTime() - Date.now()
+    );
+    return () => clearTimeout(timer);
+  }, [today]);
 
   if (!memorialBannerEnabled) return null;
 
-  const daysWithout = daysBetween(CLAUDE_CODE_LOST_ON, toLocalISODay(new Date()));
+  const daysWithout = daysBetween(CLAUDE_CODE_LOST_ON, today);
 
   return (
     <div

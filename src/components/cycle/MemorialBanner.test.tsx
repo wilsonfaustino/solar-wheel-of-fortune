@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { useSettingsStore } from '../../stores/useSettingsStore';
 import { MemorialBanner } from './MemorialBanner';
 
@@ -20,6 +20,24 @@ describe('MemorialBanner', () => {
     expect(screen.getByText('02')).toBeInTheDocument();
     expect(screen.getByText('WITHOUT CLAUDECODE')).toBeInTheDocument();
     expect(screen.getByText('SINCE 2026-09-30')).toBeInTheDocument();
+  });
+
+  it('moves the counter forward at local midnight', () => {
+    vi.setSystemTime(new Date(2026, 9, 2, 23, 59));
+    render(<MemorialBanner />);
+    expect(screen.getByText('02')).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(60_000);
+    });
+
+    expect(screen.getByText('03')).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(24 * 60 * 60 * 1000);
+    });
+
+    expect(screen.getByText('04')).toBeInTheDocument();
   });
 
   it('picks the mascot at random', () => {
