@@ -328,6 +328,39 @@ describe('roomSync', () => {
     ]);
   });
 
+  it('gives a local copy a new id when it collides with a rejoined room list', async () => {
+    const { useNameStore } = await loadModules();
+    const detachedCopy = buildRoomList('room-list', ['Ana']);
+    const localRecord = buildRecord('local-r1', 'room-list', 'room-list-Ana', '2026-01-02');
+    useNameStore.setState({
+      lists: [detachedCopy],
+      activeListId: 'room-list',
+      history: [localRecord],
+    });
+    const roomRecord = buildRecord('room-r1', 'room-list', 'room-list-Ana', '2026-01-03');
+    mocks.getRoom.mockResolvedValue(
+      serverRoom(1, { lists: [buildRoomList('room-list', ['Ana', 'Bo'])], history: [roomRecord] })
+    );
+    window.history.replaceState(null, '', `/#${ROOM_ID}`);
+    const { initRoomSync } = await import('./roomSync');
+
+    disposeRoomSync = initRoomSync();
+    await vi.advanceTimersByTimeAsync(0);
+
+    const { lists, history, activeListId } = useNameStore.getState();
+    const localCopy = lists.find((list) => !list.roomId);
+    expect(localCopy?.id).not.toBe('room-list');
+    expect(lists.find((list) => list.roomId === ROOM_ID)?.id).toBe('room-list');
+    expect(activeListId).toBe('room-list');
+    expect(history.find((record) => record.listId === localCopy?.id)?.nameValue).toBe(
+      'room-list-Ana'
+    );
+    expect(history.filter((record) => record.listId === 'room-list').map((r) => r.id)).toEqual([
+      'room-r1',
+    ]);
+    expect(new Set(history.map((record) => record.id)).size).toBe(history.length);
+  });
+
   it('stops syncing when the room does not exist', async () => {
     mocks.getRoom.mockResolvedValue(null);
     window.history.replaceState(null, '', `/#${ROOM_ID}`);

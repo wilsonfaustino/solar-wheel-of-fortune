@@ -55,16 +55,31 @@ function applyRoomData(
 ) {
   const { lists, history, activeListId } = useNameStore.getState();
   const remoteLists: NameList[] = data.lists.map((list) => ({ ...list, roomId: room.id }));
+  const remoteListIds = new Set(remoteLists.map((list) => list.id));
+  // A local copy of a room list (left the room, then rejoined) needs its own id: store actions act on the first id match
+  const renamedListIds = new Map(
+    lists
+      .filter((list) => list.roomId !== room.id && remoteListIds.has(list.id))
+      .map((list) => [list.id, crypto.randomUUID()])
+  );
   // One room per device: lists of a previous room stay here as plain local lists
   const localLists = lists
     .filter((list) => list.roomId !== room.id)
-    .map((list) => (list.roomId ? { ...list, roomId: undefined } : list));
+    .map((list) => ({
+      ...list,
+      id: renamedListIds.get(list.id) ?? list.id,
+      roomId: undefined,
+    }));
+  const localHistory = history.map((record) => {
+    const renamedListId = renamedListIds.get(record.listId);
+    return renamedListId ? { ...record, id: crypto.randomUUID(), listId: renamedListId } : record;
+  });
   const replacedListIds = new Set(
     [...lists.filter((list) => list.roomId === room.id), ...remoteLists].map((list) => list.id)
   );
   const knownRecordIds = new Set(history.map((record) => record.id));
   const nextHistory = [
-    ...history.filter((record) => !replacedListIds.has(record.listId)),
+    ...localHistory.filter((record) => !replacedListIds.has(record.listId)),
     ...data.history,
   ].sort(
     (first, second) => new Date(first.timestamp).getTime() - new Date(second.timestamp).getTime()
