@@ -8,6 +8,7 @@ describe('useSettingsStore', () => {
     state.autoExcludeEnabled = true;
     state.clearSelectionAfterExclude = false;
     state.soundEnabled = false;
+    state.memorialBannerEnabled = true;
   });
 
   describe('initial state', () => {
@@ -24,6 +25,11 @@ describe('useSettingsStore', () => {
     test('should have soundEnabled set to false by default', () => {
       const state = useSettingsStore.getState();
       expect(state.soundEnabled).toBe(false);
+    });
+
+    test('should have memorialBannerEnabled set to true by default', () => {
+      const state = useSettingsStore.getState();
+      expect(state.memorialBannerEnabled).toBe(true);
     });
   });
 
@@ -96,6 +102,25 @@ describe('useSettingsStore', () => {
 
       const state = useSettingsStore.getState();
       expect(state.autoExcludeEnabled).toBe(true);
+    });
+  });
+
+  describe('setMemorialBannerEnabled', () => {
+    test('should hide the memorial banner when set to false', () => {
+      const { setMemorialBannerEnabled } = useSettingsStore.getState();
+
+      setMemorialBannerEnabled(false);
+
+      expect(useSettingsStore.getState().memorialBannerEnabled).toBe(false);
+    });
+
+    test('should show the memorial banner again when set to true', () => {
+      const { setMemorialBannerEnabled } = useSettingsStore.getState();
+
+      setMemorialBannerEnabled(false);
+      setMemorialBannerEnabled(true);
+
+      expect(useSettingsStore.getState().memorialBannerEnabled).toBe(true);
     });
   });
 
