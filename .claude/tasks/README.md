@@ -6,6 +6,10 @@ Quick navigation for ongoing development sessions.
 
 ## Current Session Tasks
 
+### Session 36: Supabase Live Rooms (Complete ✅)
+**Summary**: [sessions/session-36-supabase-live-rooms.md](./sessions/session-36-supabase-live-rooms.md) - Share all lists into a live room by URL hash; edits sync between browsers over Supabase Realtime
+**Status**: Tests ✅ | E2E ✅
+
 ### Session 35: Vacation Unavailability (Complete ✅)
 **Summary**: [sessions/session-35-vacation-unavailability.md](./sessions/session-35-vacation-unavailability.md) - Mark a person unavailable for a date range (max 30 days) from a row dialog; replaces the today-only toggle
 **Status**: Tests ✅ | E2E ✅
