@@ -2,6 +2,7 @@ import { Link, Radio } from 'lucide-react';
 import { memo, useState } from 'react';
 import { isRoomSyncConfigured, loadRoomSync } from '../../lib/roomSyncLoader';
 import { useNameStore } from '../../stores/useNameStore';
+import { useRoomStore } from '../../stores/useRoomStore';
 import { ActionButtons } from './names-list/ActionButtons';
 
 type LiveRoomStatus = 'idle' | 'sharing' | 'copied' | 'share-failed' | 'copy-failed';
@@ -15,7 +16,10 @@ const ERROR_MESSAGES: Partial<Record<LiveRoomStatus, string>> = {
 };
 
 function LiveRoomActionsComponent() {
-  const roomId = useNameStore((state) => state.lists.find((list) => list.roomId)?.roomId);
+  const activeRoomId = useRoomStore((state) => state.activeRoomId);
+  // Cached room lists cover the moment before the lazy roomSync chunk joins
+  const cachedRoomId = useNameStore((state) => state.lists.find((list) => list.roomId)?.roomId);
+  const roomId = activeRoomId ?? cachedRoomId;
   const [status, setStatus] = useState<LiveRoomStatus>('idle');
 
   const copyRoomLink = async (id: string) => {

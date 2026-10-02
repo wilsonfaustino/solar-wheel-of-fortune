@@ -82,8 +82,9 @@ function serverRoom(version: number, data: RoomData): Room {
 
 async function loadModules() {
   const store = await import('../stores/useNameStore');
+  const roomStore = await import('../stores/useRoomStore');
   const sync = await import('./roomSync');
-  return { useNameStore: store.useNameStore, ...sync };
+  return { useNameStore: store.useNameStore, useRoomStore: roomStore.useRoomStore, ...sync };
 }
 
 describe('roomSync', () => {
@@ -136,6 +137,17 @@ describe('roomSync', () => {
     expect(window.location.hash).toBe(`#${ROOM_ID}`);
     expect(await shareRoom()).toBe(ROOM_ID);
     expect(mocks.createRoom).toHaveBeenCalledTimes(1);
+  });
+
+  it('publishes the active room id while syncing and clears it on stop', async () => {
+    const { useRoomStore, shareRoom, stopRoomSync } = await loadModules();
+    mocks.createRoom.mockResolvedValue({ id: ROOM_ID, version: 1, data: {} });
+
+    await shareRoom();
+    expect(useRoomStore.getState().activeRoomId).toBe(ROOM_ID);
+
+    stopRoomSync();
+    expect(useRoomStore.getState().activeRoomId).toBeNull();
   });
 
   it('saves a debounced snapshot after a local edit and announces the new version', async () => {

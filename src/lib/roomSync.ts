@@ -1,5 +1,6 @@
 import { showSelectionToast } from '../components/toast';
 import { useNameStore } from '../stores/useNameStore';
+import { useRoomStore } from '../stores/useRoomStore';
 import type { NameList, SelectionRecord } from '../types/name';
 import {
   createRoom,
@@ -222,6 +223,7 @@ function startRoom(roomId: string, version: number): ActiveRoom {
     unsubscribeStore: useNameStore.subscribe(handleStoreChange),
   };
   activeRoom = room;
+  useRoomStore.setState({ activeRoomId: roomId });
   window.history.replaceState(null, '', `#${roomId}`);
   return room;
 }
@@ -251,6 +253,7 @@ export function stopRoomSync() {
   activeRoom.channel.close();
   activeRoom.unsubscribeStore();
   activeRoom = null;
+  useRoomStore.setState({ activeRoomId: null });
 }
 
 /** Moves every current list into a new room and returns its id. */

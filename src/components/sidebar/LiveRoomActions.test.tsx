@@ -1,5 +1,6 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { useNameStore } from '../../stores/useNameStore';
+import { useRoomStore } from '../../stores/useRoomStore';
 import { LiveRoomActions } from './LiveRoomActions';
 
 const ROOM_ID = '11111111-2222-4333-8444-555555555555';
@@ -36,6 +37,7 @@ describe('LiveRoomActions', () => {
       configurable: true,
     });
     useNameStore.setState({ lists: initialLists });
+    useRoomStore.setState({ activeRoomId: null });
   });
 
   afterEach(() => {
@@ -82,6 +84,15 @@ describe('LiveRoomActions', () => {
       vi.advanceTimersByTime(2000);
     });
     expect(screen.getByRole('button', { name: /copy link/i })).toBeInTheDocument();
+  });
+
+  it('keeps the room controls when the active room has no lists left', () => {
+    useRoomStore.setState({ activeRoomId: ROOM_ID });
+
+    render(<LiveRoomActions />);
+
+    expect(screen.getByRole('button', { name: /copy link/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /share live/i })).not.toBeInTheDocument();
   });
 
   it('shows an error when the room cannot start', async () => {
