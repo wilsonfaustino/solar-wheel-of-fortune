@@ -147,8 +147,11 @@ async function saveRoomNow(room: ActiveRoom) {
     const saved = await saveRoom(room.id, data, room.version);
     if (activeRoom !== room) return;
     if (saved) {
-      room.version = saved.version;
-      room.syncedFingerprint = nextFingerprint;
+      // A pull may have applied a newer version while this save was in flight
+      if (saved.version > room.version) {
+        room.version = saved.version;
+        room.syncedFingerprint = nextFingerprint;
+      }
       room.channel.announceSave(saved.version);
     } else {
       // ponytail: stale version means another device saved first; its data wins and this edit drops. Merge per list if that bites.
@@ -215,6 +218,8 @@ async function joinRoom(roomId: string, focus: boolean) {
       stopRoomSync();
       return;
     }
+    // A catch-up pull may have applied a newer version first; an equal one re-applies the same data
+    if (latest.version < room.version) return;
     room.version = latest.version;
     applyRoomData(room, latest.data, { announce: false, focus });
   } catch (error) {

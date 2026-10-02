@@ -361,6 +361,61 @@ describe('roomSync', () => {
     expect(new Set(history.map((record) => record.id)).size).toBe(history.length);
   });
 
+  it('ignores a join response older than a version already applied', async () => {
+    let resolveJoin: (room: Room) => void = () => {};
+    mocks.getRoom
+      .mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveJoin = resolve;
+        })
+      )
+      .mockResolvedValueOnce(
+        serverRoom(2, { lists: [buildRoomList('room-list', ['New'])], history: [] })
+      );
+    window.history.replaceState(null, '', `/#${ROOM_ID}`);
+    const { useNameStore, initRoomSync } = await loadModules();
+
+    disposeRoomSync = initRoomSync();
+    channelHandlers.onSubscribed();
+    await vi.advanceTimersByTimeAsync(0);
+    resolveJoin(serverRoom(1, { lists: [buildRoomList('room-list', ['Old'])], history: [] }));
+    await vi.advanceTimersByTimeAsync(0);
+
+    const roomList = useNameStore.getState().lists.find((list) => list.roomId === ROOM_ID);
+    expect(roomList?.names.map((name) => name.value)).toEqual(['New']);
+  });
+
+  it('keeps a newer pulled version when an older save response arrives late', async () => {
+    mocks.getRoom.mockResolvedValueOnce(
+      serverRoom(1, { lists: [buildRoomList('room-list', ['Ana'])], history: [] })
+    );
+    window.history.replaceState(null, '', `/#${ROOM_ID}`);
+    const { useNameStore, initRoomSync } = await loadModules();
+    disposeRoomSync = initRoomSync();
+    await vi.advanceTimersByTimeAsync(0);
+    let resolveSave: (room: Room) => void = () => {};
+    mocks.saveRoom.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveSave = resolve;
+      })
+    );
+
+    useNameStore.getState().addName('Mine');
+    await vi.advanceTimersByTimeAsync(300);
+    mocks.getRoom.mockResolvedValueOnce(
+      serverRoom(3, { lists: [buildRoomList('room-list', ['Ana', 'MINE', 'Theirs'])], history: [] })
+    );
+    channelHandlers.onSaved(3);
+    await vi.advanceTimersByTimeAsync(0);
+    resolveSave({ id: ROOM_ID, version: 2, data: { lists: [], history: [] } });
+    await vi.advanceTimersByTimeAsync(0);
+    mocks.saveRoom.mockResolvedValue({ id: ROOM_ID, version: 4, data: { lists: [], history: [] } });
+    useNameStore.getState().addName('Next');
+    await vi.advanceTimersByTimeAsync(300);
+
+    expect(mocks.saveRoom).toHaveBeenLastCalledWith(ROOM_ID, expect.anything(), 3);
+  });
+
   it('stops syncing when the room does not exist', async () => {
     mocks.getRoom.mockResolvedValue(null);
     window.history.replaceState(null, '', `/#${ROOM_ID}`);
