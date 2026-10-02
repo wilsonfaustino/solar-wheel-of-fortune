@@ -8,6 +8,7 @@ import { CyclesPanel } from './CyclesPanel';
 import { EventsPanel } from './EventsPanel';
 import { HistoryPanel } from './HistoryPanel';
 import { ListSelector } from './ListSelector';
+import { LiveRoomActions } from './LiveRoomActions';
 import { NameListDisplay } from './NameListDisplay';
 import { SettingsPanel } from './SettingsPanel';
 import { ShareListActions } from './ShareListActions';
@@ -145,6 +146,8 @@ function NameManagementSidebarComponent({
           />
 
           <ShareListActions activeList={activeList} />
+
+          <LiveRoomActions />
         </div>
       )}
 
