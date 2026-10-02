@@ -1,6 +1,6 @@
 import { showSelectionToast } from '../components/toast';
 import { useNameStore } from '../stores/useNameStore';
-import type { NameList } from '../types/name';
+import type { NameList, SelectionRecord } from '../types/name';
 import {
   createRoom,
   getRoom,
@@ -34,14 +34,18 @@ let isApplyingRemote = false;
 
 export const isRoomSyncAvailable = supabase !== null;
 
-function snapshotRoom(roomId: string): RoomData {
-  const { lists, history } = useNameStore.getState();
+function buildRoomData(lists: NameList[], history: SelectionRecord[], roomId: string): RoomData {
   const roomLists = lists.filter((list) => list.roomId === roomId);
   const roomListIds = new Set(roomLists.map((list) => list.id));
   return {
     lists: roomLists,
     history: history.filter((record) => roomListIds.has(record.listId)),
   };
+}
+
+function snapshotRoom(roomId: string): RoomData {
+  const { lists, history } = useNameStore.getState();
+  return buildRoomData(lists, history, roomId);
 }
 
 function fingerprintRoom(roomId: string): string {
@@ -184,6 +188,10 @@ function handleStoreChange(state: NameStoreState, previous: NameStoreState) {
     return;
   }
 
+  scheduleSave(room);
+}
+
+function scheduleSave(room: ActiveRoom) {
   clearTimeout(room.saveTimer);
   room.saveTimer = setTimeout(() => void saveRoomNow(room), SAVE_DEBOUNCE_MS);
 }
@@ -239,12 +247,16 @@ export function stopRoomSync() {
 export async function shareRoom(): Promise<string> {
   if (activeRoom) return activeRoom.id;
   const { lists, history } = useNameStore.getState();
-  const room = await createRoom({ lists, history });
+  const created = await createRoom({ lists, history });
   useNameStore.setState({
-    lists: useNameStore.getState().lists.map((list) => ({ ...list, roomId: room.id })),
+    lists: useNameStore.getState().lists.map((list) => ({ ...list, roomId: created.id })),
   });
-  startRoom(room.id, room.version);
-  return room.id;
+  const room = startRoom(created.id, created.version);
+  // The server holds the snapshot sent above; edits made while createRoom ran still need a save
+  const sentLists = lists.map((list) => ({ ...list, roomId: created.id }));
+  room.syncedFingerprint = JSON.stringify(buildRoomData(sentLists, history, created.id));
+  scheduleSave(room);
+  return created.id;
 }
 
 /** Runs once, from roomSyncLoader. */

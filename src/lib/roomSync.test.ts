@@ -280,6 +280,40 @@ describe('roomSync', () => {
     expect(mocks.saveRoom).toHaveBeenCalledTimes(1);
   });
 
+  it('saves an edit made while the room was being created', async () => {
+    const { useNameStore, shareRoom } = await loadModules();
+    let resolveCreate: (room: Room) => void = () => {};
+    mocks.createRoom.mockReturnValue(
+      new Promise((resolve) => {
+        resolveCreate = resolve;
+      })
+    );
+    mocks.saveRoom.mockResolvedValue({ id: ROOM_ID, version: 2, data: {} });
+
+    const sharing = shareRoom();
+    useNameStore.getState().addName('During');
+    resolveCreate({ id: ROOM_ID, version: 1, data: { lists: [], history: [] } });
+    await sharing;
+    await vi.advanceTimersByTimeAsync(300);
+
+    expect(mocks.saveRoom).toHaveBeenCalledTimes(1);
+    const [, savedData, baseVersion] = mocks.saveRoom.mock.calls[0];
+    expect(baseVersion).toBe(1);
+    expect(savedData.lists[0].names.map((name: { value: string }) => name.value)).toContain(
+      'DURING'
+    );
+  });
+
+  it('does not save after sharing when nothing changed during creation', async () => {
+    const { shareRoom } = await loadModules();
+    mocks.createRoom.mockResolvedValue({ id: ROOM_ID, version: 1, data: {} });
+
+    await shareRoom();
+    await vi.advanceTimersByTimeAsync(300);
+
+    expect(mocks.saveRoom).not.toHaveBeenCalled();
+  });
+
   it('puts a list created while in a room into that room', async () => {
     const { useNameStore, shareRoom } = await loadModules();
     mocks.createRoom.mockResolvedValue({ id: ROOM_ID, version: 1, data: {} });
