@@ -3,8 +3,8 @@ import { memo, useMemo } from 'react';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import { selectActiveList, useNameStore } from '../../stores/useNameStore';
-import { toISODay } from '../../utils/cycle';
 import { getEventCountdown } from '../../utils/event';
+import { toLocalISODay } from '../../utils/name';
 
 function formatDays(days: number): string {
   return `${days} ${days === 1 ? 'DAY' : 'DAYS'}`;
@@ -17,7 +17,7 @@ function EventCountdownBadgeComponent() {
 
   const countdown = useMemo(() => {
     const events = selectActiveList({ lists, activeListId })?.events ?? [];
-    return getEventCountdown(events, toISODay(new Date()));
+    return getEventCountdown(events, toLocalISODay(new Date()));
   }, [lists, activeListId]);
 
   if (!countdown) return null;

@@ -65,6 +65,20 @@ describe('CycleWidget', () => {
     expect(screen.getByText('38 DAYS')).toBeInTheDocument();
   });
 
+  it('counts from the local day late in the evening, when UTC is already tomorrow', () => {
+    const originalTimeZone = process.env.TZ;
+    process.env.TZ = 'America/Sao_Paulo';
+    try {
+      vi.setSystemTime(new Date('2026-08-25T23:30:00-03:00'));
+      seedCycle();
+      render(<CycleWidget />);
+
+      expect(screen.getByText('38 DAYS')).toBeInTheDocument();
+    } finally {
+      process.env.TZ = originalTimeZone;
+    }
+  });
+
   it('shows the cooldown state and the next cycle countdown', () => {
     vi.setSystemTime(new Date('2026-09-30T12:00:00Z'));
     seedCycle();
