@@ -3,7 +3,7 @@
 **Date**: 2026-10-01
 **Status**: Completed
 **Branch**: `wilsonfaustino/add-persistence`
-**Tests**: 527 unit passed | 52 E2E passed locally (CI skips the live room spec: 51 passed, 1 skipped)
+**Tests**: 536 unit passed | 52 E2E passed locally (CI skips the live room spec: 51 passed, 1 skipped)
 
 ## Overview
 
@@ -46,6 +46,16 @@ The RACHAI project (`~/www/dot/rachai`) gave the model: publishable key only, no
 
 The history cap was 100 records for all lists together. A busy local list then trimmed the records of a shared list, and the next save deleted them for everyone. The cap is now 100 records per list (`trimHistoryPerList`).
 
+### PR #83 review fixes
+
+An agent review on PR #83 found 5 sync defects. Each fix has a test that failed before the fix.
+
+1. **Duplicate list ids after rejoining a room.** Leaving a room kept its lists as local copies with the same ids. Rejoining added remote lists with those ids, and store actions edited the first match, which was the local copy. `applyRoomData` now gives a colliding local list a new id and moves its history to the new id with new record ids.
+2. **Older responses rolled the room back.** A late join response could replace data that a catch-up pull had already applied, and a late save response could move the version backward. Both paths now ignore a version older than the applied one.
+3. **Edits during `createRoom` were never saved.** `shareRoom` now builds the fingerprint from the snapshot it sent, then schedules a save.
+4. **Failed saves were never retried.** A failed save retries every 5s (fixed interval, no backoff). A reconnect or the tab becoming visible runs `catchUp`: pull first, then save any unsaved edit.
+5. **An empty room lost its controls.** `useRoomStore.activeRoomId` (not persisted) holds the active room apart from the lists. `startRoom` sets it, `stopRoomSync` clears it, and `LiveRoomActions` prefers it over the cached list `roomId`.
+
 ### Test isolation
 
 Vitest loaded the real keys from `.env.local`. `vitest.config.ts` now sets both vars to empty strings, so unit tests cannot reach the live project.
@@ -61,6 +71,7 @@ Vitest loaded the real keys from `.env.local`. `vitest.config.ts` now sets both 
 | `src/lib/roomSyncLoader.ts` | New: lazy load and boot |
 | `src/main.tsx` | Calls `bootRoomSync()` |
 | `src/types/name.ts` | `NameList.roomId` |
+| `src/stores/useRoomStore.ts` | New: active room id, not persisted |
 | `src/stores/useNameStore.ts` | History cap per list |
 | `src/components/sidebar/LiveRoomActions.tsx` | New: SHARE LIVE, COPY LINK |
 | `src/components/sidebar/NameManagementSidebar.tsx` | Renders `LiveRoomActions` |
@@ -86,12 +97,18 @@ Vitest loaded the real keys from `.env.local`. `vitest.config.ts` now sets both 
 | `4585954` | `feat(sidebar): add live room share button` |
 | `49809e1` | `test(e2e): verify live sync across two browser contexts` |
 | `47989e9` | `feat(sidebar): mark live room lists in list selector` |
-| `(this commit)` | `docs(session): document Session 36 supabase live rooms` |
+| `b23b8f8` | `docs(session): document Session 36 supabase live rooms` |
+| `49b3052` | `fix(sync): give local copies new ids when they collide with room lists` |
+| `7882b40` | `fix(sync): ignore room responses older than the applied version` |
+| `968bcdc` | `fix(sync): save edits made while a room is being created` |
+| `67a76c7` | `fix(sync): retry failed room saves and save after reconnecting` |
+| `14eb5d7` | `fix(sidebar): keep live room controls when the room has no lists` |
+| `(this commit)` | `docs(session): add PR #83 review fixes to Session 36` |
 
 ## Verification
 
 ```
-bun test:coverage -> 527 passed, lines 96.4%, branches 89.5%
+bun test:coverage -> 536 passed, lines 96.7%, branches 89.6%
 bun run test:e2e  -> 52 passed with .env.local keys
                      live room spec skips without keys (CI)
 ```
@@ -108,6 +125,7 @@ bun run test:e2e  -> 52 passed with .env.local keys
 - A queued save of a room the device already left sends an empty snapshot. Each save checks that its room is still the active room.
 - `VITE_*` vars in `.env.local` reach Vitest. Blank them in `test.env` before any test imports the client.
 - The two-browser check found the toast count bug that the unit tests missed. Mocked tests passed the name in the shape the test author expected, not in the shape the app sends.
+- The review found 5 ordering defects (late responses, work in flight during create, failures with no follow-up edit). For each async path, ask: what if this response arrives late, what changes while it runs, and what happens when it fails with no further input.
 
 ## Next Steps
 
