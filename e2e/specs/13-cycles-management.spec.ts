@@ -1,9 +1,16 @@
 import { expect, test } from '../fixtures/localStorage.fixture';
 
+/** The app reads cycle days in local time; toISOString() is UTC and shifts the day late in the evening. */
+function toLocalIsoDay(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
 function isoDayOffset(days: number): string {
   const date = new Date();
   date.setDate(date.getDate() + days);
-  return date.toISOString().slice(0, 10);
+  return toLocalIsoDay(date);
 }
 
 /**
@@ -15,7 +22,7 @@ function mondayAnchoredCycle(): { start: string; end: string } {
   monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7) - 14);
   const end = new Date(monday);
   end.setDate(end.getDate() + 34);
-  return { start: monday.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10) };
+  return { start: toLocalIsoDay(monday), end: toLocalIsoDay(end) };
 }
 
 test.describe('Cycles management', () => {
