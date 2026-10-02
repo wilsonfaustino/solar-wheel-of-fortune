@@ -221,7 +221,7 @@ export async function shareRoom(): Promise<string> {
   return room.id;
 }
 
-/** Runs once from main.tsx: outside React, so StrictMode cannot join a room twice. */
+/** Runs once, from roomSyncLoader. */
 export function initRoomSync(): () => void {
   if (!isRoomSyncAvailable) return () => {};
 

@@ -2,9 +2,9 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.tsx';
-import { initRoomSync } from './lib/roomSync';
+import { bootRoomSync } from './lib/roomSyncLoader';
 
-initRoomSync();
+bootRoomSync();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
