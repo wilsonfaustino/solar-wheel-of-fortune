@@ -95,7 +95,13 @@ function applyRoomData(
     const selectedName = remoteLists
       .flatMap((list) => list.names)
       .find((name) => name.id === latestNewRecord?.nameId);
-    if (selectedName) showSelectionToast(selectedName);
+    // The toast expects the name as it was before the pick; synced data already counts it
+    if (selectedName) {
+      showSelectionToast({
+        ...selectedName,
+        selectionCount: Math.max(0, selectedName.selectionCount - 1),
+      });
+    }
   }
 }
 

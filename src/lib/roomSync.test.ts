@@ -201,13 +201,19 @@ describe('roomSync', () => {
     await vi.advanceTimersByTimeAsync(0);
 
     const record = buildRecord('r2', 'room-list', 'room-list-Bo', '2026-01-03');
-    mocks.getRoom.mockResolvedValueOnce(serverRoom(2, { lists: [roomList], history: [record] }));
+    const pickedList = {
+      ...roomList,
+      names: roomList.names.map((name) =>
+        name.id === 'room-list-Bo' ? { ...name, selectionCount: 3 } : name
+      ),
+    };
+    mocks.getRoom.mockResolvedValueOnce(serverRoom(2, { lists: [pickedList], history: [record] }));
     channelHandlers.onSaved(2);
     await vi.advanceTimersByTimeAsync(1000);
 
     expect(useNameStore.getState().history.map((entry) => entry.id)).toEqual(['r2']);
     expect(mocks.showSelectionToast).toHaveBeenCalledWith(
-      expect.objectContaining({ id: 'room-list-Bo' })
+      expect.objectContaining({ id: 'room-list-Bo', selectionCount: 2 })
     );
     expect(mocks.saveRoom).not.toHaveBeenCalled();
   });
