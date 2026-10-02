@@ -43,17 +43,21 @@ function SettingsPanelComponent() {
     autoExcludeEnabled,
     clearSelectionAfterExclude,
     soundEnabled,
+    memorialBannerEnabled,
     setAutoExclude,
     setClearSelectionAfterExclude,
     setSoundEnabled,
+    setMemorialBannerEnabled,
   } = useSettingsStore(
     useShallow((state) => ({
       autoExcludeEnabled: state.autoExcludeEnabled,
       clearSelectionAfterExclude: state.clearSelectionAfterExclude,
       soundEnabled: state.soundEnabled,
+      memorialBannerEnabled: state.memorialBannerEnabled,
       setAutoExclude: state.setAutoExclude,
       setClearSelectionAfterExclude: state.setClearSelectionAfterExclude,
       setSoundEnabled: state.setSoundEnabled,
+      setMemorialBannerEnabled: state.setMemorialBannerEnabled,
     }))
   );
 
@@ -95,6 +99,19 @@ function SettingsPanelComponent() {
           a11yLabel="Spin sound"
           title="Spin sound"
           description="Play a sound effect when the wheel spins"
+        />
+      </div>
+
+      <div className="text-xs font-mono tracking-wider mt-6 mb-4 text-text/70">BANNER</div>
+
+      <div className="space-y-4">
+        <SwitchSettings
+          checked={memorialBannerEnabled}
+          onCheckedChange={setMemorialBannerEnabled}
+          name="memorial-banner-enabled"
+          a11yLabel="ClaudeCode memorial"
+          title="ClaudeCode memorial"
+          description="Count the days since the team lost ClaudeCode"
         />
       </div>
     </div>

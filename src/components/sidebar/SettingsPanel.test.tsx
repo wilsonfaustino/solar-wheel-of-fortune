@@ -10,6 +10,7 @@ describe('SettingsPanel', () => {
       autoExcludeEnabled: true,
       clearSelectionAfterExclude: false,
       soundEnabled: false,
+      memorialBannerEnabled: true,
     });
   });
 
@@ -324,6 +325,28 @@ describe('SettingsPanel', () => {
       const secondRender = screen.getByText('WHEEL BEHAVIOR');
 
       expect(firstRender).toBe(secondRender);
+    });
+  });
+
+  describe('memorial banner toggle interactions', () => {
+    it('should render the banner section with the toggle on by default', () => {
+      render(<SettingsPanel />);
+
+      expect(screen.getByText('BANNER')).toBeInTheDocument();
+      expect(screen.getByRole('switch', { name: 'ClaudeCode memorial' })).toHaveAttribute(
+        'data-state',
+        'checked'
+      );
+    });
+
+    it('should show the banner again after it was dismissed', async () => {
+      useSettingsStore.setState({ memorialBannerEnabled: false });
+      const user = userEvent.setup();
+      render(<SettingsPanel />);
+
+      await user.click(screen.getByRole('switch', { name: 'ClaudeCode memorial' }));
+
+      expect(useSettingsStore.getState().memorialBannerEnabled).toBe(true);
     });
   });
 });

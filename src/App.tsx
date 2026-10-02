@@ -1,7 +1,7 @@
 import { domAnimation, LazyMotion } from 'motion/react';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
-import { CycleWidget, EventCountdownBadge } from './components/cycle';
+import { CycleWidget, EventCountdownBadge, MemorialBanner } from './components/cycle';
 import { Footer } from './components/Footer';
 import { MobileHeader } from './components/MobileHeader';
 import { NameManagementSidebar } from './components/sidebar';
@@ -128,7 +128,10 @@ function App() {
                 {isMatrixTheme ? <GlitchText>{instructionText}</GlitchText> : instructionText}
               </div>
             </div>
-            <EventCountdownBadge />
+            <div className="pointer-events-none absolute bottom-16 right-4 z-10 flex flex-col items-end gap-3 lg:bottom-20 lg:right-8">
+              <MemorialBanner />
+              <EventCountdownBadge />
+            </div>
             <Footer />
           </div>
         </div>
