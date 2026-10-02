@@ -39,6 +39,21 @@ describe('EventCountdownBadge', () => {
     expect(screen.getByText('IN 2 DAYS')).toBeInTheDocument();
   });
 
+  it('counts from the local day late in the evening, when UTC is already tomorrow', () => {
+    const originalTimeZone = process.env.TZ;
+    process.env.TZ = 'America/Sao_Paulo';
+    try {
+      vi.setSystemTime(new Date('2026-09-01T22:00:00-03:00'));
+      seedEvents([{ id: 'e1', name: 'Launch Day', start: '2026-09-03', end: '2026-09-04' }]);
+
+      render(<EventCountdownBadge />);
+
+      expect(screen.getByText('IN 2 DAYS')).toBeInTheDocument();
+    } finally {
+      process.env.TZ = originalTimeZone;
+    }
+  });
+
   it('shows remaining days while an event is running', () => {
     vi.setSystemTime(new Date('2026-09-03T12:00:00Z'));
     seedEvents([{ id: 'e1', name: 'Launch Day', start: '2026-09-02', end: '2026-09-04' }]);
