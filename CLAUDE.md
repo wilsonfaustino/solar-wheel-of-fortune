@@ -247,6 +247,8 @@ bun test:ui     # Debug with Vitest UI
 - Room id in the URL hash is the only access key. RLS has no policies; access only through `create_room` / `get_room` / `save_room`
 - Lists with `roomId` sync; lists without it never leave the device. One room per device
 - Saves debounce 300ms with optimistic `version`; a stale save pulls the room (last write wins)
+- A failed save retries every 5s; reconnect or tab visible runs `catchUp` (pull, then save). Responses older than the applied version are ignored
+- `useRoomStore.activeRoomId` (not persisted) holds the live room apart from its lists; UI reads it first, then the cached list `roomId`
 - Broadcast carries only `{ version }`; receivers call `get_room`. Pull again on `SUBSCRIBED` and tab visible
 - Sync fingerprint is a store snapshot, never the server `jsonb` payload (key order differs, causes save loops)
 - Components import from `roomSyncLoader`, never `roomSync` or `supabase` directly, to keep supabase-js out of the main bundle
