@@ -1,0 +1,252 @@
+import { showSelectionToast } from '../components/toast';
+import { useNameStore } from '../stores/useNameStore';
+import type { NameList } from '../types/name';
+import {
+  createRoom,
+  getRoom,
+  openRoomChannel,
+  type RoomChannel,
+  type RoomData,
+  saveRoom,
+} from './rooms';
+import { supabase } from './supabase';
+
+// Short enough to feel live, long enough to batch typing into one save
+const SAVE_DEBOUNCE_MS = 300;
+const ROOM_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+type NameStoreState = ReturnType<typeof useNameStore.getState>;
+
+interface ActiveRoom {
+  id: string;
+  version: number;
+  /** Store snapshot at the last save or apply. Never built from a server payload: jsonb reorders keys. */
+  syncedFingerprint: string;
+  channel: RoomChannel;
+  unsubscribeStore: () => void;
+  saveTimer?: ReturnType<typeof setTimeout>;
+  isSaving: boolean;
+  hasPendingSave: boolean;
+}
+
+let activeRoom: ActiveRoom | null = null;
+let isApplyingRemote = false;
+
+export const isRoomSyncAvailable = supabase !== null;
+
+function snapshotRoom(roomId: string): RoomData {
+  const { lists, history } = useNameStore.getState();
+  const roomLists = lists.filter((list) => list.roomId === roomId);
+  const roomListIds = new Set(roomLists.map((list) => list.id));
+  return {
+    lists: roomLists,
+    history: history.filter((record) => roomListIds.has(record.listId)),
+  };
+}
+
+function fingerprintRoom(roomId: string): string {
+  return JSON.stringify(snapshotRoom(roomId));
+}
+
+function applyRoomData(
+  room: ActiveRoom,
+  data: RoomData,
+  options: { announce: boolean; focus: boolean }
+) {
+  const { lists, history, activeListId } = useNameStore.getState();
+  const remoteLists: NameList[] = data.lists.map((list) => ({ ...list, roomId: room.id }));
+  // One room per device: lists of a previous room stay here as plain local lists
+  const localLists = lists
+    .filter((list) => list.roomId !== room.id)
+    .map((list) => (list.roomId ? { ...list, roomId: undefined } : list));
+  const replacedListIds = new Set(
+    [...lists.filter((list) => list.roomId === room.id), ...remoteLists].map((list) => list.id)
+  );
+  const knownRecordIds = new Set(history.map((record) => record.id));
+  const nextHistory = [
+    ...history.filter((record) => !replacedListIds.has(record.listId)),
+    ...data.history,
+  ].sort(
+    (first, second) => new Date(first.timestamp).getTime() - new Date(second.timestamp).getTime()
+  );
+  const nextLists = [...localLists, ...remoteLists];
+  const isActiveListKept = nextLists.some((list) => list.id === activeListId);
+  const fallbackListId = nextLists[0]?.id ?? null;
+
+  isApplyingRemote = true;
+  try {
+    useNameStore.setState({
+      lists: nextLists,
+      history: nextHistory,
+      activeListId:
+        options.focus && remoteLists[0]
+          ? remoteLists[0].id
+          : isActiveListKept
+            ? activeListId
+            : fallbackListId,
+    });
+  } finally {
+    isApplyingRemote = false;
+  }
+  room.syncedFingerprint = fingerprintRoom(room.id);
+
+  if (options.announce) {
+    const latestNewRecord = data.history.filter((record) => !knownRecordIds.has(record.id)).at(-1);
+    const selectedName = remoteLists
+      .flatMap((list) => list.names)
+      .find((name) => name.id === latestNewRecord?.nameId);
+    if (selectedName) showSelectionToast(selectedName);
+  }
+}
+
+async function pullRoom(room: ActiveRoom, announce: boolean) {
+  try {
+    const latest = await getRoom(room.id);
+    if (activeRoom !== room || !latest || latest.version <= room.version) return;
+    room.version = latest.version;
+    applyRoomData(room, latest.data, { announce, focus: false });
+  } catch (error) {
+    console.warn('[room] pull failed', error);
+  }
+}
+
+async function saveRoomNow(room: ActiveRoom) {
+  // A queued save of a room this device left would push an empty snapshot and wipe it
+  if (activeRoom !== room) return;
+  if (room.isSaving) {
+    room.hasPendingSave = true;
+    return;
+  }
+  const data = snapshotRoom(room.id);
+  const nextFingerprint = JSON.stringify(data);
+  if (nextFingerprint === room.syncedFingerprint) return;
+
+  room.isSaving = true;
+  try {
+    const saved = await saveRoom(room.id, data, room.version);
+    if (activeRoom !== room) return;
+    if (saved) {
+      room.version = saved.version;
+      room.syncedFingerprint = nextFingerprint;
+      room.channel.announceSave(saved.version);
+    } else {
+      // ponytail: stale version means another device saved first; its data wins and this edit drops. Merge per list if that bites.
+      await pullRoom(room, true);
+    }
+  } catch (error) {
+    console.warn('[room] save failed', error);
+  } finally {
+    room.isSaving = false;
+    if (room.hasPendingSave) {
+      room.hasPendingSave = false;
+      void saveRoomNow(room);
+    }
+  }
+}
+
+function handleStoreChange(state: NameStoreState, previous: NameStoreState) {
+  const room = activeRoom;
+  if (!room || isApplyingRemote) return;
+
+  const previousListIds = new Set(previous.lists.map((list) => list.id));
+  const isNewLocalList = (list: NameList) => !list.roomId && !previousListIds.has(list.id);
+  if (state.lists.some(isNewLocalList)) {
+    // Re-enters this handler, which then schedules the save
+    useNameStore.setState({
+      lists: state.lists.map((list) =>
+        isNewLocalList(list) ? { ...list, roomId: room.id } : list
+      ),
+    });
+    return;
+  }
+
+  clearTimeout(room.saveTimer);
+  room.saveTimer = setTimeout(() => void saveRoomNow(room), SAVE_DEBOUNCE_MS);
+}
+
+function startRoom(roomId: string, version: number): ActiveRoom {
+  const room: ActiveRoom = {
+    id: roomId,
+    version,
+    syncedFingerprint: fingerprintRoom(roomId),
+    isSaving: false,
+    hasPendingSave: false,
+    channel: openRoomChannel(roomId, {
+      onSaved: (savedVersion) => {
+        if (savedVersion > room.version) void pullRoom(room, true);
+      },
+      onSubscribed: () => void pullRoom(room, false),
+    }),
+    unsubscribeStore: useNameStore.subscribe(handleStoreChange),
+  };
+  activeRoom = room;
+  window.history.replaceState(null, '', `#${roomId}`);
+  return room;
+}
+
+async function joinRoom(roomId: string, focus: boolean) {
+  const room = startRoom(roomId, 0);
+  try {
+    const latest = await getRoom(roomId);
+    if (activeRoom !== room) return;
+    if (!latest) {
+      console.warn('[room] not found', roomId);
+      stopRoomSync();
+      return;
+    }
+    room.version = latest.version;
+    applyRoomData(room, latest.data, { announce: false, focus });
+  } catch (error) {
+    console.warn('[room] join failed', error);
+  }
+}
+
+export function stopRoomSync() {
+  if (!activeRoom) return;
+  clearTimeout(activeRoom.saveTimer);
+  activeRoom.channel.close();
+  activeRoom.unsubscribeStore();
+  activeRoom = null;
+}
+
+/** Moves every current list into a new room and returns its id. */
+export async function shareRoom(): Promise<string> {
+  if (activeRoom) return activeRoom.id;
+  const { lists, history } = useNameStore.getState();
+  const room = await createRoom({ lists, history });
+  useNameStore.setState({
+    lists: useNameStore.getState().lists.map((list) => ({ ...list, roomId: room.id })),
+  });
+  startRoom(room.id, room.version);
+  return room.id;
+}
+
+/** Runs once from main.tsx: outside React, so StrictMode cannot join a room twice. */
+export function initRoomSync(): () => void {
+  if (!isRoomSyncAvailable) return () => {};
+
+  const joinFromHash = () => {
+    const hashRoomId = window.location.hash.slice(1);
+    if (!ROOM_ID_PATTERN.test(hashRoomId) || hashRoomId === activeRoom?.id) return false;
+    stopRoomSync();
+    void joinRoom(hashRoomId, true);
+    return true;
+  };
+  const catchUpWhenVisible = () => {
+    if (document.visibilityState === 'visible' && activeRoom) void pullRoom(activeRoom, false);
+  };
+
+  window.addEventListener('hashchange', joinFromHash);
+  document.addEventListener('visibilitychange', catchUpWhenVisible);
+
+  if (!joinFromHash()) {
+    const cachedRoomId = useNameStore.getState().lists.find((list) => list.roomId)?.roomId;
+    if (cachedRoomId) void joinRoom(cachedRoomId, false);
+  }
+
+  return () => {
+    window.removeEventListener('hashchange', joinFromHash);
+    document.removeEventListener('visibilitychange', catchUpWhenVisible);
+    stopRoomSync();
+  };
+}
