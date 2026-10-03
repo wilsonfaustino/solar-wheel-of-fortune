@@ -245,6 +245,7 @@ bun test:ui     # Debug with Vitest UI
 - Setup: copy `.env.example` to `.env.local`, set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (publishable key only, never the secret key). Schema: `supabase/schema.sql`
 - No env vars: SHARE LIVE is hidden and the app is local-only. Vitest blanks both vars in `vitest.config.ts`
 - Room id in the URL hash is the only access key. RLS has no policies; access only through `create_room` / `get_room` / `save_room`
+- The publishable key is public by design; abuse limits live in Postgres: `create_room` raises after 50 rooms/hour (global), rooms cap at 250KB (uncompressed, ~7 full lists), and the `delete-stale-rooms` pg_cron job deletes rooms idle 30 days
 - Lists with `roomId` sync; lists without it never leave the device. One room per device
 - Saves debounce 300ms with optimistic `version`; a stale save pulls the room (last write wins)
 - A failed save retries every 5s; reconnect or tab visible runs `catchUp` (pull, then save). Responses older than the applied version are ignored
