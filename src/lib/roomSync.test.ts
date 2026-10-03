@@ -476,6 +476,41 @@ describe('roomSync', () => {
     expect(mocks.saveRoom).not.toHaveBeenCalled();
   });
 
+  it('forgets an expired cached room and keeps its lists local', async () => {
+    const { useNameStore, useRoomStore } = await loadModules();
+    const cachedList = { ...buildRoomList('room-list', ['Ana']), roomId: ROOM_ID };
+    useNameStore.setState({ lists: [cachedList], activeListId: 'room-list' });
+    mocks.getRoom.mockResolvedValue(null);
+    const { initRoomSync } = await import('./roomSync');
+
+    disposeRoomSync = initRoomSync();
+    await vi.advanceTimersByTimeAsync(0);
+
+    const [keptList] = useNameStore.getState().lists;
+    expect(keptList.roomId).toBeUndefined();
+    expect(keptList.names.map((name) => name.value)).toEqual(['Ana']);
+    expect(window.location.hash).toBe('');
+    expect(useRoomStore.getState().activeRoomId).toBeNull();
+  });
+
+  it('forgets the room when it expires while the tab is open', async () => {
+    const roomList = { ...buildRoomList('room-list', ['Ana']), roomId: ROOM_ID };
+    mocks.getRoom.mockResolvedValueOnce(serverRoom(1, { lists: [roomList], history: [] }));
+    window.history.replaceState(null, '', `/#${ROOM_ID}`);
+    const { useNameStore, useRoomStore, initRoomSync } = await loadModules();
+    disposeRoomSync = initRoomSync();
+    await vi.advanceTimersByTimeAsync(0);
+
+    mocks.getRoom.mockResolvedValue(null);
+    document.dispatchEvent(new Event('visibilitychange'));
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(mocks.closeChannel).toHaveBeenCalled();
+    expect(useNameStore.getState().lists.every((list) => !list.roomId)).toBe(true);
+    expect(window.location.hash).toBe('');
+    expect(useRoomStore.getState().activeRoomId).toBeNull();
+  });
+
   it('switches rooms when the hash changes', async () => {
     mocks.getRoom.mockResolvedValue(serverRoom(1, { lists: [], history: [] }));
     const { initRoomSync } = await loadModules();
