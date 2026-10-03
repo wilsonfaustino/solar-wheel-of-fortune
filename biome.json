@@ -53,6 +53,7 @@
         "recommended": true,
         "useConst": "error",
         "useNodejsImportProtocol": "error",
+        "noNestedTernary": "error",
         "noNonNullAssertion": "off"
       },
       "suspicious": {

@@ -94,18 +94,14 @@ function applyRoomData(
   const nextLists = [...localLists, ...remoteLists];
   const isActiveListKept = nextLists.some((list) => list.id === activeListId);
   const fallbackListId = nextLists[0]?.id ?? null;
+  const keptListId = isActiveListKept ? activeListId : fallbackListId;
 
   isApplyingRemote = true;
   try {
     useNameStore.setState({
       lists: nextLists,
       history: nextHistory,
-      activeListId:
-        options.focus && remoteLists[0]
-          ? remoteLists[0].id
-          : isActiveListKept
-            ? activeListId
-            : fallbackListId,
+      activeListId: options.focus && remoteLists[0] ? remoteLists[0].id : keptListId,
     });
   } finally {
     isApplyingRemote = false;
@@ -113,7 +109,7 @@ function applyRoomData(
   room.syncedFingerprint = fingerprintRoom(room.id);
 
   if (options.announce) {
-    const latestNewRecord = data.history.filter((record) => !knownRecordIds.has(record.id)).at(-1);
+    const latestNewRecord = data.history.findLast((record) => !knownRecordIds.has(record.id));
     const selectedName = remoteLists
       .flatMap((list) => list.names)
       .find((name) => name.id === latestNewRecord?.nameId);
