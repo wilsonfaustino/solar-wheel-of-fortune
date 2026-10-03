@@ -130,7 +130,12 @@ function applyRoomData(
 async function pullRoom(room: ActiveRoom, announce: boolean) {
   try {
     const latest = await getRoom(room.id);
-    if (activeRoom !== room || !latest || latest.version <= room.version) return;
+    if (activeRoom !== room) return;
+    if (!latest) {
+      forgetMissingRoom(room.id);
+      return;
+    }
+    if (latest.version <= room.version) return;
     room.version = latest.version;
     applyRoomData(room, latest.data, { announce, focus: false });
   } catch (error) {
@@ -235,7 +240,7 @@ async function joinRoom(roomId: string, focus: boolean) {
     if (activeRoom !== room) return;
     if (!latest) {
       console.warn('[room] not found', roomId);
-      stopRoomSync();
+      forgetMissingRoom(roomId);
       return;
     }
     // A catch-up pull may have applied a newer version first; an equal one re-applies the same data
@@ -254,6 +259,19 @@ export function stopRoomSync() {
   activeRoom.unsubscribeStore();
   activeRoom = null;
   useRoomStore.setState({ activeRoomId: null });
+}
+
+/** The room expired or never existed: its lists stay as local lists, so SHARE LIVE works again. */
+function forgetMissingRoom(roomId: string) {
+  stopRoomSync();
+  useNameStore.setState({
+    lists: useNameStore
+      .getState()
+      .lists.map((list) => (list.roomId === roomId ? { ...list, roomId: undefined } : list)),
+  });
+  if (window.location.hash.slice(1) === roomId) {
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+  }
 }
 
 /** Moves every current list into a new room and returns its id. */
