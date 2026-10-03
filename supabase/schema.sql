@@ -18,7 +18,7 @@ revoke all on public.rooms from anon, authenticated;
 
 -- 50 rooms per hour across all clients: the public key has no per-user identity to throttle.
 -- ponytail: global cap, a spammer can block real users for up to an hour; move to per-user
--- limits with anonymous auth if that happens. Concurrent calls can overshoot by a few rows.
+-- limits with anonymous auth if that happens.
 create function public.create_room(room_data jsonb)
 returns setof public.rooms
 language plpgsql
@@ -26,6 +26,8 @@ security definer
 set search_path = public
 as $$
 begin
+  -- Serializes callers until commit, so concurrent calls cannot all pass the count
+  perform pg_advisory_xact_lock(hashtext('public.create_room'));
   if (select count(*) from rooms where created_at > now() - interval '1 hour') >= 50 then
     raise exception 'room creation limit reached, try again later';
   end if;
