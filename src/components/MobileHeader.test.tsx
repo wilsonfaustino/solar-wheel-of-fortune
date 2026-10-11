@@ -22,6 +22,6 @@ describe('MobileHeader', () => {
   it('has hover class for background highlight', () => {
     render(<MobileHeader onToggleSidebar={vi.fn()} />);
     const button = screen.getByRole('button', { name: 'Toggle sidebar menu' });
-    expect(button.className).toContain('hover:bg-white/10');
+    expect(button).toHaveClass('hover:bg-white/10');
   });
 });
