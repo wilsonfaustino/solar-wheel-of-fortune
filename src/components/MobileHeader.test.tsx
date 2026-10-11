@@ -19,18 +19,9 @@ describe('MobileHeader', () => {
     expect(handleToggleSidebar).toHaveBeenCalledTimes(1);
   });
 
-  it('changes button background on mouseenter', () => {
+  it('has hover class for background highlight', () => {
     render(<MobileHeader onToggleSidebar={vi.fn()} />);
     const button = screen.getByRole('button', { name: 'Toggle sidebar menu' });
-    fireEvent.mouseEnter(button);
-    expect(button.style.backgroundColor).toBe('rgba(255, 255, 255, 0.1)');
-  });
-
-  it('resets button background on mouseleave', () => {
-    render(<MobileHeader onToggleSidebar={vi.fn()} />);
-    const button = screen.getByRole('button', { name: 'Toggle sidebar menu' });
-    fireEvent.mouseEnter(button);
-    fireEvent.mouseLeave(button);
-    expect(button.style.backgroundColor).toBe('transparent');
+    expect(button).toHaveClass('hover:bg-white/10');
   });
 });
