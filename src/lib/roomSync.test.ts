@@ -167,6 +167,52 @@ describe('roomSync', () => {
     expect(mocks.announceSave).toHaveBeenCalledWith(2);
   });
 
+  it('saves unavailability set on a shared name', async () => {
+    const { useNameStore, shareRoom } = await loadModules();
+    mocks.createRoom.mockResolvedValue({ id: ROOM_ID, version: 1, data: {} });
+    mocks.saveRoom.mockResolvedValue({ id: ROOM_ID, version: 2, data: {} });
+    await shareRoom();
+    const { activeListId, lists } = useNameStore.getState();
+    const unavailableName = lists.find((list) => list.id === activeListId)?.names[0];
+
+    useNameStore
+      .getState()
+      .setUnavailability(unavailableName?.id ?? '', '2026-10-13', '2026-10-20');
+    await vi.advanceTimersByTimeAsync(300);
+
+    expect(mocks.saveRoom).toHaveBeenCalledTimes(1);
+    const [, savedData] = mocks.saveRoom.mock.calls[0];
+    const savedName = savedData.lists
+      .find((list: NameList) => list.id === activeListId)
+      .names.find((name: { id: string }) => name.id === unavailableName?.id);
+    expect(savedName).toMatchObject({
+      unavailableFrom: '2026-10-13',
+      unavailableUntil: '2026-10-20',
+    });
+  });
+
+  it('keeps unavailability on names pulled from a room', async () => {
+    const roomList = buildRoomList('room-list', ['Ana', 'Bo']);
+    roomList.names[0] = {
+      ...roomList.names[0],
+      unavailableFrom: '2026-10-13',
+      unavailableUntil: '2026-10-20',
+    };
+    mocks.getRoom.mockResolvedValue(serverRoom(1, { lists: [roomList], history: [] }));
+    window.history.replaceState(null, '', `/#${ROOM_ID}`);
+    const { useNameStore, initRoomSync } = await loadModules();
+
+    disposeRoomSync = initRoomSync();
+    await vi.advanceTimersByTimeAsync(0);
+
+    const pulledList = useNameStore.getState().lists.find((list) => list.roomId === ROOM_ID);
+    expect(pulledList?.names[0]).toMatchObject({
+      unavailableFrom: '2026-10-13',
+      unavailableUntil: '2026-10-20',
+    });
+    expect(pulledList?.names[1].unavailableFrom).toBeUndefined();
+  });
+
   it('joins a room from the hash next to local lists without a toast', async () => {
     const roomList = buildRoomList('room-list', ['Ana', 'Bo']);
     const record = buildRecord('r1', 'room-list', 'room-list-Ana', '2026-01-02');
