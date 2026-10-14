@@ -61,6 +61,7 @@ function ReturnDayLabel({ name }: Readonly<{ name: Name }>) {
   const totalDays = countRangeDays(name.unavailableFrom, name.unavailableUntil);
   const returnDay = endsToday ? 'TOMORROW' : formatReturnDay(name.unavailableUntil);
   const preset = getUnavailabilityIcon(name.unavailableIcon);
+  const dayCountSuffix = totalDays > 1 ? ` · ${totalDays} DAYS` : '';
   return (
     <span className="flex items-center gap-1 font-mono text-[10px] tracking-wider text-text/70">
       {preset && (
@@ -75,7 +76,7 @@ function ReturnDayLabel({ name }: Readonly<{ name: Name }>) {
           </TooltipContent>
         </Tooltip>
       )}
-      <span>{`BACK ${returnDay}${totalDays > 1 ? ` · ${totalDays} DAYS` : ''}`}</span>
+      <span>{`BACK ${returnDay}${dayCountSuffix}`}</span>
     </span>
   );
 }
