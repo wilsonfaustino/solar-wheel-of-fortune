@@ -1,3 +1,5 @@
+import type { UnavailabilityIconId } from '../constants/unavailability';
+
 export interface Name {
   id: string;
   value: string;
@@ -9,6 +11,7 @@ export interface Name {
   /** Local ISO days (YYYY-MM-DD), both inclusive; the range expires on its own after the end day. */
   unavailableFrom?: string;
   unavailableUntil?: string;
+  unavailableIcon?: UnavailabilityIconId;
   categoryId: string | null;
 }
 
