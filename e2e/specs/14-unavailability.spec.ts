@@ -72,4 +72,35 @@ test.describe('Unavailability', () => {
     );
     await expect(sidebarPage.nameItems.filter({ hasText: 'ALEX' })).not.toContainText('BACK');
   });
+
+  test('shows the picked icon and total day count and keeps them after reload', async ({
+    sidebarPage,
+    page,
+  }) => {
+    await sidebarPage.setUnavailability('ALEX', localISODay(0), localISODay(4), 'VACATION');
+
+    const alexRow = sidebarPage.nameItems.filter({ hasText: 'ALEX' });
+    await expect(sidebarPage.rowIcon('ALEX', 'VACATION')).toBeVisible();
+    await expect(alexRow).toContainText('5 DAYS');
+
+    await page.reload();
+
+    await expect(sidebarPage.rowIcon('ALEX', 'VACATION')).toBeVisible();
+    await expect(alexRow).toContainText('5 DAYS');
+  });
+
+  test('shows the icon without a day count for today only', async ({ sidebarPage }) => {
+    await sidebarPage.markUnavailableToday('ALEX', 'SICK');
+
+    await expect(sidebarPage.rowIcon('ALEX', 'SICK')).toBeVisible();
+    await expect(sidebarPage.nameItems.filter({ hasText: 'ALEX' })).not.toContainText('DAYS');
+  });
+
+  test('shows the icon text as a tooltip on hover', async ({ sidebarPage, page }) => {
+    await sidebarPage.setUnavailability('ALEX', localISODay(0), localISODay(2), 'VACATION');
+
+    await sidebarPage.rowIcon('ALEX', 'VACATION').hover();
+
+    await expect(page.getByRole('tooltip')).toHaveText('VACATION');
+  });
 });
