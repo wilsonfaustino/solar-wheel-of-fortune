@@ -1,9 +1,16 @@
 import { Edit2, Eye, EyeOff, Hand, Trash2, UserCheck, UserX } from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { getUnavailabilityIcon, type UnavailabilityIconId } from '../../constants/unavailability';
 import type { Name } from '../../types/name';
-import { formatReturnDay, isUnavailableToday, toLocalISODay } from '../../utils/name';
+import {
+  countRangeDays,
+  formatReturnDay,
+  isUnavailableToday,
+  toLocalISODay,
+} from '../../utils/name';
 import { Button } from '../ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { UnavailabilityDialog } from './UnavailabilityDialog';
 
 interface NameListItemProps {
@@ -12,7 +19,12 @@ interface NameListItemProps {
   onDelete: (nameId: string) => void;
   onToggleExclude: (nameId: string) => void;
   onVolunteer: (nameId: string) => void;
-  onSetUnavailability: (nameId: string, from: string, until: string) => void;
+  onSetUnavailability: (
+    nameId: string,
+    from: string,
+    until: string,
+    icon?: UnavailabilityIconId
+  ) => void;
   onClearUnavailability: (nameId: string) => void;
 }
 
@@ -43,12 +55,27 @@ function UnavailabilityButton({
 }
 
 function ReturnDayLabel({ name }: Readonly<{ name: Name }>) {
-  if (!name.unavailableUntil || !isUnavailableToday(name)) return null;
+  if (!name.unavailableFrom || !name.unavailableUntil || !isUnavailableToday(name)) return null;
 
   const endsToday = name.unavailableUntil === toLocalISODay(new Date());
+  const totalDays = countRangeDays(name.unavailableFrom, name.unavailableUntil);
+  const returnDay = endsToday ? 'TOMORROW' : formatReturnDay(name.unavailableUntil);
+  const preset = getUnavailabilityIcon(name.unavailableIcon);
   return (
-    <span className="font-mono text-[10px] tracking-wider text-text/70">
-      BACK {endsToday ? 'TOMORROW' : formatReturnDay(name.unavailableUntil)}
+    <span className="flex items-center gap-1 font-mono text-[10px] tracking-wider text-text/70">
+      {preset && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span role="img" aria-label={preset.text}>
+              <preset.Icon className="size-3" />
+            </span>
+          </TooltipTrigger>
+          <TooltipContent className="px-2 py-1 text-xs tracking-wider text-text">
+            {preset.text}
+          </TooltipContent>
+        </Tooltip>
+      )}
+      <span>{`BACK ${returnDay}${totalDays > 1 ? ` · ${totalDays} DAYS` : ''}`}</span>
     </span>
   );
 }
@@ -187,7 +214,7 @@ function NameListItemComponent({
       {isAvailabilityOpen && (
         <UnavailabilityDialog
           name={name}
-          onSave={(from, until) => onSetUnavailability(name.id, from, until)}
+          onSave={(from, until, icon) => onSetUnavailability(name.id, from, until, icon)}
           onClear={() => onClearUnavailability(name.id)}
           onClose={() => setIsAvailabilityOpen(false)}
         />

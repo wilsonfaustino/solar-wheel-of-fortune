@@ -1,9 +1,17 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ComponentProps } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import type { Name } from '../../types/name';
 import { formatReturnDay, toLocalISODay } from '../../utils/name';
-import { NameListItem } from './NameListItem';
+import { TooltipProvider } from '../ui/tooltip';
+import { NameListItem as NameListItemWithoutProvider } from './NameListItem';
+
+const NameListItem = (props: ComponentProps<typeof NameListItemWithoutProvider>) => (
+  <TooltipProvider>
+    <NameListItemWithoutProvider {...props} />
+  </TooltipProvider>
+);
 
 const mockName: Name = {
   id: 'name-1',
@@ -71,7 +79,7 @@ describe('NameListItem', () => {
       await user.click(screen.getByRole('button', { name: /set availability for alice/i }));
       await user.click(screen.getByRole('button', { name: /today only/i }));
 
-      expect(onSetUnavailability).toHaveBeenCalledWith(mockName.id, today, today);
+      expect(onSetUnavailability).toHaveBeenCalledWith(mockName.id, today, today, undefined);
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
@@ -109,7 +117,82 @@ describe('NameListItem', () => {
         />
       );
 
-      expect(screen.getByText(`BACK ${formatReturnDay(laterISO)}`)).toBeInTheDocument();
+      expect(screen.getByText(`BACK ${formatReturnDay(laterISO)} · 4 DAYS`)).toBeInTheDocument();
+    });
+
+    it('should show the total day count for a multi-day range', () => {
+      const laterDay = new Date();
+      laterDay.setDate(laterDay.getDate() + 4);
+      render(
+        <NameListItem
+          {...defaultProps}
+          name={{ ...mockName, unavailableFrom: today, unavailableUntil: toLocalISODay(laterDay) }}
+        />
+      );
+
+      expect(screen.getByText(/· 5 DAYS$/)).toBeInTheDocument();
+    });
+
+    it('should not show a day count for a single day', () => {
+      render(<NameListItem {...defaultProps} name={unavailableName} />);
+
+      expect(screen.queryByText(/DAYS/)).not.toBeInTheDocument();
+    });
+
+    it('should show the icon and open its tooltip on hover', async () => {
+      const user = userEvent.setup();
+      render(
+        <NameListItem
+          {...defaultProps}
+          name={{ ...unavailableName, unavailableIcon: 'vacation' }}
+        />
+      );
+
+      await user.hover(screen.getByRole('img', { name: 'VACATION' }));
+
+      expect(await screen.findByRole('tooltip')).toHaveTextContent('VACATION');
+    });
+
+    it('should not make the row icon focusable', () => {
+      render(
+        <NameListItem
+          {...defaultProps}
+          name={{ ...unavailableName, unavailableIcon: 'vacation' }}
+        />
+      );
+
+      expect(screen.getByRole('img', { name: 'VACATION' })).not.toHaveAttribute('tabindex');
+    });
+
+    it('should show no icon when none is set', () => {
+      render(<NameListItem {...defaultProps} name={unavailableName} />);
+
+      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    });
+
+    it('should show no icon and not crash for an unknown icon id', () => {
+      const unknownIconName = {
+        ...unavailableName,
+        unavailableIcon: 'teleport',
+      } as unknown as Name;
+      render(<NameListItem {...defaultProps} name={unknownIconName} />);
+
+      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+      expect(screen.getByText('BACK TOMORROW')).toBeInTheDocument();
+    });
+
+    it('should enter edit mode on double-click of the name', async () => {
+      const user = userEvent.setup();
+      render(
+        <NameListItem
+          {...defaultProps}
+          name={{ ...unavailableName, unavailableIcon: 'vacation' }}
+        />
+      );
+
+      await user.dblClick(screen.getByText('ALICE'));
+
+      expect(screen.getByRole('textbox')).toHaveValue('ALICE');
     });
 
     it('should not show a badge for a future range', () => {
