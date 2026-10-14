@@ -661,6 +661,28 @@ describe('useNameStore', () => {
       expect(isUnavailableToday(getFirstName())).toBe(false);
     });
 
+    it('should store the icon with the range', () => {
+      useNameStore.getState().setUnavailability(getFirstName().id, today(), today(), 'vacation');
+
+      expect(getFirstName().unavailableIcon).toBe('vacation');
+    });
+
+    it('should drop the old icon when saved without one', () => {
+      const state = useNameStore.getState();
+      state.setUnavailability(getFirstName().id, today(), today(), 'sick');
+      state.setUnavailability(getFirstName().id, today(), today());
+
+      expect(getFirstName().unavailableIcon).toBeUndefined();
+    });
+
+    it('should clear the icon when marked available', () => {
+      const state = useNameStore.getState();
+      state.setUnavailability(getFirstName().id, today(), today(), 'sick');
+      state.clearUnavailability(getFirstName().id);
+
+      expect(getFirstName().unavailableIcon).toBeUndefined();
+    });
+
     it('should keep unavailable names in selectActiveNames so the wheel can show them', () => {
       useNameStore.getState().setUnavailability(getFirstName().id, today(), today());
 
@@ -671,12 +693,13 @@ describe('useNameStore', () => {
 
     it('should be cleared by resetList', () => {
       const state = useNameStore.getState();
-      state.setUnavailability(getFirstName().id, today(), today());
+      state.setUnavailability(getFirstName().id, today(), today(), 'pto');
 
       state.resetList();
 
       expect(getFirstName().unavailableFrom).toBeUndefined();
       expect(getFirstName().unavailableUntil).toBeUndefined();
+      expect(getFirstName().unavailableIcon).toBeUndefined();
     });
 
     it('should block volunteerName for an unavailable name', () => {

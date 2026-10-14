@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { DEFAULT_NAMES } from '../constants/defaults';
 import { DEFAULT_THEME } from '../constants/themes';
+import type { UnavailabilityIconId } from '../constants/unavailability';
 import type {
   Cycle,
   Name,
@@ -90,7 +91,12 @@ interface NameActions {
   deleteList: (listId: string) => void;
   updateListTitle: (listId: string, title: string) => void;
   toggleNameExclusion: (nameId: string) => void;
-  setUnavailability: (nameId: string, from: string, until: string) => void;
+  setUnavailability: (
+    nameId: string,
+    from: string,
+    until: string,
+    icon?: UnavailabilityIconId
+  ) => void;
   clearUnavailability: (nameId: string) => void;
   clearSelections: () => void;
   resetList: () => void;
@@ -374,7 +380,12 @@ export const useNameStore = create<NameStore>()(
         });
       },
 
-      setUnavailability: (nameId: string, from: string, until: string) => {
+      setUnavailability: (
+        nameId: string,
+        from: string,
+        until: string,
+        icon?: UnavailabilityIconId
+      ) => {
         set((draft) => {
           const activeList = draft.lists.find((list) => list.id === draft.activeListId);
           const name = activeList?.names.find((n) => n.id === nameId);
@@ -382,6 +393,7 @@ export const useNameStore = create<NameStore>()(
 
           name.unavailableFrom = from;
           name.unavailableUntil = until;
+          name.unavailableIcon = icon;
           activeList.updatedAt = new Date();
         });
       },
@@ -394,6 +406,7 @@ export const useNameStore = create<NameStore>()(
 
           name.unavailableFrom = undefined;
           name.unavailableUntil = undefined;
+          name.unavailableIcon = undefined;
           activeList.updatedAt = new Date();
         });
       },
@@ -421,6 +434,7 @@ export const useNameStore = create<NameStore>()(
               name.isExcluded = false;
               name.unavailableFrom = undefined;
               name.unavailableUntil = undefined;
+              name.unavailableIcon = undefined;
             });
             activeList.updatedAt = new Date();
           }
