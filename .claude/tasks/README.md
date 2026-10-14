@@ -6,6 +6,10 @@ Quick navigation for ongoing development sessions.
 
 ## Current Session Tasks
 
+### Session 37: Unavailability Icon and Day Count (Complete ✅)
+**Summary**: [sessions/session-37-unavailability-icon-label.md](./sessions/session-37-unavailability-icon-label.md) - Optional icon preset for an unavailable person, shown with the total day count on the row
+**Status**: Tests ✅ | E2E ✅
+
 ### Session 36: Supabase Live Rooms (Complete ✅)
 **Summary**: [sessions/session-36-supabase-live-rooms.md](./sessions/session-36-supabase-live-rooms.md) - Share all lists into a live room by URL hash; edits sync between browsers over Supabase Realtime
 **Status**: Tests ✅ | E2E ✅
