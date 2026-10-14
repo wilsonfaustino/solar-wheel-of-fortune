@@ -100,7 +100,7 @@ describe('UnavailabilityDialog', () => {
       'FAMILY',
       'APPOINTMENT',
       'PTO',
-      'OTHER',
+      'DUNNO',
     ]) {
       expect(screen.getByRole('button', { name: text })).toHaveAttribute('aria-pressed', 'false');
     }

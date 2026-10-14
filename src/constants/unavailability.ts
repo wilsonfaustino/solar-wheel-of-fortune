@@ -17,7 +17,7 @@ export const UNAVAILABILITY_ICONS = [
   { id: 'family', Icon: Baby, text: 'FAMILY' },
   { id: 'appointment', Icon: Stethoscope, text: 'APPOINTMENT' },
   { id: 'pto', Icon: CalendarOff, text: 'PTO' },
-  { id: 'other', Icon: CircleHelp, text: 'OTHER' },
+  { id: 'other', Icon: CircleHelp, text: 'DUNNO' },
 ] as const;
 
 export type UnavailabilityIconId = (typeof UNAVAILABILITY_ICONS)[number]['id'];
