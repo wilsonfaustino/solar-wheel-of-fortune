@@ -26,6 +26,12 @@ export function isUnavailableToday(name: Name, today = new Date()): boolean {
 
 const MILLISECONDS_PER_DAY = 86_400_000;
 
+/** Inclusive number of days in a range of ISO days. */
+export function countRangeDays(from: string, until: string): number {
+  // Date-only ISO strings parse as UTC midnight, so daylight saving never skews the count
+  return (Date.parse(until) - Date.parse(from)) / MILLISECONDS_PER_DAY + 1;
+}
+
 export function validateUnavailabilityRange(
   from: string,
   until: string,
@@ -34,9 +40,7 @@ export function validateUnavailabilityRange(
   if (!from || !until) return 'SELECT BOTH DATES';
   if (until < from) return 'END DATE IS BEFORE START DATE';
   if (until < todayISO) return 'END DATE IS IN THE PAST';
-  // Date-only ISO strings parse as UTC midnight, so daylight saving never skews the count
-  const inclusiveDays = (Date.parse(until) - Date.parse(from)) / MILLISECONDS_PER_DAY + 1;
-  if (inclusiveDays > MAX_UNAVAILABILITY_DAYS) {
+  if (countRangeDays(from, until) > MAX_UNAVAILABILITY_DAYS) {
     return `RANGE IS LONGER THAN ${MAX_UNAVAILABILITY_DAYS} DAYS`;
   }
   return null;

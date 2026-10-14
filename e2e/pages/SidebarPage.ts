@@ -65,13 +65,19 @@ export class SidebarPage extends BasePage {
     return this.page.getByRole('dialog', { name: new RegExp(`${name} availability`, 'i') });
   }
 
-  async markUnavailableToday(name: string) {
+  rowIcon(name: string, iconText: string) {
+    return this.nameItems.filter({ hasText: name }).getByRole('img', { name: iconText });
+  }
+
+  async markUnavailableToday(name: string, iconText?: string) {
     const dialog = await this.openAvailability(name);
+    if (iconText) await dialog.getByRole('button', { name: iconText, exact: true }).click();
     await dialog.getByRole('button', { name: /today only/i }).click();
   }
 
-  async setUnavailability(name: string, from: string, until: string) {
+  async setUnavailability(name: string, from: string, until: string, iconText?: string) {
     const dialog = await this.openAvailability(name);
+    if (iconText) await dialog.getByRole('button', { name: iconText, exact: true }).click();
     await this.pickDate(dialog.getByLabel('Unavailable from'), from);
     await this.pickDate(dialog.getByLabel('Unavailable until'), until);
     await dialog.getByRole('button', { name: /^save$/i }).click();

@@ -978,6 +978,12 @@ Install Playwright extension: `ms-playwright.playwright`
 - [x] History cap per list; Supabase env vars blanked in unit tests
 - [x] Unit tests for client, rooms, sync, loader, components; two-browser E2E spec
 
+### Session 37: Unavailability Icon and Day Count (Completed)
+- [x] `Name.unavailableIcon` picked from 8 presets in `src/constants/unavailability.ts`; store `setUnavailability(nameId, from, until, icon?)`
+- [x] `ICON (OPTIONAL)` toggle grid in `UnavailabilityDialog`; tooltips on hover and focus
+- [x] Row shows icon (hover tooltip only, not focusable) and `BACK <day> · N DAYS` for multi-day ranges
+- [x] Unit tests for presets, `countRangeDays`, store, dialog, row; 3 E2E tests
+
 ### Session 5: Selection History & Export (Planned)
 - [ ] Create selection history store (extend useNameStore)
 - [ ] Create history panel component

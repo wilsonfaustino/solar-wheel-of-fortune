@@ -1,17 +1,20 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { memo, useState } from 'react';
+import { cn } from '@/lib/utils';
+import { UNAVAILABILITY_ICONS, type UnavailabilityIconId } from '../../constants/unavailability';
 import type { Name } from '../../types/name';
 import { toLocalISODay, validateUnavailabilityRange } from '../../utils/name';
 import { Button } from '../ui/button';
 import { DatePicker } from '../ui/date-picker';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 const LABEL_CLASS =
   'flex items-center justify-between gap-3 font-mono text-xs tracking-wider text-white/60';
 
 interface UnavailabilityDialogProps {
   name: Name;
-  onSave: (from: string, until: string) => void;
+  onSave: (from: string, until: string, icon?: UnavailabilityIconId) => void;
   onClear: () => void;
   onClose: () => void;
 }
@@ -28,10 +31,13 @@ function UnavailabilityDialogComponent({
   const hasCurrentRange = !!unavailableFrom && !!unavailableUntil && unavailableUntil >= today;
   const [from, setFrom] = useState(hasCurrentRange ? unavailableFrom : today);
   const [until, setUntil] = useState(hasCurrentRange ? unavailableUntil : today);
+  const [icon, setIcon] = useState<UnavailabilityIconId | undefined>(
+    hasCurrentRange ? name.unavailableIcon : undefined
+  );
   const validationError = validateUnavailabilityRange(from, until, today);
 
   const saveAndClose = (rangeFrom: string, rangeUntil: string) => {
-    onSave(rangeFrom, rangeUntil);
+    onSave(rangeFrom, rangeUntil, icon);
     onClose();
   };
 
@@ -65,6 +71,40 @@ function UnavailabilityDialogComponent({
           <Dialog.Description className="sr-only">
             Mark {name.value} unavailable for today or for a date range
           </Dialog.Description>
+
+          <p className={cn(LABEL_CLASS, 'mb-2')}>ICON (OPTIONAL)</p>
+          <TooltipProvider delayDuration={200}>
+            <div className="grid grid-cols-4 gap-2 mb-4">
+              {UNAVAILABILITY_ICONS.map(({ id, Icon, text }) => {
+                const isSelected = icon === id;
+                return (
+                  <Tooltip key={id}>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="tech-toggle"
+                        size="icon-sm"
+                        className={cn(
+                          'w-full',
+                          isSelected
+                            ? 'border-accent bg-accent-20 text-accent'
+                            : 'border-white/20 text-text/70'
+                        )}
+                        aria-label={text}
+                        aria-pressed={isSelected}
+                        onClick={() => setIcon(isSelected ? undefined : id)}
+                      >
+                        <Icon className="size-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="px-2 py-1 text-xs tracking-wider text-text">
+                      {text}
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </TooltipProvider>
 
           <Button
             type="button"

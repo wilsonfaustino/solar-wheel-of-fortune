@@ -1,6 +1,7 @@
 import { MAX_NAME_LENGTH } from '../constants/defaults';
 import type { Name } from '../types/name';
 import {
+  countRangeDays,
   filterValidNames,
   formatReturnDay,
   isUnavailableToday,
@@ -72,6 +73,24 @@ describe('isUnavailableToday', () => {
 
   it('is false when no range is set', () => {
     expect(isUnavailableToday({} as Name, today)).toBe(false);
+  });
+});
+
+describe('countRangeDays', () => {
+  it('counts a single day as 1', () => {
+    expect(countRangeDays('2026-10-13', '2026-10-13')).toBe(1);
+  });
+
+  it('counts both ends of a range', () => {
+    expect(countRangeDays('2026-10-13', '2026-10-17')).toBe(5);
+  });
+
+  it('crosses a month end', () => {
+    expect(countRangeDays('2026-10-30', '2026-11-02')).toBe(4);
+  });
+
+  it('stays exact across a daylight saving change', () => {
+    expect(countRangeDays('2026-10-31', '2026-11-04')).toBe(5);
   });
 });
 

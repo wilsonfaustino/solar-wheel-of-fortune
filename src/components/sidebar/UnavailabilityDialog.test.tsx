@@ -73,7 +73,7 @@ describe('UnavailabilityDialog', () => {
 
     await user.click(screen.getByRole('button', { name: /today only/i }));
 
-    expect(onSave).toHaveBeenCalledWith(today, today);
+    expect(onSave).toHaveBeenCalledWith(today, today, undefined);
     expect(onClose).toHaveBeenCalled();
   });
 
@@ -85,8 +85,93 @@ describe('UnavailabilityDialog', () => {
     pickDate('Unavailable until', daysFromToday(4));
     await user.click(screen.getByRole('button', { name: /^save$/i }));
 
-    expect(onSave).toHaveBeenCalledWith(daysFromToday(1), daysFromToday(4));
+    expect(onSave).toHaveBeenCalledWith(daysFromToday(1), daysFromToday(4), undefined);
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('should render one toggle button per preset', () => {
+    renderDialog();
+
+    for (const text of [
+      'VACATION',
+      'SICK',
+      'WORK TRIP',
+      'TRAINING',
+      'FAMILY',
+      'APPOINTMENT',
+      'PTO',
+      'DUNNO',
+    ]) {
+      expect(screen.getByRole('button', { name: text })).toHaveAttribute('aria-pressed', 'false');
+    }
+  });
+
+  it('should toggle an icon on and off', async () => {
+    const user = userEvent.setup();
+    renderDialog();
+    const vacation = screen.getByRole('button', { name: 'VACATION' });
+
+    await user.click(vacation);
+    expect(vacation).toHaveAttribute('aria-pressed', 'true');
+
+    await user.click(vacation);
+    expect(vacation).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('should save the selected icon with the range', async () => {
+    const user = userEvent.setup();
+    const { onSave } = renderDialog();
+
+    await user.click(screen.getByRole('button', { name: 'SICK' }));
+    await user.click(screen.getByRole('button', { name: /^save$/i }));
+
+    expect(onSave).toHaveBeenCalledWith(today, today, 'sick');
+  });
+
+  it('should save the selected icon for today only', async () => {
+    const user = userEvent.setup();
+    const { onSave } = renderDialog();
+
+    await user.click(screen.getByRole('button', { name: 'PTO' }));
+    await user.click(screen.getByRole('button', { name: /today only/i }));
+
+    expect(onSave).toHaveBeenCalledWith(today, today, 'pto');
+  });
+
+  it('should preselect the icon of the current range', () => {
+    renderDialog({
+      ...sampleNames[0],
+      unavailableFrom: today,
+      unavailableUntil: daysFromToday(2),
+      unavailableIcon: 'training',
+    });
+
+    expect(screen.getByRole('button', { name: 'TRAINING' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+  });
+
+  it('should not preselect the icon of an ended range', () => {
+    renderDialog({
+      ...sampleNames[0],
+      unavailableFrom: daysFromToday(-5),
+      unavailableUntil: daysFromToday(-1),
+      unavailableIcon: 'training',
+    });
+
+    expect(screen.getByRole('button', { name: 'TRAINING' })).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
+  });
+
+  it.each(['VACATION', 'PTO'])('should show the %s tooltip on focus', (text) => {
+    renderDialog();
+
+    fireEvent.focus(screen.getByRole('button', { name: text }));
+
+    expect(screen.getByRole('tooltip')).toHaveTextContent(text);
   });
 
   it('should clear the range and close', async () => {
