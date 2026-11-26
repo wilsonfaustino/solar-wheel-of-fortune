@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { type KeyboardEvent, memo, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import type { CycleGridDay } from '../../utils/cycle';
 
@@ -12,8 +12,9 @@ const WEEKDAY_COLUMNS = [
 
 const HATCH_NEUTRAL =
   'bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.12)_0_3px,transparent_3px_6px)]';
-const HATCH_ACCENT =
-  'bg-[repeating-linear-gradient(135deg,var(--color-accent-70)_0_3px,var(--color-accent-30)_3px_6px)]';
+// Dark stripes over the fill, so a done holiday keeps its phase colour (accent or cooldown grey).
+const HATCH_DONE =
+  'bg-[repeating-linear-gradient(135deg,rgba(0,0,0,0.4)_0_3px,transparent_3px_6px)]';
 
 function describeDay(day: CycleGridDay, weekdayName: string): string {
   const date = new Date(Date.parse(day.isoDay)).toLocaleDateString('en-US', {
@@ -34,10 +35,10 @@ function dayCellClass(day: CycleGridDay): string {
     day.isCooldown && 'border-dashed border-white/40 text-white/60',
     isHoliday && cn('border-dashed border-white/35', HATCH_NEUTRAL),
     day.progress === 'done' && 'border-accent bg-accent text-background',
-    day.progress === 'done' && day.isCooldown && 'border-white/35 bg-white/35',
-    day.progress === 'done' && isHoliday && HATCH_ACCENT,
+    day.progress === 'done' && day.isCooldown && 'border-white/35 bg-white/35 text-white',
+    day.progress === 'done' && isHoliday && HATCH_DONE,
     day.progress === 'today' &&
-      'border-2 border-solid border-accent font-bold text-accent animate-today-pulse motion-reduce:animate-none'
+      'border-2 border-accent font-bold text-accent animate-today-pulse motion-reduce:animate-none'
   );
 }
 
@@ -46,10 +47,32 @@ interface CycleDayGridProps {
   currentWeek: number;
 }
 
+/** Space scrolls the focused grid instead of reaching the global spin shortcut on window. */
+function keepSpaceInGrid(event: KeyboardEvent<HTMLElement>) {
+  if (event.code === 'Space') event.stopPropagation();
+}
+
 function CycleDayGridComponent({ rows, currentWeek }: Readonly<CycleDayGridProps>) {
+  const scrollBoxRef = useRef<HTMLElement>(null);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: rows.length re-centres the current week when the cycle changes
+  useEffect(() => {
+    const scrollBox = scrollBoxRef.current;
+    const currentRow = scrollBox?.querySelectorAll('tbody tr')[currentWeek - 1];
+    if (!scrollBox || !(currentRow instanceof HTMLElement)) return;
+    scrollBox.scrollTop = currentRow.offsetTop - scrollBox.clientHeight / 2;
+  }, [currentWeek, rows.length]);
+
   return (
     // Long cycles (a year is 50+ rows) scroll inside the block so the wheel keeps its space.
-    <div className="max-h-44 overflow-y-auto">
+    <section
+      ref={scrollBoxRef}
+      aria-label="Cycle weekday grid"
+      // biome-ignore lint/a11y/noNoninteractiveTabindex: a scroll container must take focus so keyboard users can reach clipped weeks
+      tabIndex={0}
+      onKeyDown={keepSpaceInGrid}
+      className="max-h-44 overflow-y-auto focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+    >
       <table
         data-testid="cycle-day-grid"
         aria-label="Cycle weekdays by week"
@@ -113,7 +136,7 @@ function CycleDayGridComponent({ rows, currentWeek }: Readonly<CycleDayGridProps
           })}
         </tbody>
       </table>
-    </div>
+    </section>
   );
 }
 

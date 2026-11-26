@@ -389,5 +389,22 @@ describe('CycleWidget', () => {
         process.env.TZ = originalTimeZone;
       }
     });
+
+    it('keeps Space inside the focused grid so it scrolls instead of spinning the wheel', () => {
+      vi.setSystemTime(new Date('2026-08-25T12:00:00Z'));
+      seedCycle();
+      render(<CycleWidget />);
+      const windowKeydown = vi.fn();
+      globalThis.addEventListener('keydown', windowKeydown);
+
+      const gridRegion = screen.getByRole('region', { name: 'Cycle weekday grid' });
+      fireEvent.keyDown(gridRegion, { code: 'Space', key: ' ' });
+      fireEvent.keyDown(gridRegion, { code: 'ArrowDown', key: 'ArrowDown' });
+      globalThis.removeEventListener('keydown', windowKeydown);
+
+      expect(gridRegion).toHaveAttribute('tabindex', '0');
+      expect(windowKeydown).toHaveBeenCalledTimes(1);
+      expect(windowKeydown.mock.calls[0][0].code).toBe('ArrowDown');
+    });
   });
 });
