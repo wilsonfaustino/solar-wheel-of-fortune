@@ -13,7 +13,9 @@ const WEEKDAY_COLUMNS = [
 const HATCH_NEUTRAL =
   'bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.12)_0_3px,transparent_3px_6px)]';
 // Dark stripes over the fill, so a done holiday keeps its phase colour (accent or cooldown grey).
-const HATCH_DONE =
+const HATCH_DONE_BUILD =
+  'bg-[repeating-linear-gradient(135deg,rgba(0,0,0,0.2)_0_3px,transparent_3px_6px)]';
+const HATCH_DONE_COOLDOWN =
   'bg-[repeating-linear-gradient(135deg,rgba(0,0,0,0.4)_0_3px,transparent_3px_6px)]';
 
 function describeDay(day: CycleGridDay, weekdayName: string): string {
@@ -36,7 +38,9 @@ function dayCellClass(day: CycleGridDay): string {
     isHoliday && cn('border-dashed border-white/35', HATCH_NEUTRAL),
     day.progress === 'done' && 'border-accent bg-accent text-background',
     day.progress === 'done' && day.isCooldown && 'border-white/35 bg-white/35 text-white',
-    day.progress === 'done' && isHoliday && HATCH_DONE,
+    day.progress === 'done' &&
+      isHoliday &&
+      (day.isCooldown ? HATCH_DONE_COOLDOWN : HATCH_DONE_BUILD),
     day.progress === 'today' &&
       'border-2 border-accent font-bold text-accent animate-today-pulse motion-reduce:animate-none'
   );
@@ -55,13 +59,13 @@ function keepSpaceInGrid(event: KeyboardEvent<HTMLElement>) {
 function CycleDayGridComponent({ rows, currentWeek }: Readonly<CycleDayGridProps>) {
   const scrollBoxRef = useRef<HTMLElement>(null);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: rows.length re-centres the current week when the cycle changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a new rows array (another list or cycle) re-centres the current week
   useEffect(() => {
     const scrollBox = scrollBoxRef.current;
     const currentRow = scrollBox?.querySelectorAll('tbody tr')[currentWeek - 1];
     if (!scrollBox || !(currentRow instanceof HTMLElement)) return;
     scrollBox.scrollTop = currentRow.offsetTop - scrollBox.clientHeight / 2;
-  }, [currentWeek, rows.length]);
+  }, [currentWeek, rows]);
 
   return (
     // Long cycles (a year is 50+ rows) scroll inside the block so the wheel keeps its space.
@@ -80,11 +84,15 @@ function CycleDayGridComponent({ rows, currentWeek }: Readonly<CycleDayGridProps
       >
         <thead>
           <tr>
-            <th scope="col" className="w-6">
+            <th scope="col" className="sticky top-0 w-6 bg-background">
               <span className="sr-only">Week</span>
             </th>
             {WEEKDAY_COLUMNS.map((column) => (
-              <th key={column.id} scope="col" className="text-[9px] font-normal text-text/60">
+              <th
+                key={column.id}
+                scope="col"
+                className="sticky top-0 bg-background text-[9px] font-normal text-text/60"
+              >
                 {column.letter}
               </th>
             ))}
