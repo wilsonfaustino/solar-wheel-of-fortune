@@ -23,6 +23,13 @@
   /* Glitch animation utilities */
   --animate-glitch-1: glitch-1 5.5s linear infinite;
   --animate-glitch-2: glitch-2 5.5s linear infinite;
+  --animate-today-pulse: today-pulse 1.6s ease-in-out infinite;
+
+  @keyframes today-pulse {
+    50% {
+      box-shadow: 0 0 0 3px var(--color-accent-20);
+    }
+  }
 
   @keyframes glitch-1 {
     /* Active glitch: 0% to ~9% (0.5s of 5.5s) */

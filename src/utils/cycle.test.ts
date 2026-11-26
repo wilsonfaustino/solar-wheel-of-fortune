@@ -2,6 +2,7 @@ import type { Cycle } from '../types/name';
 import {
   formatShortDay,
   getCooldownRange,
+  getCycleDayGrid,
   getCycleStatus,
   getWeekdaysPerWeek,
   isWeekday,
@@ -159,5 +160,105 @@ describe('getWeekdaysPerWeek', () => {
 
   it('is empty for a span holding no weekdays', () => {
     expect(getWeekdaysPerWeek({ ...cycle, start: '2026-09-05', end: '2026-09-06' })).toEqual([]);
+  });
+});
+
+describe('getCycleDayGrid', () => {
+  const isoDaysOf = (row: ReturnType<typeof getCycleDayGrid>[number]) =>
+    row.map((slot) => slot?.isoDay ?? null);
+
+  it('has one row per calendar week, with null slots before a mid-week start', () => {
+    const grid = getCycleDayGrid(cycle, '2026-08-11', []);
+
+    expect(grid).toHaveLength(8);
+    expect(isoDaysOf(grid[0])).toEqual([
+      null,
+      '2026-08-11',
+      '2026-08-12',
+      '2026-08-13',
+      '2026-08-14',
+    ]);
+    expect(isoDaysOf(grid[7])).toEqual([
+      '2026-09-28',
+      '2026-09-29',
+      '2026-09-30',
+      '2026-10-01',
+      '2026-10-02',
+    ]);
+  });
+
+  it('leaves null slots after a mid-week end', () => {
+    const grid = getCycleDayGrid({ ...cycle, start: '2026-08-17', end: '2026-08-25' }, '', []);
+
+    expect(grid).toHaveLength(2);
+    expect(isoDaysOf(grid[1])).toEqual(['2026-08-24', '2026-08-25', null, null, null]);
+  });
+
+  it('adds no row for a weekend before the first weekday', () => {
+    const grid = getCycleDayGrid({ ...cycle, start: '2026-08-15', end: '2026-08-21' }, '', []);
+
+    expect(grid).toHaveLength(1);
+    expect(isoDaysOf(grid[0])).toEqual([
+      '2026-08-17',
+      '2026-08-18',
+      '2026-08-19',
+      '2026-08-20',
+      '2026-08-21',
+    ]);
+  });
+
+  it('marks days before today done, today today, and the rest upcoming', () => {
+    const [week] = getCycleDayGrid(
+      { ...cycle, start: '2026-08-17', end: '2026-08-21' },
+      '2026-08-19',
+      []
+    );
+
+    expect(week.map((slot) => slot?.progress)).toEqual([
+      'done',
+      'done',
+      'today',
+      'upcoming',
+      'upcoming',
+    ]);
+  });
+
+  it('flags cooldown from the first weekday on or after the cooldown start', () => {
+    const days = getCycleDayGrid(cycle, '2026-08-11', []).flat();
+    const byDay = (isoDay: string) => days.find((slot) => slot?.isoDay === isoDay);
+
+    // Cooldown opens on Sat SEP 19, so Fri SEP 18 is the last build day.
+    expect(byDay('2026-09-18')?.isCooldown).toBe(false);
+    expect(byDay('2026-09-21')?.isCooldown).toBe(true);
+    expect(byDay('2026-10-02')?.isCooldown).toBe(true);
+  });
+
+  it('flags no cooldown day when the cycle has zero cooldown weeks', () => {
+    const days = getCycleDayGrid({ ...cycle, cooldownWeeks: 0 }, '2026-08-11', []).flat();
+
+    expect(days.some((slot) => slot?.isCooldown)).toBe(false);
+  });
+
+  it('marks overlapping events, and a holiday wins over a plain event', () => {
+    const [week] = getCycleDayGrid({ ...cycle, start: '2026-08-17', end: '2026-08-21' }, '', [
+      { id: 'e1', name: 'Demo day', start: '2026-08-18', end: '2026-08-19' },
+      { id: 'e2', name: 'Founders day', start: '2026-08-19', end: '2026-08-19', isHoliday: true },
+    ]);
+
+    expect(week[0]).toMatchObject({ eventKind: null, eventNames: [] });
+    expect(week[1]).toMatchObject({ eventKind: 'event', eventNames: ['Demo day'] });
+    expect(week[2]).toMatchObject({
+      eventKind: 'holiday',
+      eventNames: ['Demo day', 'Founders day'],
+    });
+    expect(week[3]).toMatchObject({ eventKind: null, eventNames: [] });
+  });
+
+  it('marks no cell for an event that covers only a weekend', () => {
+    const days = getCycleDayGrid({ ...cycle, start: '2026-08-17', end: '2026-08-25' }, '', [
+      { id: 'e1', name: 'Offsite', start: '2026-08-22', end: '2026-08-23' },
+    ]).flat();
+
+    expect(days.some((slot) => slot?.eventKind)).toBe(false);
   });
 });

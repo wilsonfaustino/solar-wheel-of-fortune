@@ -1,4 +1,4 @@
-import type { Cycle, CycleStatus } from '../types/name';
+import type { Cycle, CycleStatus, SpecialEvent } from '../types/name';
 
 const MS_PER_DAY = 86_400_000;
 
@@ -54,13 +54,9 @@ function mondayOf(isoDay: string): string {
   return toISODay(new Date(Date.parse(isoDay) - daysSinceMonday * MS_PER_DAY));
 }
 
-/**
- * Weekdays per calendar week covered by the cycle, in order. Blocks follow Mon-Fri rather than
- * running five weekdays from the start date, so no block steps over a weekend.
- * A cycle opening or closing mid-week gives a short first or last entry.
- */
-export function getWeekdaysPerWeek(cycle: Cycle): number[] {
-  const counts: number[] = [];
+/** The cycle's weekdays grouped by calendar week (Mon-Fri), in order. */
+function weekdaysByCalendarWeek(cycle: Cycle): string[][] {
+  const weeks: string[][] = [];
   let currentMonday = '';
 
   for (let ms = Date.parse(cycle.start); ms <= Date.parse(cycle.end); ms += MS_PER_DAY) {
@@ -70,11 +66,65 @@ export function getWeekdaysPerWeek(cycle: Cycle): number[] {
     const monday = mondayOf(isoDay);
     if (monday !== currentMonday) {
       currentMonday = monday;
-      counts.push(0);
+      weeks.push([]);
     }
-    counts[counts.length - 1] += 1;
+    weeks[weeks.length - 1].push(isoDay);
   }
-  return counts;
+  return weeks;
+}
+
+/**
+ * Weekdays per calendar week covered by the cycle, in order. Blocks follow Mon-Fri rather than
+ * running five weekdays from the start date, so no block steps over a weekend.
+ * A cycle opening or closing mid-week gives a short first or last entry.
+ */
+export function getWeekdaysPerWeek(cycle: Cycle): number[] {
+  return weekdaysByCalendarWeek(cycle).map((week) => week.length);
+}
+
+export type CycleDayProgress = 'done' | 'today' | 'upcoming';
+
+export interface CycleGridDay {
+  isoDay: string;
+  progress: CycleDayProgress;
+  isCooldown: boolean;
+  /** Holiday wins when a holiday and a plain event both cover the day. */
+  eventKind: 'holiday' | 'event' | null;
+  eventNames: string[];
+}
+
+function toProgress(isoDay: string, todayISO: string): CycleDayProgress {
+  if (isoDay < todayISO) return 'done';
+  return isoDay === todayISO ? 'today' : 'upcoming';
+}
+
+/** Rows are calendar weeks; each row has 5 slots Mon-Fri, null for weekdays outside the cycle (short first/last week). */
+export function getCycleDayGrid(
+  cycle: Cycle,
+  todayISO: string,
+  events: SpecialEvent[]
+): (CycleGridDay | null)[][] {
+  // A zero-week cooldown starts the day after the cycle ends, so no cycle day is flagged.
+  const cooldownStart = getCooldownRange(cycle).start;
+
+  return weekdaysByCalendarWeek(cycle).map((week) => {
+    const slots: (CycleGridDay | null)[] = [null, null, null, null, null];
+    for (const isoDay of week) {
+      const overlapping = events.filter((event) => event.start <= isoDay && isoDay <= event.end);
+      let eventKind: CycleGridDay['eventKind'] = null;
+      if (overlapping.some((event) => event.isHoliday)) eventKind = 'holiday';
+      else if (overlapping.length > 0) eventKind = 'event';
+
+      slots[daysBetween(mondayOf(isoDay), isoDay)] = {
+        isoDay,
+        progress: toProgress(isoDay, todayISO),
+        isCooldown: isoDay >= cooldownStart,
+        eventKind,
+        eventNames: overlapping.map((event) => event.name),
+      };
+    }
+    return slots;
+  });
 }
 
 /** 1-based calendar week holding the nth elapsed weekday. */
