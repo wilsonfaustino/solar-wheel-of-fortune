@@ -3,10 +3,11 @@ import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import { selectActiveList, useNameStore } from '../../stores/useNameStore';
 import type { EventOverlap } from '../../types/name';
-import { getCycleStatus } from '../../utils/cycle';
+import { getCycleDayGrid, getCycleStatus } from '../../utils/cycle';
 import { getEventOverlaps } from '../../utils/event';
 import { toLocalISODay } from '../../utils/name';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { CycleDayGrid } from './CycleDayGrid';
 
 function formatDays(days: number): string {
   return `${days} ${days === 1 ? 'DAY' : 'DAYS'}`;
@@ -141,14 +142,21 @@ function CycleWidgetComponent() {
     [lists, activeListId]
   );
 
+  const todayISO = toLocalISODay(new Date());
+
   const status = useMemo(
-    () => getCycleStatus(activeList?.cycles ?? [], toLocalISODay(new Date())),
-    [activeList]
+    () => getCycleStatus(activeList?.cycles ?? [], todayISO),
+    [activeList, todayISO]
   );
 
   const overlaps = useMemo(
     () => (status ? getEventOverlaps(status.cycle, activeList?.events ?? []) : []),
     [status, activeList]
+  );
+
+  const dayGrid = useMemo(
+    () => (status ? getCycleDayGrid(status.cycle, todayISO, activeList?.events ?? []) : []),
+    [status, todayISO, activeList]
   );
 
   if (!status) return null;
@@ -194,23 +202,73 @@ function CycleWidgetComponent() {
         </span>
       </div>
 
-      <div className="flex items-end justify-between gap-4">
-        <div className="flex items-baseline gap-2.5">
-          <span className="text-4xl font-bold leading-none text-text">
-            {isCooldown ? `DAY ${status.dayOfPhase}` : `WEEK ${status.weekOfCycle}`}
-          </span>
-          <span className="text-lg font-light text-text/35">
-            / {isCooldown ? status.totalPhaseDays : status.totalCycleWeeks}
-          </span>
+      <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-center">
+        <div className="flex flex-col gap-3.5">
+          <div className="flex items-end justify-between gap-4">
+            <div className="flex items-baseline gap-2.5">
+              <span className="text-4xl font-bold leading-none text-text">
+                {isCooldown ? `DAY ${status.dayOfPhase}` : `WEEK ${status.weekOfCycle}`}
+              </span>
+              <span className="text-lg font-light text-text/35">
+                / {isCooldown ? status.totalPhaseDays : status.totalCycleWeeks}
+              </span>
+            </div>
+            <span
+              className={cn(
+                'text-3xl font-medium leading-none',
+                isCooldown ? 'text-text/70' : 'text-accent'
+              )}
+            >
+              {status.percentComplete}%
+            </span>
+          </div>
+
+          <div className="flex flex-wrap gap-x-6 gap-y-3 border-t border-white/8 pt-3">
+            {isCooldown ? (
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] tracking-[0.2em] text-text/35">COOLDOWN LEFT</span>
+                <span className="text-lg font-medium text-text">
+                  {formatDays(status.daysToCycleEnd)}
+                </span>
+              </div>
+            ) : (
+              <>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[10px] tracking-[0.2em] text-text/35">TO COOLDOWN</span>
+                  <span className="text-lg font-medium text-text">
+                    {formatDays(status.daysToCooldownStart)}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[10px] tracking-[0.2em] text-text/35">TO CYCLE END</span>
+                  <span className="text-lg font-medium text-text/60">
+                    {formatDays(status.daysToCycleEnd)}
+                  </span>
+                </div>
+              </>
+            )}
+
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] tracking-[0.2em] text-text/35">WEEKDAYS</span>
+              <span data-testid="cycle-weekday-count" className="text-lg font-medium text-text/60">
+                {weekdayOfCycle} / {totalCycleWeekdays}
+              </span>
+            </div>
+
+            {isCooldown && status.nextCycle && (
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] tracking-[0.2em] text-text/35">
+                  NEXT — {status.nextCycle.cycle.name.toUpperCase()} ·{' '}
+                  {status.nextCycle.cycle.start}
+                </span>
+                <span className="text-lg font-medium text-accent">
+                  STARTS IN {formatDays(status.nextCycle.daysUntilStart)}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
-        <span
-          className={cn(
-            'text-3xl font-medium leading-none',
-            isCooldown ? 'text-text/70' : 'text-accent'
-          )}
-        >
-          {status.percentComplete}%
-        </span>
+        <CycleDayGrid rows={dayGrid} currentWeek={status.weekOfCycle} />
       </div>
 
       <div className="flex flex-col gap-2">
@@ -282,50 +340,6 @@ function CycleWidgetComponent() {
           {cooldownWeekdays > 0 && <span>COOLDOWN START</span>}
           <span>CYCLE END</span>
         </div>
-      </div>
-
-      <div className="flex gap-6 border-t border-white/8 pt-3">
-        {isCooldown ? (
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] tracking-[0.2em] text-text/35">COOLDOWN LEFT</span>
-            <span className="text-lg font-medium text-text">
-              {formatDays(status.daysToCycleEnd)}
-            </span>
-          </div>
-        ) : (
-          <>
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] tracking-[0.2em] text-text/35">TO COOLDOWN</span>
-              <span className="text-lg font-medium text-text">
-                {formatDays(status.daysToCooldownStart)}
-              </span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] tracking-[0.2em] text-text/35">TO CYCLE END</span>
-              <span className="text-lg font-medium text-text/60">
-                {formatDays(status.daysToCycleEnd)}
-              </span>
-            </div>
-          </>
-        )}
-
-        <div className="flex flex-col gap-1">
-          <span className="text-[10px] tracking-[0.2em] text-text/35">WEEKDAYS</span>
-          <span data-testid="cycle-weekday-count" className="text-lg font-medium text-text/60">
-            {weekdayOfCycle} / {totalCycleWeekdays}
-          </span>
-        </div>
-
-        {isCooldown && status.nextCycle && (
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] tracking-[0.2em] text-text/35">
-              NEXT — {status.nextCycle.cycle.name.toUpperCase()} · {status.nextCycle.cycle.start}
-            </span>
-            <span className="text-lg font-medium text-accent">
-              STARTS IN {formatDays(status.nextCycle.daysUntilStart)}
-            </span>
-          </div>
-        )}
       </div>
     </div>
   );

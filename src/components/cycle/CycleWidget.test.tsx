@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { useNameStore } from '../../stores/useNameStore';
 import { CycleWidget } from './CycleWidget';
 
@@ -271,5 +271,123 @@ describe('CycleWidget', () => {
     expect(launch.className).toContain('border-accent');
     expect(holiday).toHaveAttribute('data-holiday', 'true');
     expect(holiday.className).toContain('border-dashed');
+  });
+
+  describe('weekday grid', () => {
+    const dayCells = () => screen.getAllByTestId('cycle-day-cell');
+    const cellFor = (label: string) =>
+      dayCells().find((cell) => cell.getAttribute('aria-label')?.startsWith(`${label},`));
+
+    it('shows one labelled row per calendar week, short where the cycle starts mid-week', () => {
+      vi.setSystemTime(new Date('2026-08-25T12:00:00Z'));
+      seedCycle();
+      render(<CycleWidget />);
+
+      const grid = screen.getByTestId('cycle-day-grid');
+      const rowLabels = within(grid).getAllByRole('rowheader');
+      expect(rowLabels.map((label) => label.textContent)).toEqual([
+        'W1',
+        'W2',
+        'W3',
+        'W4',
+        'W5',
+        'W6',
+        'W7',
+        'W8',
+      ]);
+      expect(rowLabels[2].className).toContain('text-accent');
+      expect(rowLabels[1].className).not.toContain('text-accent');
+
+      // AUG 11 is a Tuesday, so the first row leaves the Monday slot empty.
+      const firstRow = rowLabels[0].closest('tr') as HTMLElement;
+      expect(within(firstRow).getAllByTestId('cycle-day-cell')).toHaveLength(4);
+      expect(dayCells()).toHaveLength(39);
+    });
+
+    it('marks past weekdays done, today, and the rest upcoming', () => {
+      vi.setSystemTime(new Date('2026-08-25T12:00:00Z'));
+      seedCycle();
+      render(<CycleWidget />);
+
+      const progress = dayCells().map((cell) => cell.getAttribute('data-progress'));
+      expect(progress.filter((value) => value === 'done')).toHaveLength(10);
+      expect(progress.filter((value) => value === 'upcoming')).toHaveLength(28);
+      expect(cellFor('Tue Aug 25')).toHaveAttribute('data-progress', 'today');
+      expect(cellFor('Tue Aug 25')).toHaveAttribute('aria-label', 'Tue Aug 25, today');
+      expect(cellFor('Tue Aug 25')).toHaveTextContent('25');
+    });
+
+    it('flags the cooldown weekdays', () => {
+      vi.setSystemTime(new Date('2026-08-25T12:00:00Z'));
+      seedCycle();
+      render(<CycleWidget />);
+
+      const cooldownCells = dayCells().filter(
+        (cell) => cell.getAttribute('data-cooldown') === 'true'
+      );
+      expect(cooldownCells).toHaveLength(10);
+      expect(cellFor('Fri Sep 18')).toHaveAttribute('data-cooldown', 'false');
+      expect(cellFor('Mon Sep 21')).toHaveAttribute('aria-label', 'Mon Sep 21, upcoming, cooldown');
+    });
+
+    it('keeps the grid in the cooldown phase with today inside the cooldown', () => {
+      vi.setSystemTime(new Date('2026-09-24T12:00:00Z'));
+      seedCycle();
+      render(<CycleWidget />);
+
+      expect(screen.getByText('COOLDOWN')).toBeInTheDocument();
+      expect(cellFor('Thu Sep 24')).toHaveAttribute('aria-label', 'Thu Sep 24, today, cooldown');
+    });
+
+    it('marks event and holiday days and names them', () => {
+      vi.setSystemTime(new Date('2026-09-01T12:00:00Z'));
+      seedCycle();
+      useNameStore.setState((current) => ({
+        lists: current.lists.map((list) => ({
+          ...list,
+          events: [
+            { id: 'e1', name: 'Launch Day', start: '2026-09-01', end: '2026-09-03' },
+            {
+              id: 'e2',
+              name: 'Independence',
+              start: '2026-09-03',
+              end: '2026-09-07',
+              isHoliday: true,
+            },
+          ],
+        })),
+      }));
+      render(<CycleWidget />);
+
+      expect(cellFor('Tue Sep 1')).toHaveAttribute('data-event', 'event');
+      expect(cellFor('Tue Sep 1')).toHaveAttribute(
+        'aria-label',
+        'Tue Sep 1, today, event: Launch Day'
+      );
+      expect(cellFor('Tue Sep 1')).toHaveAttribute('title', 'Launch Day');
+      expect(cellFor('Thu Sep 3')).toHaveAttribute('data-event', 'holiday');
+      expect(cellFor('Thu Sep 3')).toHaveAttribute(
+        'aria-label',
+        'Thu Sep 3, upcoming, holiday: Launch Day, Independence'
+      );
+      expect(cellFor('Mon Sep 7')).toHaveAttribute('data-event', 'holiday');
+      expect(cellFor('Tue Sep 8')).toHaveAttribute('data-event', 'none');
+      expect(cellFor('Tue Sep 8')).not.toHaveAttribute('title');
+    });
+
+    it('puts today on the local day late in the evening, when UTC is already tomorrow', () => {
+      const originalTimeZone = process.env.TZ;
+      process.env.TZ = 'America/Sao_Paulo';
+      try {
+        vi.setSystemTime(new Date('2026-08-25T23:30:00-03:00'));
+        seedCycle();
+        render(<CycleWidget />);
+
+        expect(cellFor('Tue Aug 25')).toHaveAttribute('data-progress', 'today');
+        expect(screen.getByText('WEEK 3')).toBeInTheDocument();
+      } finally {
+        process.env.TZ = originalTimeZone;
+      }
+    });
   });
 });
